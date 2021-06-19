@@ -1,0 +1,497 @@
+<object-stream>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>2</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>2</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>0</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+        <left reference=".."/>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">1</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">1</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">1</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>2</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+        <right reference="../.."/>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>2</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>1</height>
+      <size>1</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right reference="../left"/>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>1</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">0</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">0</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">1</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../.."/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">1</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>1</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList/>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <height>0</height>
+      <size>0</size>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+  <casestudies.motivation.AvlTreeList>
+    <root>
+      <value class="int">2</value>
+      <height>2</height>
+      <size>2</size>
+      <left>
+        <height>0</height>
+        <size>0</size>
+      </left>
+      <right>
+        <value class="int">2</value>
+        <height>1</height>
+        <size>2</size>
+        <left reference="../../left"/>
+        <right reference="../../left"/>
+      </right>
+    </root>
+  </casestudies.motivation.AvlTreeList>
+</object-stream>

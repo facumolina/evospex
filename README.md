@@ -1,2 +1,10 @@
-# evospex
-EvoSpex: Learning Postconditions with Evolutionary Computation
+# EvoSpex
+
+## Installation
+`./setup.sh`
+
+`mvn clean compile assembly:single`
+
+## Usage
+
+TBD

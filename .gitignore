@@ -1,0 +1,10 @@
+ustive-gen/learning-spec/
+field-exhaustive-gen/alloy/
+field-exhaustive-gen/instances/
+/target/
+.project
+.classpath
+.settings/
+output/
+**/.DS_Store
+bin/
