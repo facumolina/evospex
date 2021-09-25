@@ -1,5 +1,10 @@
 # EvoSpex
 
+## Requirements
+* Maven
+* Java 8
+
+
 ## Installation
 `./setup.sh`
 
