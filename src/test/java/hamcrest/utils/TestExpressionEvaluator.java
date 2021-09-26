@@ -219,13 +219,7 @@ public class TestExpressionEvaluator {
     NodeCachingLinkedList<Object> nodeCachingLinkedListGA0 = new NodeCachingLinkedList<Object>();
     int int0 = 2060;
     boolean boolean0 = nodeCachingLinkedListGA0.addFirst(nodeCachingLinkedListGA0);
-    // Integer integer0 = new Integer(int0);
-    // boolean boolean1 = nodeCachingLinkedListGA0.addLast(integer0);
-    // boolean boolean2 = nodeCachingLinkedListGA0.addLast(integer0);
-    nodeCachingLinkedListGA0.hashCode();
-    // assert ((ExpressionEvaluator.evaluateSetMembership(integer0, "this . header . * next .
-    // value",
-    // nodeCachingLinkedListGA0)));
+    //nodeCachingLinkedListGA0.hashCode();
   }
 
   @Test
