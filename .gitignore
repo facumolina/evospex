@@ -1,10 +1,17 @@
+# Folders and files
 ustive-gen/learning-spec/
 field-exhaustive-gen/alloy/
 field-exhaustive-gen/instances/
 /target/
+bin/
+output/
+**/.DS_Store
+
+# Eclipse stuff
 .project
 .classpath
 .settings/
-output/
-**/.DS_Store
-bin/
+
+# IntelliJ stuff
+.idea/
+evospex.iml
