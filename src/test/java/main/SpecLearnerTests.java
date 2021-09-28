@@ -105,7 +105,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyLinkedListDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyLinkedListDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyLinkedListDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -114,7 +114,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyLinkedListDYN3Instances() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyLinkedListDYN3Instances.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyLinkedListDYN3Instances.als");
     assertTrue(r == 1);
   }
 
@@ -123,7 +123,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyLinkedListDYN5() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyLinkedListDYN5.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyLinkedListDYN5.als");
     assertTrue(r == 1);
   }
 
@@ -132,7 +132,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyLinkedListDYN8() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyLinkedListDYN8.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyLinkedListDYN8.als");
     assertTrue(r == 1);
   }
 
@@ -141,7 +141,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyLinkedListDYN10() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyLinkedListDYN10.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyLinkedListDYN10.als");
     assertTrue(r == 1);
   }
 
@@ -152,7 +152,7 @@ public class SpecLearnerTests {
   public void testSinglySortedLinkedListDYN3() throws Exception {
     EvoSpexParameters params = new EvoSpexParameters();
     params.setMutationProbabilty(0.01);
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglySortedLinkedListDYN3.als",
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglySortedLinkedListDYN3.als",
         params);
     assertTrue(r == 1);
   }
@@ -162,7 +162,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testBinaryTreeDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/BinaryTreeDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/BinaryTreeDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -171,7 +171,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testBinaryTreeDYN5() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/BinaryTreeDYN5.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/BinaryTreeDYN5.als");
     assertTrue(r == 1);
   }
 
@@ -180,7 +180,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testBinarySearchTreeDYN5() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/BinarySearchTreeDYN5.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/BinarySearchTreeDYN5.als");
     assertTrue(r == 1);
   }
 
@@ -191,7 +191,7 @@ public class SpecLearnerTests {
   public void testRedBlackTreeWithoutPathsPropertyDYN3() throws Exception {
     ConfigurationProperties.setIntEvaluations("false");
     int r = EvoSpex
-        .processFile("src/test/resources/specs/RedBlackTreeWithoutPathsPropertyDYN3.als");
+        .processClass("src/test/resources/specs/RedBlackTreeWithoutPathsPropertyDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -202,7 +202,7 @@ public class SpecLearnerTests {
   public void testRedBlackTreeWithoutPathsPropertyDYN5() throws Exception {
     ConfigurationProperties.setIntEvaluations("false");
     int r = EvoSpex
-        .processFile("src/test/resources/specs/RedBlackTreeWithoutPathsPropertyDYN5.als");
+        .processClass("src/test/resources/specs/RedBlackTreeWithoutPathsPropertyDYN5.als");
     assertTrue(r == 1);
   }
 
@@ -211,7 +211,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testBinaryHeapDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/BinaryHeapDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/BinaryHeapDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -220,7 +220,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testDagDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/DagDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/DagDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -229,7 +229,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testSinglyCircularListDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/SinglyCircularListDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/SinglyCircularListDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -238,7 +238,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testDoublyLinkedListDYN3() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/DoublyLinkedListDYN3.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/DoublyLinkedListDYN3.als");
     assertTrue(r == 1);
   }
 
@@ -247,7 +247,7 @@ public class SpecLearnerTests {
    */
   @Test
   public void testDoublyLinkedListDYN5() throws Exception {
-    int r = EvoSpex.processFile("src/test/resources/specs/DoublyLinkedListDYN5.als");
+    int r = EvoSpex.processClass("src/test/resources/specs/DoublyLinkedListDYN5.als");
     assertTrue(r == 1);
   }
 
