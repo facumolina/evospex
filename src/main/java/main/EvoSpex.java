@@ -5,11 +5,11 @@ import org.jgap.InvalidConfigurationException;
 import utils.EvoSpexParameters;
 
 /**
- * Main class with the main methods. It takes an Alloy file containing a repOKOK pred which is a
- * representation invariant of some data structure, and also contains a repOK pred which is empty
- * and will be filled with a representation invariant equivalent to the repOKOK.
- * 
- * @author fmolina
+ * Class main.EvoSpex is the main class of the system. It allows to start the evolutionary process
+ * from a given target class that has only one method with the statement assert(true); denoting the
+ * place in which the inferred postcondition it is supposed to be produced.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class EvoSpex {
 
@@ -29,9 +29,11 @@ public class EvoSpex {
     try {
       if (args.length < 4) {
         System.out.println(
-            "Error: correct usage is ./evospex.sh file.als methodObjsFolder numArgs numOutputs ['popSize=n' 'gens=g' 'mp=m' 'cp=c' 'to=sec']");
+            "Error: correct usage is ./evospex.sh class_name method_name methods_object_folder ['popSize=n' 'gens=g' 'mp=m' 'cp=c' 'to=sec']");
+        System.out.println();
+        System.out.println("Example: ./evospex.sh casestudies.motivation.AvlTreeList clear src/test/resources/objects/AvlTreeList/clear\\\\\\(\\\\\\)/3/");
       } else {
-        String className = args[0];
+        String fqname = args[0];
         String baseFolder = args[1];
         int numArgs = Integer.parseInt(args[2]);
         int numOutputs = Integer.parseInt(args[3]);
@@ -69,7 +71,7 @@ public class EvoSpex {
         params.setArgumentsNumber(numArgs);
         params.setOutputsNumber(numOutputs);
         params.setBuildBigAndChromosome(false);
-        processFile(className, params);
+        processClass(fqname, params);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -79,7 +81,7 @@ public class EvoSpex {
   /**
    * Process the given file
    */
-  public static int processFile(String filePath) throws Exception {
+  public static int processClass(String filePath) throws Exception {
     System.out.println("Starting learning process for: " + filePath);
     EvoSpexParameters params = new EvoSpexParameters();
     EvoSpexGA learner = new EvoSpexGA(filePath, params);
@@ -92,8 +94,8 @@ public class EvoSpex {
    * 
    * @throws InvalidConfigurationException
    */
-  public static int processFile(String filePath, String inputsFile, String positivesFile,
-      String negativesFile) throws Exception {
+  public static int processClass(String filePath, String inputsFile, String positivesFile,
+                                 String negativesFile) throws Exception {
     System.out.println("Starting learning process for: " + filePath);
     EvoSpexParameters params = new EvoSpexParameters();
     params.setInputsFilename(inputsFile);
@@ -109,7 +111,7 @@ public class EvoSpex {
    * 
    * @throws InvalidConfigurationException
    */
-  public static int processFile(String className, String baseFolder, int numArgs, int numOutputs)
+  public static int processClass(String className, String baseFolder, int numArgs, int numOutputs)
       throws Exception {
     String filePath = "src/test/resources/specs/" + className + ".als";
     System.out.println("Starting learning process for: " + filePath);
@@ -119,8 +121,8 @@ public class EvoSpex {
     params.setOutputsNumber(numOutputs);
     params.setPopulationSize(200);
     params.setBuildBigAndChromosome(false);
-    EvoSpexGA learner = new EvoSpexGA(filePath, "", params);
-    learner.learnPostCondition();
+    //EvoSpexGA learner = new EvoSpexGA(filePath, "", params);
+    //learner.learnPostCondition();
     return 1;
   }
 
@@ -129,10 +131,32 @@ public class EvoSpex {
    * 
    * @throws InvalidConfigurationException
    */
-  public static int processFile(String filePath, EvoSpexParameters params) throws Exception {
-    System.out.println("Starting learning process for: " + filePath);
-    EvoSpexGA learner = new EvoSpexGA(filePath, "", params);
+  public static int processClass(String targetClassName, EvoSpexParameters params) throws Exception {
+    System.out.println("EvoSpex 1.0.0");
+    Class<?> targetClass = getTargetClass(targetClassName);
+
+    if (targetClass==null) {
+      System.out.println("The target class " + targetClassName + " can't be loaded. Is it in the classpath?");
+      return 0;
+    }
+
+    System.out.println("target class: " + targetClass.getName());
+    // TODO find the method that contains the assert(true) statement
+    System.out.println("target method: ...");
+    EvoSpexGA learner = new EvoSpexGA(targetClass, "", params);
     learner.learnPostCondition();
     return 1;
   }
+
+  /**
+   * Load and return the target class or null if can't be loaded
+   */
+  private static Class<?> getTargetClass(String targetClassName) {
+    try {
+      return Class.forName(targetClassName);
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
+  }
+
 }
