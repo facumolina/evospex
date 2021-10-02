@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import org.jgap.InvalidConfigurationException;
 

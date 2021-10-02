@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import main.ConfigurationProperties;
+import evospex.ConfigurationProperties;
 import rfm.dynalloy.A4Reporter;
 import rfm.dynalloy.ConstList;
 import rfm.dynalloy.Err;
@@ -38,7 +38,7 @@ import rfm.dynalloyCompiler.parser.CompUtil;
 import rfm.dynalloyCompiler.translator.A4Options;
 import rfm.dynalloyCompiler.translator.A4Solution;
 import rfm.dynalloyCompiler.translator.TranslateAlloyToKodkod;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.DynAlloyExpressionsUtils;
 
 /**
@@ -710,8 +710,8 @@ public class DynAlloyRunner extends Runner {
    * @return a new data structure information from the list of declarations in the main predicate
    * @throws Err
    */
-  public ContextInformation getStructureInformation() throws Err {
-    return new ContextInformation(decls, commands);
+  public TargetInformation getStructureInformation() throws Err {
+    return new TargetInformation(decls, commands);
   }
 
   /**

@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,10 +29,9 @@ import report.Report;
 import report.Stats;
 import rfm.dynalloy.Err;
 import rfm.dynalloyCompiler.ast.ExprConstant;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
-import wrapper.HamcrestRunner;
 
 /**
  * This class represents the EvoSpex's Genetic Algorithm.
@@ -46,7 +45,7 @@ public class EvoSpexGA {
   private int genes_num;
   private boolean empty_spec;
   private SpecChromosome foundChromosome = null;
-  private ContextInformation dataStructureInformation;
+  private TargetInformation dataStructureInformation;
   private Class<?> targetClass; // Target class under analysis
   private EvoSpexParameters parameters; // Evolutionary process arguments
   private ChromosomeGenesFactory cgfactory;
@@ -111,7 +110,7 @@ public class EvoSpexGA {
     CustomConfiguration.reset();
     this.parameters = parameters;
     this.targetClass = targetClass;
-    extractDataStructureInformation();
+    extractDataStructureInformation(targetClass);
     updateParametersAccordingToDataStructureInformation();
     setUpGeneticAlgorithm();
     parameters.readMethodsFolder();
@@ -120,9 +119,10 @@ public class EvoSpexGA {
   /**
    * Extract the data structure information for the current target class
    */
-  private void extractDataStructureInformation() {
+  private void extractDataStructureInformation(Class<?> targetClass) {
     // TODO build a proper dataStructureInformation object !!
     System.out.println();
+    dataStructureInformation = new TargetInformation(targetClass);
     System.out.println("extracting class information");
 
   }

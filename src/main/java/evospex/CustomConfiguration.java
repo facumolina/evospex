@@ -1,5 +1,5 @@
 
-package main;
+package evospex;
 
 import org.jgap.*;
 import org.jgap.event.*;

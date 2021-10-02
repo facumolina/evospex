@@ -2,7 +2,7 @@ package hamcrest.assertion;
 
 import hamcrest.expression.HamcrestExpr;
 import hamcrest.expression.QuantifiedHamcrestExpr;
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 
 /**
  * SimpleHamcrestAssertion is an assertion that evaluates an expression of the from op : set | expr

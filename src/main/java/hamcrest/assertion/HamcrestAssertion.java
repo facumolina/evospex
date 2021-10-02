@@ -1,7 +1,7 @@
 package hamcrest.assertion;
 
 import hamcrest.expression.HamcrestExpr;
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 
 /**
  * This class represents a Hamcrest assertion

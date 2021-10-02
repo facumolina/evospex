@@ -15,7 +15,7 @@ import geneticalgorithm.chromosome.ExprGeneValue;
 import geneticalgorithm.chromosome.SpecChromosome;
 import hamcrest.assertion.HamcrestAssertion;
 import hamcrest.expression.NonEvaluableExpressionException;
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.EvoSpexParameters;

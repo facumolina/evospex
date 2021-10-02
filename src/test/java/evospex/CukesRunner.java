@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.*;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import evospex.target.TypeGraph;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -31,39 +32,36 @@ import rfm.dynalloyCompiler.translator.A4Solution;
 import wrapper.DynAlloyRunner;
 
 /**
- * This class keeps some useful information regarding the data structure being analyzed.
+ * This class keeps some useful information regarding the target class and method.
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class ContextInformation {
+public class TargetInformation {
 
-  private DirectedGraph<String, DefaultEdge> structureGraph; // Graph of the relation of the data
-                                                             // structure
+  private TypeGraph typeGraph; // Current cut type graph
+  private DirectedGraph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
 
-  private Map<String, LinkedList<Expr>> commandExpressions; // Commands
-  private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains the expressions
-                                                                      // according to its evaluation
-                                                                      // result
+  private Map<String, LinkedList<Expr>> commandExpressions; // Commands.
+  private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains expressions grouped by its evaluation results.
   private final int scope; // Scope (defined in the alloy file)
 
   private List<Expr> joinedExpressions; // Contains expressions of the form e.f
-  private List<Expr> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type
-                                                // is int
+  private List<Expr> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type is int
+
   private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
 
   public static Sig nullSig; // Null signature
 
-  private List<Expr> relationsForEvaluation; // Data structure relations ready to evaluate
-  private Map<String, Type> structureRelations; // Data structure relations with types
+  private List<Expr> relationsForEvaluation; // Target relations ready to evaluate
+  private Map<String, Type> structureRelations; // Target relations with types
   private static List<Sig> structureSignatures; // All signatures
   private List<Sig> signaturesUsedInRecursiveRelations; // Signatures used in recursive relations
   private static List<Sig> unarySignatures; // Unary signatures
-  private static Map<Type, List<Expr>> signatureEvaluations; // Each time that an expression of any
-                                                             // type is evaluated, the evaluation
-                                                             // value is added to the list.
-  private static Map<Type, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each
-                                                                  // type
+  private static Map<Type, List<Expr>> signatureEvaluations; // Map types to values seen during expresion evaluations.\
+
+  private static Map<Type, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
+
   private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
   private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
@@ -72,21 +70,33 @@ public class ContextInformation {
   private static List<Expr> allIntExpressions;
 
   /**
-   * Constructor
-   * 
-   * @param decls
-   *          is the parameter declarations of the data structure
-   * @param commands
-   *          are the commands to be executed
+   * Constructor from a given target class
+   * @param targetClass is the current class under analysis
+   */
+  public TargetInformation(Class<?> targetClass) {
+    typeGraph = new TypeGraph(targetClass);
+    structureRelations = new HashMap<>();
+    expressionsByEvaluationValue = new HashMap<>();
+    relationsForEvaluation = new LinkedList<>();
+    methodVarsByType = new HashMap<>();
+    methodVarsType = new HashMap<>();
+    allIntExpressions = new LinkedList<>();
+    scope = 3;
+  }
+
+  /**
+   * Constructor from Alloy
+   * @param decls is the parameter declarations of the data structure
+   * @param commands are the commands to be executed
    * @throws Err
    */
-  public ContextInformation(ConstList<Decl> decls, ConstList<Command> commands) throws Err {
-    structureRelations = new HashMap<String, Type>();
-    expressionsByEvaluationValue = new HashMap<String, LinkedList<Expr>>();
-    relationsForEvaluation = new LinkedList<Expr>();
-    methodVarsByType = new HashMap<String, Set<String>>();
-    methodVarsType = new HashMap<String, String>();
-    allIntExpressions = new LinkedList<Expr>();
+  public TargetInformation(ConstList<Decl> decls, ConstList<Command> commands) throws Err {
+    structureRelations = new HashMap<>();
+    expressionsByEvaluationValue = new HashMap<>();
+    relationsForEvaluation = new LinkedList<>();
+    methodVarsByType = new HashMap<>();
+    methodVarsType = new HashMap<>();
+    allIntExpressions = new LinkedList<>();
 
     for (Decl decl : decls) {
       // Get each attribute with the respective type from the specification (RepOK parameters)
@@ -136,7 +146,7 @@ public class ContextInformation {
     SafeList<Sig> signatureList = example.getAllReachableSigs();
 
     Sig nullSignature = signatureList.get(5);
-    ContextInformation.nullSig = nullSignature;
+    TargetInformation.nullSig = nullSignature;
     structureSignatures = new LinkedList<Sig>();
     unarySignatures = new LinkedList<Sig>();
     signaturesUsedInRecursiveRelations = new LinkedList<Sig>();
@@ -525,9 +535,7 @@ public class ContextInformation {
 
   /**
    * Builds all the expressions of a given length
-   * 
-   * @param expr
-   *          is the expression being builded
+   *
    * @param vertex
    *          is the current vertex being
    * @param scope

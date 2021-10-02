@@ -1,7 +1,7 @@
 package hamcrest.assertion;
 
 import hamcrest.expression.HamcrestExpr;
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 
 /**
  * SimpleHamcrestAssertion is an assertion of the from o.f = v where o is an object, f is a field

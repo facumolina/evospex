@@ -82,7 +82,7 @@
       <configuration>
         <archive>
           <manifest>
-            <mainClass>main.EvoSpex</mainClass>
+            <mainClass>evospex.EvoSpex</mainClass>
           </manifest>
         </archive>
         <descriptorRefs>

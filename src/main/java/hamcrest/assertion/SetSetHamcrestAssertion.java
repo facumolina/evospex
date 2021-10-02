@@ -1,7 +1,7 @@
 package hamcrest.assertion;
 
 import hamcrest.expression.HamcrestExpr;
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 
 /**
  * SetSetHamcrestAssertion is an assertion of the from set1 op set2 where both expressions contains
