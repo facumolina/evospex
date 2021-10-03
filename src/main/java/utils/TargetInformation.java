@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import evospex.expression.ExprBuilder;
+import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.target.TypeGraph;
+import evospex.target.TypeGraphEdge;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -38,6 +41,7 @@ import wrapper.DynAlloyRunner;
  */
 public class TargetInformation {
 
+  private Class<?> cut; // The current cut
   private TypeGraph typeGraph; // Current cut type graph
   private DirectedGraph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
 
@@ -45,24 +49,22 @@ public class TargetInformation {
   private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains expressions grouped by its evaluation results.
   private final int scope; // Scope (defined in the alloy file)
 
-  private List<Expr> joinedExpressions; // Contains expressions of the form e.f
-  private List<Expr> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type is int
-
-  private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
-  private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
+  // Structures handling expressions extracted by traversing the type graph
+  private List<ExprContext> joinedExpressions; // Contains expressions of the form e.f
+  private List<ExprContext> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type is int
+  private static List<ExprContext> simpleClosuredExpressions; // Contains expressions of the form e.*f
+  private static List<ExprContext> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
+  private static Map<Class<?>, Set<ExprContext>> joineableExpressionsByType; // Joineable expressions for each type
+  private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
   public static Sig nullSig; // Null signature
 
-  private List<Expr> relationsForEvaluation; // Target relations ready to evaluate
-  private Map<String, Type> structureRelations; // Target relations with types
+  private Map<String, ExprContext> relationsForEvaluation; // Target relations with expressions
+  private Map<String, Class<?>> structureRelations; // Target relations with types
   private static List<Sig> structureSignatures; // All signatures
   private List<Sig> signaturesUsedInRecursiveRelations; // Signatures used in recursive relations
   private static List<Sig> unarySignatures; // Unary signatures
   private static Map<Type, List<Expr>> signatureEvaluations; // Map types to values seen during expresion evaluations.\
-
-  private static Map<Type, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
-
-  private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
   private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
   private Map<String, String> methodVarsType; // Variables names and their types
@@ -74,14 +76,97 @@ public class TargetInformation {
    * @param targetClass is the current class under analysis
    */
   public TargetInformation(Class<?> targetClass) {
+    // Build the type graph
+    cut = targetClass;
     typeGraph = new TypeGraph(targetClass);
+    // Build the structure relations and the relations to eval
     structureRelations = new HashMap<>();
+    relationsForEvaluation = new HashMap<>();
+    structureRelations.put("this", targetClass);
+    relationsForEvaluation.put("this", ExprBuilder.getExpr("this"));
+    buildBaseExpressions(cut, new HashSet<>());
+
+    scope = 3;
+    buildInitialExpressions();
     expressionsByEvaluationValue = new HashMap<>();
-    relationsForEvaluation = new LinkedList<>();
+
     methodVarsByType = new HashMap<>();
     methodVarsType = new HashMap<>();
     allIntExpressions = new LinkedList<>();
-    scope = 3;
+
+  }
+
+  /**
+   * Build the base expressions from the current cut
+   */
+  private void buildBaseExpressions(Class<?> vertex, Set<String> visited) {
+      Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(vertex);
+      for (TypeGraphEdge edge : outgoingEdges) {
+        if (visited.add(edge.getLabel())) {
+          Class<?> targetVertex = typeGraph.getTargetVertex(edge);
+          structureRelations.put(edge.getLabel(), targetVertex);
+          relationsForEvaluation.put(edge.getLabel(), ExprBuilder.getExpr(edge.getLabel()));
+          buildBaseExpressions(targetVertex, visited);
+        }
+      }
+  }
+
+  /**
+   * Build the initial expressions by traversing the type graph
+   * Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+   */
+  private void buildInitialExpressions() {
+    joinedExpressions = new LinkedList<>();
+    joinedExpressionsOfTypeInt = new LinkedList<>();
+    simpleClosuredExpressions = new LinkedList<>();
+    doubleClosuredExpressions = new LinkedList<>();
+    joineableExpressionsByType = new HashMap<>();
+    collectionsByType = new HashMap<>();
+
+    //if (structureRelations.keySet().contains("thizPre")) {
+      // Shoudl be present when learning post conditions
+      //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
+      //buildAllExpressions(thizPreExpr, "thizPre", scope);
+    //}
+    buildInitialExpressionsRec("this", relationsForEvaluation.get("this"), cut, scope);
+  }
+
+  /**
+   * Build all the initial expressions recursively
+   */
+  private void buildInitialExpressionsRec(String currStrExpr, ExprContext currExpr, Class<?> vertex, int k) {
+    System.out.println("Processing expr: "+currStrExpr);
+    if (!currStrExpr.equals("this")) {
+      joinedExpressions.add(currExpr);
+    }
+    if (k > 0) {
+      Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(vertex);
+      List<ExprContext> adjacentClosuredExpressions = new LinkedList<>();
+      for (TypeGraphEdge edge : outgoingEdges) {
+        Class<?> targetVertex = typeGraph.getTargetVertex(edge);
+        if (vertex.equals(targetVertex))
+          continue;
+        ExprContext adjacentExpr = relationsForEvaluation.get(edge.getLabel());
+
+        if (!joineableExpressionsByType.containsKey(targetVertex))
+          joineableExpressionsByType.put(targetVertex, new HashSet<>());
+        joineableExpressionsByType.get(targetVertex).add(adjacentExpr);
+
+
+        String newStrExpr = currStrExpr + "." + edge.getLabel();
+        ExprContext newExpr = ExprBuilder.getExpr(newStrExpr);
+        buildInitialExpressionsRec(newStrExpr, newExpr, targetVertex, k - 1);
+        // }
+        //if (isClosure(targetVertex) && (!isClosure(vertex))) {
+        //  adjacentClosuredExpressions.add(adjacentExpr);
+        //  Expr closured = expr.join(ExprUnary.Op.RCLOSURE.make(null, adjacentExpr));
+        //  simpleClosuredExpressions.add(closured);
+        //}
+      }
+
+
+
+    }
   }
 
   /**
@@ -93,7 +178,7 @@ public class TargetInformation {
   public TargetInformation(ConstList<Decl> decls, ConstList<Command> commands) throws Err {
     structureRelations = new HashMap<>();
     expressionsByEvaluationValue = new HashMap<>();
-    relationsForEvaluation = new LinkedList<>();
+    relationsForEvaluation = new HashMap<>();
     methodVarsByType = new HashMap<>();
     methodVarsType = new HashMap<>();
     allIntExpressions = new LinkedList<>();
@@ -102,9 +187,9 @@ public class TargetInformation {
       // Get each attribute with the respective type from the specification (RepOK parameters)
       Type declType = decl.expr.type();
       for (int i = 0; i < decl.names.size(); i++) {
-        relationsForEvaluation.add(decl.names.get(i));
+        //relationsForEvaluation.add(decl.names.get(i));
         String name = decl.names.get(i).label;
-        structureRelations.put(name, declType);
+        //structureRelations.put(name, declType);
       }
     }
     if (commands.size() > 0)
@@ -124,18 +209,18 @@ public class TargetInformation {
     if (doubleClosuredExpressions.isEmpty()) {
       // Create collections for simple closured expressions only when there are no double cloured
       // expressions
-      for (Expr e : simpleClosuredExpressions) {
+      //for (Expr e : simpleClosuredExpressions) {
         // if (e.toString().contains("thizPre"))
         // continue;
-        createCollections(e);
-      }
+      //  createCollections(e);
+      //}
     } else {
       // Create collections for double closured expressions
-      for (Expr e : doubleClosuredExpressions) {
+      //for (Expr e : doubleClosuredExpressions) {
         // if (e.toString().contains("thizPre"))
         // continue;
-        createCollections(e);
-      }
+      //  createCollections(e);
+      //}
     }
   }
 
@@ -194,11 +279,11 @@ public class TargetInformation {
     // Generate each edge from the key types
     for (String sourceKey : structureRelations.keySet()) {
       for (String targetKey : structureRelations.keySet()) {
-        Type sourceType = structureRelations.get(sourceKey);
-        Type targetType = structureRelations.get(targetKey);
-        if (DynAlloyRunner.joinableTypes(sourceType, targetType)) {
+        //Type sourceType = structureRelations.get(sourceKey);
+        //Type targetType = structureRelations.get(targetKey);
+        //if (DynAlloyRunner.joinableTypes(sourceType, targetType)) {
           structureGraph.addEdge(sourceKey, targetKey);
-        }
+        //}
       }
     }
   }
@@ -208,10 +293,10 @@ public class TargetInformation {
    */
   public List<Expr> getEvaluableExpressions() {
     List<Expr> expressionsList = new LinkedList<Expr>();
-    expressionsList.addAll(joinedExpressions);
+    //expressionsList.addAll(joinedExpressions);
     expressionsList.addAll(allIntExpressions);
-    expressionsList.addAll(simpleClosuredExpressions);
-    expressionsList.addAll(doubleClosuredExpressions);
+    //expressionsList.addAll(simpleClosuredExpressions);
+    //expressionsList.addAll(doubleClosuredExpressions);
     return expressionsList;
   }
 
@@ -271,51 +356,35 @@ public class TargetInformation {
   }
 
   /**
-   * Get the expressions that can be evaluated for a command
-   * 
-   * @param cmdLabel
-   *          is the command label
-   */
-  public List<Expr> getCommandExpressions(String cmdLabel) {
-    return commandExpressions.get(cmdLabel);
-
-  }
-
-  public List<Expr> getCommandExpressions2(Iterable<ExprVar> skolems) {
-    List<Expr> expressionsToEval = new LinkedList<Expr>();
-    expressionsToEval.addAll(translateExpressions(joinedExpressions, skolems));
-    expressionsToEval.addAll(translateExpressions(joinedExpressionsOfTypeInt, skolems));
-    expressionsToEval.addAll(translateExpressions(simpleClosuredExpressions, skolems));
-    expressionsToEval.addAll(translateExpressions(doubleClosuredExpressions, skolems));
-    return expressionsToEval;
-  }
-
-  /**
    * Translate all the joined expressions
    */
   public List<Expr> getCommandJoinedExpressions(Iterable<ExprVar> skolems) {
-    return translateExpressions(joinedExpressions, skolems);
+    //return translateExpressions(joinedExpressions, skolems);
+    return new LinkedList<>();
   }
 
   /**
    * Translate all the joined expressions of type int
    */
   public List<Expr> getCommandJoinedExpressionsInt(Iterable<ExprVar> skolems) {
-    return translateExpressions(joinedExpressionsOfTypeInt, skolems);
+    //return translateExpressions(joinedExpressionsOfTypeInt, skolems);
+    return new LinkedList<>();
   }
 
   /**
    * Translate all the simple closured expressions
    */
   public List<Expr> getCommandSimpleClosuredExpressions(Iterable<ExprVar> skolems) {
-    return translateExpressions(simpleClosuredExpressions, skolems);
+    //return translateExpressions(simpleClosuredExpressions, skolems);
+    return new LinkedList<>();
   }
 
   /**
    * Translate all the double closured expressions
    */
   public List<Expr> getCommandDoubleClosuredExpressions(Iterable<ExprVar> skolems) {
-    return translateExpressions(doubleClosuredExpressions, skolems);
+    //return translateExpressions(doubleClosuredExpressions, skolems);
+    return new LinkedList<>();
   }
 
   /**
@@ -387,30 +456,31 @@ public class TargetInformation {
    * @throws Err
    */
   private void buildExpressions() throws Err {
-    joinedExpressions = new LinkedList<Expr>();
-    joinedExpressionsOfTypeInt = new LinkedList<Expr>();
-    simpleClosuredExpressions = new LinkedList<Expr>();
-    doubleClosuredExpressions = new LinkedList<Expr>();
-    joineableExpressionsByType = new HashMap<Type, Set<Expr>>();
+    //joinedExpressions = new LinkedList<Expr>();
+    //joinedExpressionsOfTypeInt = new LinkedList<Expr>();
+    //simpleClosuredExpressions = new LinkedList<Expr>();
+    //doubleClosuredExpressions = new LinkedList<Expr>();
+    //joineableExpressionsByType = new HashMap<Type, Set<Expr>>();
     collectionsByType = new HashMap<String, Set<Expr>>();
 
     if (structureRelations.keySet().contains("thizPre")) {
       // Shoudl be present when learning post conditions
-      ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
-      buildAllExpressions(thizPreExpr, "thizPre", scope);
+      //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
+      //buildAllExpressions(thizPreExpr, "thizPre", scope);
     }
-    ExprVar thizExpr = ExprVar.make(null, "thiz", structureRelations.get("thiz"));
-    buildAllExpressions(thizExpr, "thiz", scope);
+
+    //ExprVar thizExpr = ExprVar.make(null, "thiz", structureRelations.get("thiz"));
+    //buildAllExpressions(thizExpr, "thiz", scope);
 
   }
 
   private void buildAllExpressions(Expr expr, String vertex, int currScope) throws Err {
     if (DynAlloyExpressionsUtils.isNumeric(expr.type())) {
-      joinedExpressionsOfTypeInt.add(expr);
+      //joinedExpressionsOfTypeInt.add(expr);
       allIntExpressions.add(expr);
     } else {
       if (!vertex.equals("thiz") && !vertex.equals("thizPre")) {
-        joinedExpressions.add(expr);
+        //joinedExpressions.add(expr);
         Type exprType = expr.type();
         if (exprType.toString().contains("this/Collection")) {
           if (!collectionsByType.containsKey(exprType.toString()))
@@ -441,25 +511,25 @@ public class TargetInformation {
         String targetVertex = structureGraph.getEdgeTarget(edge);
         if (vertex.equals(targetVertex))
           continue;
-        ExprVar adjacentExpr = ExprVar.make(null, targetVertex,
-            structureRelations.get(targetVertex));
+        //ExprVar adjacentExpr = ExprVar.make(null, targetVertex,
+        //    structureRelations.get(targetVertex));
 
         // if (!expr.type().equals(expr.join(adjacentExpr).type())) {
-        if (!joineableExpressionsByType.containsKey(expr.type()))
-          joineableExpressionsByType.put(expr.type(), new HashSet<Expr>());
-        joineableExpressionsByType.get(expr.type())
-            .add(getCorrespondingEvaluableExpression(targetVertex));
+        //if (!joineableExpressionsByType.containsKey(expr.type()))
+        //  joineableExpressionsByType.put(expr.type(), new HashSet<Expr>());
+        //joineableExpressionsByType.get(expr.type())
+        //    .add(getCorrespondingEvaluableExpression(targetVertex));
         // }
 
         // if (!isClosure(targetVertex)) {
         // Just join with non closured expressions
-        Expr newExpr = expr.join(adjacentExpr);
-        buildAllExpressions(newExpr, targetVertex, currScope - 1);
+        // Expr newExpr = expr.join(adjacentExpr);
+        //buildAllExpressions(newExpr, targetVertex, currScope - 1);
         // }
         if (isClosure(targetVertex) && (!isClosure(vertex))) {
-          adjacentClosuredExpressions.add(adjacentExpr);
-          Expr closured = expr.join(ExprUnary.Op.RCLOSURE.make(null, adjacentExpr));
-          simpleClosuredExpressions.add(closured);
+         // adjacentClosuredExpressions.add(adjacentExpr);
+          //Expr closured = expr.join(ExprUnary.Op.RCLOSURE.make(null, adjacentExpr));
+          //simpleClosuredExpressions.add(closured);
         }
       }
 
@@ -467,7 +537,7 @@ public class TargetInformation {
         for (int j = i + 1; j < adjacentClosuredExpressions.size(); j++) {
           Expr closured = expr.join(ExprUnary.Op.RCLOSURE.make(null, ExprBinary.Op.PLUS.make(null,
               null, adjacentClosuredExpressions.get(i), adjacentClosuredExpressions.get(j))));
-          doubleClosuredExpressions.add(closured);
+          //doubleClosuredExpressions.add(closured);
         }
       }
 
@@ -525,11 +595,11 @@ public class TargetInformation {
    * Get corresponding evaluable expression according to name
    */
   private Expr getCorrespondingEvaluableExpression(String exprName) {
-    for (Expr expr : relationsForEvaluation) {
-      if (exprName.equals(((ExprHasName) expr).label)) {
-        return expr;
-      }
-    }
+    //for (Expr expr : relationsForEvaluation) {
+    //  if (exprName.equals(((ExprHasName) expr).label)) {
+    //    return expr;
+    //  }
+    //}
     return null;
   }
 
@@ -543,12 +613,12 @@ public class TargetInformation {
    * @return a list of expressions
    */
   private List<Expr> buildExpressionsOfLength(String vertex, int scope) {
-    ExprVar currentExpr = ExprVar.make(null, vertex, structureRelations.get(vertex));
+    //ExprVar currentExpr = ExprVar.make(null, vertex, structureRelations.get(vertex));
     if (scope == 0) {
       LinkedList<Expr> exprList = new LinkedList<Expr>();
-      exprList.add(currentExpr);
+      //exprList.add(currentExpr);
       if (isClosure(vertex)) {
-        exprList.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr));
+        //exprList.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr));
       }
       return exprList;
     } else {
@@ -567,9 +637,9 @@ public class TargetInformation {
         // For each adjacent expression, join it with the current expression. If the current
         // expression
         // can be closured, also join the closured current expression with the adjacent.
-        resultingExpressions.add(currentExpr.join(expr));
+        //resultingExpressions.add(currentExpr.join(expr));
         if (isClosure(vertex)) {
-          resultingExpressions.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr).join(expr));
+          //resultingExpressions.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr).join(expr));
         }
       }
       return resultingExpressions;
@@ -604,11 +674,11 @@ public class TargetInformation {
     commandExpressions = new HashMap<String, LinkedList<Expr>>();
     for (Command cmd : commands) {
       commandExpressions.put(cmd.label, new LinkedList<Expr>());
-      commandExpressions.get(cmd.label).addAll(buildExpressionsForCommand(cmd, joinedExpressions));
-      commandExpressions.get(cmd.label)
-          .addAll(buildExpressionsForCommand(cmd, simpleClosuredExpressions));
-      commandExpressions.get(cmd.label)
-          .addAll(buildExpressionsForCommand(cmd, doubleClosuredExpressions));
+      //commandExpressions.get(cmd.label).addAll(buildExpressionsForCommand(cmd, joinedExpressions));
+      //commandExpressions.get(cmd.label)
+      //    .addAll(buildExpressionsForCommand(cmd, simpleClosuredExpressions));
+      //commandExpressions.get(cmd.label)
+      //    .addAll(buildExpressionsForCommand(cmd, doubleClosuredExpressions));
     }
   }
 
@@ -664,10 +734,10 @@ public class TargetInformation {
     int possibleComparisons = 0;
     for (int i = 0; i < joinedExpressions.size() - 1; i++) {
       for (int j = i + 1; j < joinedExpressions.size(); j++) {
-        if (joinedExpressions.get(i).type().intersects(joinedExpressions.get(j).type())) {
+        //if (joinedExpressions.get(i).type().intersects(joinedExpressions.get(j).type())) {
           // The i-th expression can be compared with the j-th expression
           possibleComparisons++;
-        }
+        //}
       }
     }
     return possibleComparisons;
@@ -830,9 +900,9 @@ public class TargetInformation {
    * expressions of the form: type -> AnotherType
    */
   public Set<Expr> getJoineableExpressionsOfCurrentType(Type type) {
-    if (joineableExpressionsByType.containsKey(type))
-      return joineableExpressionsByType.get(type);
-    return new HashSet<Expr>();
+    //if (joineableExpressionsByType.containsKey(type))
+      //return joineableExpressionsByType.get(type);
+    return new HashSet<>();
   }
 
   /**
@@ -842,16 +912,16 @@ public class TargetInformation {
   public List<Expr> getJoineableExpressionsOfCurrentTypeMaintinigReturnType(Expr expr) {
     Type type = expr.type();
     if (joineableExpressionsByType.containsKey(type)) {
-      Set<Expr> joineableToType = joineableExpressionsByType.get(type);
+      //Set<Expr> joineableToType = joineableExpressionsByType.get(type);
       List<Expr> sameReturnType = new LinkedList<Expr>();
-      for (Expr joineable : joineableToType) {
-        Type returnType = getReturnType(joineable.type());
-        if (type.intersects(returnType) && !expr.toString().contains(joineable.toString()))
-          sameReturnType.add(joineable);
-      }
-      return sameReturnType;
+      //for (Expr joineable : joineableToType) {
+        //Type returnType = getReturnType(joineable.type());
+       // if (type.intersects(returnType) && !expr.toString().contains(joineable.toString()))
+       //   sameReturnType.add(joineable);
+     // }
+      //return sameReturnType;
     }
-    return new LinkedList<Expr>();
+    return new LinkedList<>();
   }
 
   /**
