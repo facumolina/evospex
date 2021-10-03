@@ -16,8 +16,7 @@ import java.util.*;
  */
 public class TypeGraph {
 
-  private Class<?> cut; // The current class under analysis
-  protected static Graph<Class<?>, TypeGraphEdge> graph; // The actual graph
+  protected DirectedPseudograph<Class<?>, TypeGraphEdge> graph; // The actual graph
 
   /**
    * Constructor
@@ -26,9 +25,8 @@ public class TypeGraph {
   public TypeGraph(Class<?> cut) {
     if (cut == null)
       throw new IllegalArgumentException("The CUT can't be null");
-    this.cut = cut;
     graph = new DirectedPseudograph<>(TypeGraphEdge.class);
-    buildGraph(this.cut, new HashSet<>());
+    buildGraph(cut, new HashSet<>());
     System.out.println("Nodes: " + graph.vertexSet().toString());
     System.out.println("Edges: " + graph.edgeSet().toString());
   }
@@ -64,6 +62,20 @@ public class TypeGraph {
         }
       }
     }
+  }
+
+  /**
+   * Returns the edges of the given vertex class
+   */
+  public Set<TypeGraphEdge> getOutgoingEdges(Class<?> vertexClass) {
+    return graph.outgoingEdgesOf(vertexClass);
+  }
+
+  /**
+   * Get the target vertex of the given edge
+   */
+  public Class<?> getTargetVertex(TypeGraphEdge edge) {
+    return graph.getEdgeTarget(edge);
   }
 
   /**
