@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -51,7 +51,7 @@ public class TestsRunner {
               new BufferedOutputStream(new FileOutputStream(outputFileName)), true));
           EvoSpexParameters params = new EvoSpexParameters();
           params.setPopulationSize(popsizes[k]);
-          EvoSpex.processFile("tests/" + fileName, params);
+          EvoSpex.processClass("tests/" + fileName, params);
 
         }
       }

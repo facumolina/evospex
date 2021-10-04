@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import method.MethodExecution;
-import method.MethodExecutionContext;
+import evospex.target.MethodExecution;
+import evospex.target.MethodExecutionContext;
 
 /**
  * This class represents a Hamcrest expression

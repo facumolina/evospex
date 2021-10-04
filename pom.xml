@@ -10,6 +10,11 @@
   </properties>
   <dependencies>
     <dependency>
+    	<groupId>org.antlr</groupId> 
+	<artifactId>antlr4</artifactId> 
+	<version>4.7.1</version> 
+    </dependency>
+    <dependency>
       <groupId>rfm.dynalloy</groupId>
       <artifactId>dynalloy</artifactId>
       <version>1.0.1</version>
@@ -82,7 +87,7 @@
       <configuration>
         <archive>
           <manifest>
-            <mainClass>main.EvoSpex</mainClass>
+            <mainClass>evospex.EvoSpex</mainClass>
           </manifest>
         </archive>
         <descriptorRefs>

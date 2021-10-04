@@ -24,7 +24,7 @@ import rfm.dynalloyCompiler.ast.ExprUnary;
 import rfm.dynalloyCompiler.ast.ExprVar;
 import rfm.dynalloyCompiler.ast.Sig.PrimSig;
 import rfm.dynalloyCompiler.ast.Type;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.DynAlloyExpressionsUtils;
 
 /**
@@ -36,7 +36,7 @@ import utils.DynAlloyExpressionsUtils;
 public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   private ExprGeneValue value;
-  private ContextInformation contextInfo;
+  private TargetInformation contextInfo;
   private int amountOfGenesInChromosome = 0;
   private boolean isPartOfSolution;
 
@@ -46,7 +46,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * @param a_conf
    * @throws InvalidConfigurationException
    */
-  public ExprGene(Configuration a_conf, ContextInformation info)
+  public ExprGene(Configuration a_conf, TargetInformation info)
       throws InvalidConfigurationException {
     super(a_conf);
     this.value = new ExprGeneValue();
@@ -61,7 +61,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * @param expression
    * @throws InvalidConfigurationException
    */
-  public ExprGene(Configuration a_conf, ExprGeneValue value, ContextInformation info)
+  public ExprGene(Configuration a_conf, ExprGeneValue value, TargetInformation info)
       throws InvalidConfigurationException {
     super(a_conf);
     this.value = value;
@@ -72,7 +72,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Get the Data Structure Information
    */
-  public ContextInformation getDataStructureInformation() {
+  public TargetInformation getDataStructureInformation() {
     return contextInfo;
   }
 
@@ -372,7 +372,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       Expr intersection = ExprBinary.Op.INTERSECT.make(null, null, expressionWithSets.left,
           expressionWithSets.right);
       Expr intersectionNull = ExprBinary.Op.IN.make(null, null, intersection,
-          ContextInformation.nullSig);
+          TargetInformation.nullSig);
       value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, intersectionNull), false);
       break;
     case GASpecLearnerMutations.TO_ALL:
@@ -525,7 +525,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       if (expr instanceof ExprBinary) {
         ExprBinary binaryLeft = (ExprBinary) expr;
         Type currentType = binaryLeft.left.type();
-        Expr newValue = ContextInformation.getRandomValueForType(currentType);
+        Expr newValue = TargetInformation.getRandomValueForType(currentType);
 
         Expr newBinaryLeft = binaryLeft.op.make(null, null, binaryLeft.left,
             ExprUnary.Op.NOOP.make(null, newValue));
@@ -636,7 +636,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       // Change implies equality
       ExprBinary impliesExpr = ((ExprBinary) body.left);
       Expr impliesExprLeft = impliesExpr.left;
-      Expr toCompare = ContextInformation.getUnarySigForType(impliesExprLeft.type());
+      Expr toCompare = TargetInformation.getUnarySigForType(impliesExprLeft.type());
       newBody = ExprBinary.Op.IMPLIES.make(null, null,
           impliesExpr.op.make(null, null, impliesExprLeft, toCompare), rightExpr);
       value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
@@ -728,7 +728,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       ExprBinary impliesExprR = ((ExprBinary) rightExpr.left);
       Expr impliesExprLeft = impliesExpr.left;
       Expr impliesExprRLeft = impliesExprR.left;
-      Expr toCompare = ContextInformation.getUnarySigForType(impliesExprLeft.type());
+      Expr toCompare = TargetInformation.getUnarySigForType(impliesExprLeft.type());
       newLeft = ExprBinary.Op.IMPLIES.make(null, null,
           impliesExpr.op.make(null, null, impliesExprLeft, toCompare), leftExpr.right);
       newRight = ExprBinary.Op.IMPLIES.make(null, null,
@@ -798,7 +798,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       if (allExpr.sub instanceof ExprUnary) {
         expressionWithSets = (ExprBinary) ((ExprUnary) allExpr.sub).sub;
       } else {
-        if (((ExprBinary) allExpr.sub).right.equals(ContextInformation.nullSig)) {
+        if (((ExprBinary) allExpr.sub).right.equals(TargetInformation.nullSig)) {
           expressionWithSets = (ExprBinary) ((ExprBinary) allExpr.sub).left;
         } else {
           expressionWithSets = (ExprBinary) allExpr.sub;
@@ -807,7 +807,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       Expr intersection = ExprBinary.Op.INTERSECT.make(null, null, expressionWithSets.left,
           expressionWithSets.right);
       Expr intersectionNull = ExprBinary.Op.IN.make(null, null, intersection,
-          ContextInformation.nullSig);
+          TargetInformation.nullSig);
       value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, intersectionNull), false);
       break;
     case GASpecLearnerMutations.TO_SOME:
@@ -852,7 +852,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       ExprBinary bin2 = ((ExprBinary) value.getExpression());
       ExprVar var = (ExprVar) bin2.left;
       String varType = contextInfo.getVarType(var.label);
-      List<Expr> possibleCollections = ContextInformation.getCollectionsOfType(varType);
+      List<Expr> possibleCollections = TargetInformation.getCollectionsOfType(varType);
       if (possibleCollections.size() > 0) {
         Random r = new Random();
         int rN = r.nextInt(possibleCollections.size());

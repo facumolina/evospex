@@ -13,8 +13,8 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.impl.IntegerGene;
 
-import main.ConfigurationProperties;
-import method.MethodExecution;
+import evospex.ConfigurationProperties;
+import evospex.target.MethodExecution;
 import rfm.dynalloy.Err;
 import rfm.dynalloy.SafeList;
 import rfm.dynalloyCompiler.ast.Expr;
@@ -29,7 +29,7 @@ import rfm.dynalloyCompiler.ast.Type;
 import rfm.dynalloyCompiler.translator.A4Solution;
 import rfm.dynalloyCompiler.translator.A4Tuple;
 import rfm.dynalloyCompiler.translator.A4TupleSet;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.DynAlloyExpressionsUtils;
 import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
@@ -46,14 +46,14 @@ public class ChromosomeGenesFactory {
   private DynAlloyRunner runner;
   private boolean empty_spec;
   private int genes_num;
-  private ContextInformation contextInfo;
+  private TargetInformation contextInfo;
   private EvoSpexParameters parameters;
 
   /**
    * Constructor
    */
   public ChromosomeGenesFactory(Configuration conf, DynAlloyRunner runner, int genes,
-      ContextInformation info, EvoSpexParameters params, boolean emptyspec) {
+                                TargetInformation info, EvoSpexParameters params, boolean emptyspec) {
     this.conf = conf;
     this.runner = runner;
     genes_num = genes;
@@ -456,8 +456,8 @@ public class ChromosomeGenesFactory {
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
         genes.add(new ExprGene(conf, newValue, contextInfo));
       }
-      if (ContextInformation.hasCollections()) {
-        List<Expr> collections = ContextInformation.getCollections();
+      if (TargetInformation.hasCollections()) {
+        List<Expr> collections = TargetInformation.getCollections();
         for (Expr collectionExpr : collections) {
           ExprVar collectionSizeVar = ExprVar.make(null, collectionExpr.toString() + " . size");
           Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, collectionSizeVar, resultVar);
@@ -507,7 +507,7 @@ public class ChromosomeGenesFactory {
       throws InvalidConfigurationException {
     Class<?> collection_type = guessElementType(c);
     if (collection_type != null) {
-      List<Expr> collections = ContextInformation
+      List<Expr> collections = TargetInformation
           .getCollectionsOfType(collection_type.getSimpleName());
       for (Expr collection : collections) {
         Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, collection_expr, collection);
@@ -523,7 +523,7 @@ public class ChromosomeGenesFactory {
    * @throws InvalidConfigurationException
    */
   private Gene create_gene_expr_equal_null(Expr e) throws InvalidConfigurationException {
-    Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, e, ContextInformation.nullSig);
+    Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, e, TargetInformation.nullSig);
     ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
     return new ExprGene(conf, geneValue, contextInfo);
   }
@@ -625,7 +625,7 @@ public class ChromosomeGenesFactory {
    */
   private void addAssertionsConsideringCollections(List<Gene> genes, String argLabel,
       String argClass) throws InvalidConfigurationException {
-    if (ContextInformation.hasCollectionsOfType(argClass)
+    if (TargetInformation.hasCollectionsOfType(argClass)
         || "DoublyLinkedListNode".equals(argClass)) {
       List<Expr> evaluable = contextInfo.getEvaluableExpressions();
       for (Expr expr : evaluable) {
@@ -637,7 +637,7 @@ public class ChromosomeGenesFactory {
           genes.add(new ExprGene(conf, newValue, contextInfo));
         }
       }
-      List<Expr> collections = ContextInformation.getCollectionsOfType(argClass);
+      List<Expr> collections = TargetInformation.getCollectionsOfType(argClass);
       for (Expr expr : collections) {
         // Create a gene with the expression argLabel in collection
         Expr geneExpr = ExprBinary.Op.IN.make(null, null, ExprVar.make(null, argLabel), expr);
@@ -720,7 +720,7 @@ public class ChromosomeGenesFactory {
           } else {
             // The map value is Object
             geneExpr = ExprBinary.Op.NOT_EQUALS.make(null, null, leftExpr,
-                ContextInformation.nullSig);
+                TargetInformation.nullSig);
             newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
             genes.add(new ExprGene(conf, newValue, contextInfo));
           }
@@ -1183,7 +1183,7 @@ public class ChromosomeGenesFactory {
           // genes.add(new ExprGene(conf, geneValue, dataStructureInformation));
         }
       } else {
-        Expr value = ContextInformation.getRandomValueForType(returnType);
+        Expr value = TargetInformation.getRandomValueForType(returnType);
         if (value != null) {
           // all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
           geneValue = createsQtExpressionVarValueVarValuePredicate(doubleClosuredExpr,
@@ -1237,7 +1237,7 @@ public class ChromosomeGenesFactory {
 
     Expr qtExpr = (ExprQt) DynAlloyExpressionsUtils
         .createsQuantifiedExpressionCurrentValueOpNextValue(closuredExpr, toJoinWithVarExpr, op,
-            ContextInformation.nullSig);
+            TargetInformation.nullSig);
     ExprGeneType geneType = ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON;
 
     ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
@@ -1413,7 +1413,7 @@ public class ChromosomeGenesFactory {
     if (op.equals("all")) {
       qtExpr = (ExprQt) DynAlloyExpressionsUtils
           .createsQuantifiedExpressionCurrentValueImpliesNextNotNull(closuredExpression,
-              toJoinWithVarExpr, returnTypeExpr, value, ExprQt.Op.ALL, ContextInformation.nullSig,
+              toJoinWithVarExpr, returnTypeExpr, value, ExprQt.Op.ALL, TargetInformation.nullSig,
               i);
       geneType = ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE;
     } else {
@@ -1433,7 +1433,7 @@ public class ChromosomeGenesFactory {
   public static ExprGeneValue createsDoubleQtExpressionVarValue(Expr closuredExpr,
       Expr toJoinWithVarExpr, ExprQt.Op op) throws Err {
     Expr qtExpr = (ExprQt) DynAlloyExpressionsUtils.createsQuantifiedExpressionCurrentValueNotNull(
-        closuredExpr, toJoinWithVarExpr, op, ContextInformation.nullSig);
+        closuredExpr, toJoinWithVarExpr, op, TargetInformation.nullSig);
     ExprGeneType geneType = ExprGeneType.FORALL_VAR_VALUE;
     ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
     return geneValue;
@@ -1451,7 +1451,7 @@ public class ChromosomeGenesFactory {
 
     Expr qtExpr = (ExprQt) DynAlloyExpressionsUtils
         .createsQuantifiedExpressionCurrentValueOpFstNextValueCurrentValueOpSndNextValue(
-            closuredExpr, toJoinWithVarExpr, op, ContextInformation.nullSig, i);
+            closuredExpr, toJoinWithVarExpr, op, TargetInformation.nullSig, i);
     ExprGeneType geneType = ExprGeneType.FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON;
 
     ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
@@ -1467,7 +1467,7 @@ public class ChromosomeGenesFactory {
       Expr closuredExpr, Expr toJoinWithVarExpr, Type returnTypeExpr, ExprQt.Op op) throws Err {
     Expr qtExpr = (ExprQt) DynAlloyExpressionsUtils
         .createsQuantifiedExpressionQtCurrentValueOpFstNextValueQtCurrentValueOpSndNextValue(
-            closuredExpr, toJoinWithVarExpr, op, ContextInformation.nullSig);
+            closuredExpr, toJoinWithVarExpr, op, TargetInformation.nullSig);
     ExprGeneType geneType = ExprGeneType.FORALL_VAR_VALUES_DOUBLE_QT_INT_COMPARISON;
 
     ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
@@ -1528,7 +1528,7 @@ public class ChromosomeGenesFactory {
           if (evaluatedExpression.type().toString().equals("{this/boolean}")) {
             // Is boolean, use the value
             geneExpression = ExprBinary.Op.EQUALS.make(null, null, evaluatedExpression,
-                ContextInformation.getCorrespondingSignature((ExprVar) evaluationExpr));
+                TargetInformation.getCorrespondingSignature((ExprVar) evaluationExpr));
             geneValue = new ExprGeneValue(geneExpression, ExprGeneType.EQUALITY);
             exprGene = new ExprGene(conf, geneValue, contextInfo);
           } else {

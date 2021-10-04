@@ -6,7 +6,7 @@ import java.util.Set;
 
 import hamcrest.expression.SetHamcrestExpr;
 import hamcrest.expression.SimpleHamcrestExpr;
-import method.MethodExecutionContext;
+import evospex.target.MethodExecutionContext;
 
 /**
  * Provide methods to evaluate complex expressions (such as the ones involving closure operators) in

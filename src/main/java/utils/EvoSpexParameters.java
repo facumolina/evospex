@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
-import method.MethodExecution;
+import evospex.target.MethodExecution;
 
 /**
  * This class contains parameters for the learning process

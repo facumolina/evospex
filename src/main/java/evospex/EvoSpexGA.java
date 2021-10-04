@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,15 +29,14 @@ import report.Report;
 import report.Stats;
 import rfm.dynalloy.Err;
 import rfm.dynalloyCompiler.ast.ExprConstant;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
-import wrapper.HamcrestRunner;
 
 /**
- * This class represents the specification learner.
+ * This class represents the EvoSpex's Genetic Algorithm.
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class EvoSpexGA {
 
@@ -46,8 +45,9 @@ public class EvoSpexGA {
   private int genes_num;
   private boolean empty_spec;
   private SpecChromosome foundChromosome = null;
-  private ContextInformation dataStructureInformation;
-  private EvoSpexParameters parameters;
+  private TargetInformation dataStructureInformation;
+  private Class<?> targetClass; // Target class under analysis
+  private EvoSpexParameters parameters; // Evolutionary process arguments
   private ChromosomeGenesFactory cgfactory;
 
   /**
@@ -101,32 +101,30 @@ public class EvoSpexGA {
   }
 
   /**
-   * Constructor with the method name for which we want to learn a post condition
-   * 
-   * @throws Err
+   * Constructor with the method name for which we want to infer the postcondition
    */
-  public EvoSpexGA(String filePath, String methodName, EvoSpexParameters parameters)
-      throws InvalidConfigurationException, Err {
-    if (parameters == null)
-      throw new IllegalArgumentException("The parameters cannot be null");
+  public EvoSpexGA(Class<?> targetClass, String methodName, EvoSpexParameters parameters)
+      throws InvalidConfigurationException {
+    if (parameters == null || targetClass == null)
+      throw new IllegalArgumentException("Neither the target class nor the parameters can be null!");
     CustomConfiguration.reset();
-    File f = new File(filePath);
-    if (!f.exists() || f.isDirectory())
-      throw new IllegalArgumentException("Unable to find file " + filePath);
     this.parameters = parameters;
-    // setup a DynAlloyRunner for the .als files
-    if (filePath.endsWith(".als")) {
-      runner = new DynAlloyRunner(f, "catalog", "repOK");
-      dataStructureInformation = runner.getStructureInformation();
-    } else if (filePath.endsWith(".java")) {
-      // Setup a hamcrest runner when the input is a java file?
-      HamcrestRunner hr = new HamcrestRunner(f);
-    } else {
-      throw new IllegalArgumentException("Invalid input file");
-    }
+    this.targetClass = targetClass;
+    extractDataStructureInformation(targetClass);
     updateParametersAccordingToDataStructureInformation();
     setUpGeneticAlgorithm();
     parameters.readMethodsFolder();
+  }
+
+  /**
+   * Extract the data structure information for the current target class
+   */
+  private void extractDataStructureInformation(Class<?> targetClass) {
+    // TODO build a proper dataStructureInformation object !!
+    System.out.println();
+    System.out.println("extracting class information");
+    dataStructureInformation = new TargetInformation(targetClass);
+
   }
 
   /**

@@ -20,7 +20,7 @@ import geneticalgorithm.chromosome.ExprGene;
 import geneticalgorithm.chromosome.SpecChromosome;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
-import utils.ContextInformation;
+import utils.TargetInformation;
 import utils.EvoSpexParameters;
 
 public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements Comparable {
@@ -396,7 +396,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
   /**
    * Initialize a genes array with true expressions
    */
-  private void initializeGenes(Gene[] genesArray, Configuration conf, ContextInformation dsi) {
+  private void initializeGenes(Gene[] genesArray, Configuration conf, TargetInformation dsi) {
     try {
       for (int i = 0; i < genesArray.length; i++) {
         genesArray[i] = new ExprGene(conf, dsi);

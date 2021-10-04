@@ -1,4 +1,4 @@
-package method;
+package evospex.target;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * 
  * - r is the method execution result
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  *
  */
 public class MethodExecution {

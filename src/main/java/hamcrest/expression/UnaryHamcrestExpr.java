@@ -2,8 +2,8 @@ package hamcrest.expression;
 
 import java.util.Set;
 
-import method.MethodExecution;
-import method.MethodExecutionContext;
+import evospex.target.MethodExecution;
+import evospex.target.MethodExecutionContext;
 import rfm.dynalloyCompiler.ast.ExprUnary.Op;
 
 /**

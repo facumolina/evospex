@@ -102,6 +102,7 @@ public final class AvlTreeList<E> extends AbstractList<E> {
   @SuppressWarnings("unchecked")
   public void clear() {
     root = (Node<E>) Node.EMPTY_LEAF;
+    assert(true);
   }
 
   public Iterator<E> iterator() {

@@ -1,7 +1,7 @@
 package hamcrest.expression;
 
-import method.MethodExecution;
-import method.MethodExecutionContext;
+import evospex.target.MethodExecution;
+import evospex.target.MethodExecutionContext;
 
 /**
  * This class represents a simple Hamcrest expression, i.e., an expression of the form o.f where o

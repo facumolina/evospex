@@ -1,4 +1,4 @@
-package main;
+package evospex;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +21,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testNodeCachingLinkedListAddInPosition() throws Exception {
-    int r = EvoSpex.processFile("NodeCachingLinkedList",
+    int r = EvoSpex.processClass("NodeCachingLinkedList",
         "src/test/resources/objects/NodeCachingLinkedList/add\\(int,java.lang.Object\\)/3/", 3, 3);
     assertTrue(r == 1);
   }
@@ -31,7 +31,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testNodeCachingLinkedListAddObject() throws Exception {
-    int r = EvoSpex.processFile("NodeCachingLinkedList",
+    int r = EvoSpex.processClass("NodeCachingLinkedList",
         "src/test/resources/objects/NodeCachingLinkedList/add\\(java.lang.Object\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -41,7 +41,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testNodeCachingLinkedListAddFirst() throws Exception {
-    int r = EvoSpex.processFile("NodeCachingLinkedList",
+    int r = EvoSpex.processClass("NodeCachingLinkedList",
         "src/test/resources/objects/NodeCachingLinkedList/addFirst\\(java.lang.Object\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -51,7 +51,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testNodeCachingLinkedListClear() throws Exception {
-    int r = EvoSpex.processFile("NodeCachingLinkedList",
+    int r = EvoSpex.processClass("NodeCachingLinkedList",
         "src/test/resources/objects/NodeCachingLinkedList/clear\\(\\)/3/", 1, 1);
     assertTrue(r == 1);
   }
@@ -61,7 +61,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testNodeCachingLinkedListRemovefromPosition() throws Exception {
-    int r = EvoSpex.processFile("NodeCachingLinkedList",
+    int r = EvoSpex.processClass("NodeCachingLinkedList",
         "src/test/resources/objects/NodeCachingLinkedList/remove\\(int\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -71,7 +71,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testTreeListAddInPosition() throws Exception {
-    int r = EvoSpex.processFile("TreeList",
+    int r = EvoSpex.processClass("TreeList",
         "src/test/resources/objects/TreeList/add\\(int,java.lang.Object\\)/3/", 3, 3);
     assertTrue(r == 1);
   }
@@ -81,7 +81,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testTreeListRemoveFromPos() throws Exception {
-    int r = EvoSpex.processFile("TreeList",
+    int r = EvoSpex.processClass("TreeList",
         "src/test/resources/objects/TreeList/remove\\(int\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -91,7 +91,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testAVLTreeListRemoveElem() throws Exception {
-    int r = EvoSpex.processFile("AvlTreeList",
+    int r = EvoSpex.processClass("AvlTreeList",
         "src/test/resources/objects/AvlTreeList/removeElem\\(java.lang.Object\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -101,7 +101,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testAVLTreeListAddPos() throws Exception {
-    int r = EvoSpex.processFile("AvlTreeList",
+    int r = EvoSpex.processClass("AvlTreeList",
         "src/test/resources/objects/AvlTreeList/add\\(int,java.lang.Object\\)/3/", 3, 3);
     assertTrue(r == 1);
   }
@@ -111,7 +111,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testAVLTreeListRemovePos() throws Exception {
-    int r = EvoSpex.processFile("AvlTreeList",
+    int r = EvoSpex.processClass("AvlTreeList",
         "src/test/resources/objects/AvlTreeList/remove\\(int\\)/3/", 2, 3);
     assertTrue(r == 1);
   }
@@ -121,7 +121,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testIntervalGetSize() throws Exception {
-    int r = EvoSpex.processFile("Interval", "src/test/resources/objects/Interval/getSize\\(\\)/3/",
+    int r = EvoSpex.processClass("Interval", "src/test/resources/objects/Interval/getSize\\(\\)/3/",
         1, 2);
     assertTrue(r == 1);
   }
@@ -131,7 +131,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testIntervalCheckPoint() throws Exception {
-    int r = EvoSpex.processFile("Interval",
+    int r = EvoSpex.processClass("Interval",
         "src/test/resources/objects/Interval/checkPoint\\(double,double\\)/3/", 3, 4);
     assertTrue(r == 1);
   }
@@ -141,7 +141,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testCommonTreeAddChild() throws Exception {
-    int r = EvoSpex.processFile("CommonTree",
+    int r = EvoSpex.processClass("CommonTree",
         "src/test/resources/objects/CommonTree/addChild\\(casestudies.antlr.Tree\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -151,7 +151,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testScheduleAddProcess() throws Exception {
-    int r = EvoSpex.processFile("Schedule",
+    int r = EvoSpex.processClass("Schedule",
         "src/test/resources/objects/Schedule/addProcess\\(int\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -161,7 +161,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testDoublyLinkedListNodeInsertRight() throws Exception {
-    int r = EvoSpex.processFile("DoublyLinkedListNode",
+    int r = EvoSpex.processClass("DoublyLinkedListNode",
         "src/test/resources/objects/DoublyLinkedListNode/insert_right\\(casestudies.eiffel.DoublyLinkedListNode\\)/3/",
         2, 2);
     assertTrue(r == 1);
@@ -172,7 +172,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testCompositeAddChild() throws Exception {
-    int r = EvoSpex.processFile("Composite",
+    int r = EvoSpex.processClass("Composite",
         "src/test/resources/objects/Composite/add_child\\(casestudies.eiffel.Composite\\)/3/", 2,
         2);
     assertTrue(r == 1);
@@ -183,7 +183,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testMapExtend() throws Exception {
-    int r = EvoSpex.processFile("Map",
+    int r = EvoSpex.processClass("Map",
         "src/test/resources/objects/Map/extend\\(java.lang.Object,java.lang.Object\\)/3/", 3, 4);
     assertTrue(r == 1);
   }
@@ -193,7 +193,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testMapCount() throws Exception {
-    int r = EvoSpex.processFile("Map", "src/test/resources/objects/Map/count\\(\\)/3/", 1, 2);
+    int r = EvoSpex.processClass("Map", "src/test/resources/objects/Map/count\\(\\)/3/", 1, 2);
     assertTrue(r == 1);
   }
 
@@ -202,7 +202,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testRingBufferExtend() throws Exception {
-    int r = EvoSpex.processFile("RingBuffer",
+    int r = EvoSpex.processClass("RingBuffer",
         "src/test/resources/objects/RingBuffer/extend\\(java.lang.Object\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -212,7 +212,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testStructureSetX() throws Exception {
-    int r = EvoSpex.processFile("Structure",
+    int r = EvoSpex.processClass("Structure",
         "src/test/resources/objects/Structure/setX\\(java.lang.Integer\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -222,7 +222,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testPolyupdateSm() throws Exception {
-    int r = EvoSpex.processFile("Polyupdate", "src/test/resources/objects/Polyupdate/sm\\(\\)/3/",
+    int r = EvoSpex.processClass("Polyupdate", "src/test/resources/objects/Polyupdate/sm\\(\\)/3/",
         1, 2);
     assertTrue(r == 1);
   }
@@ -232,7 +232,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testListCompClear() throws Exception {
-    int r = EvoSpex.processFile("ListComp02",
+    int r = EvoSpex.processClass("ListComp02",
         "src/test/resources/objects/ListComp02/clear\\(\\)/3/", 1, 1);
     assertTrue(r == 1);
   }
@@ -242,7 +242,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testListCompInsertR() throws Exception {
-    int r = EvoSpex.processFile("ListComp02",
+    int r = EvoSpex.processClass("ListComp02",
         "src/test/resources/objects/ListComp02/insert_r\\(casestudies.cozy.ListComp02\\$R\\)/3/", 2,
         1);
     assertTrue(r == 1);
@@ -253,7 +253,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testMinFinderFindmin() throws Exception {
-    int r = EvoSpex.processFile("MinFinder",
+    int r = EvoSpex.processClass("MinFinder",
         "src/test/resources/objects/MinFinder/findmin\\(\\)/3/", 1, 2);
     assertTrue(r == 1);
   }
@@ -263,7 +263,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testInAddY() throws Exception {
-    int r = EvoSpex.processFile("In",
+    int r = EvoSpex.processClass("In",
         "src/test/resources/objects/In/addY\\(java.lang.Integer\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -273,7 +273,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testGraphClear() throws Exception {
-    int r = EvoSpex.processFile("Graph", "src/test/resources/objects/Graph/clear\\(\\)/3/", 1, 1);
+    int r = EvoSpex.processClass("Graph", "src/test/resources/objects/Graph/clear\\(\\)/3/", 1, 1);
     assertTrue(r == 1);
   }
 
@@ -282,7 +282,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testIntSetAdd() throws Exception {
-    int r = EvoSpex.processFile("IntSet",
+    int r = EvoSpex.processClass("IntSet",
         "src/test/resources/objects/IntSet/add\\(java.lang.Integer\\)/3/", 2, 2);
     assertTrue(r == 1);
   }
@@ -292,7 +292,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testLobstersInsertStory() throws Exception {
-    int r = EvoSpex.processFile("Lobsters",
+    int r = EvoSpex.processClass("Lobsters",
         "src/test/resources/objects/Lobsters/insertStory\\(casestudies.cozy.Lobsters\\$Story\\)/2/",
         2, 2);
     assertTrue(r == 1);
@@ -303,7 +303,7 @@ public class PostConditionsTests {
    */
   @Test
   public void testMaxBagRemove() throws Exception {
-    int r = EvoSpex.processFile("MaxBag",
+    int r = EvoSpex.processClass("MaxBag",
         "src/test/resources/objects/MaxBag/remove\\(java.lang.Integer\\)/3/", 2, 2);
     assertTrue(r == 1);
   }

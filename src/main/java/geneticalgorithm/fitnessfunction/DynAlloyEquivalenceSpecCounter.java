@@ -13,7 +13,7 @@ import org.jgap.impl.IntegerGene;
 import geneticalgorithm.chromosome.ExprGene;
 import geneticalgorithm.chromosome.ExprGeneValue;
 import geneticalgorithm.chromosome.SpecChromosome;
-import main.ConfigurationProperties;
+import evospex.ConfigurationProperties;
 import rfm.dynalloyCompiler.ast.Expr;
 import wrapper.DynAlloyRunner;
 

@@ -31,7 +31,7 @@ import rfm.dynalloyCompiler.ast.ExprUnary;
 import rfm.dynalloyCompiler.ast.ExprVar;
 import rfm.dynalloyCompiler.ast.Func;
 import rfm.dynalloyCompiler.ast.Sig.PrimSig;
-import utils.ContextInformation;
+import utils.TargetInformation;
 
 /**
  * Utils to generate Hamcrest assertions from chromosomes containing Alloy specifications
@@ -92,7 +92,7 @@ public class HamcrestAssertionsUtils {
    */
   private static String alloy2HamcrestExprString(Expr alloyExpr) {
     assert !(alloyExpr instanceof ExprQt);
-    if (alloyExpr == ContextInformation.nullSig) {
+    if (alloyExpr == TargetInformation.nullSig) {
       // Null constant
       return "null";
     }
@@ -165,7 +165,7 @@ public class HamcrestAssertionsUtils {
    * Alloy Expr to Hamcrest Expr
    */
   private static HamcrestExpr alloyExpr2HamcrestExpr(Expr expr) {
-    if (expr == ContextInformation.nullSig) {
+    if (expr == TargetInformation.nullSig) {
       return new SimpleHamcrestExpr("null");
     }
     if (expr instanceof PrimSig) {
