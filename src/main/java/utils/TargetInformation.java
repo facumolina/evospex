@@ -11,7 +11,7 @@ import java.util.Set;
 
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
-import evospex.expression.ExprNames;
+import evospex.expression.ExprName;
 import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
 import org.jgrapht.DirectedGraph;
@@ -82,8 +82,8 @@ public class TargetInformation {
     // Build the structure relations and the set of initial expressions to evaluate
     structureRelations = new HashMap<>();
     relationsForEvaluation = new HashMap<>();
-    structureRelations.put(ExprNames.THIS, targetClass);
-    relationsForEvaluation.put(ExprNames.THIS, ExprBuilder.getExpr(ExprNames.THIS));
+    structureRelations.put(ExprName.THIS, targetClass);
+    relationsForEvaluation.put(ExprName.THIS, ExprBuilder.toExprContext(ExprName.THIS));
     buildBaseExpressions(cut, new HashSet<>());
     scope = 3;
     buildInitialExpressions();
@@ -105,7 +105,7 @@ public class TargetInformation {
         if (visited.add(edge.getLabel())) {
           Class<?> targetVertex = typeGraph.getTargetVertex(edge);
           structureRelations.put(edge.getLabel(), targetVertex);
-          relationsForEvaluation.put(edge.getLabel(), ExprBuilder.getExpr(edge.getLabel()));
+          relationsForEvaluation.put(edge.getLabel(), ExprBuilder.toExprContext(edge.getLabel()));
           buildBaseExpressions(targetVertex, visited);
         }
       }
@@ -128,7 +128,7 @@ public class TargetInformation {
       //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
       //buildAllExpressions(thizPreExpr, "thizPre", scope);
     //}
-    buildInitialExpressionsRec(ExprNames.THIS, relationsForEvaluation.get(ExprNames.THIS), cut, scope);
+    buildInitialExpressionsRec(ExprName.THIS, relationsForEvaluation.get(ExprName.THIS), cut, scope);
   }
 
   /**
@@ -136,7 +136,7 @@ public class TargetInformation {
    */
   private void buildInitialExpressionsRec(String currStrExpr, ExprContext currExpr, Class<?> vertex, int k) {
     System.out.println("Expr "+currStrExpr+" of class "+vertex.getSimpleName());
-    if (!currStrExpr.equals(ExprNames.THIS)) {
+    if (!currStrExpr.equals(ExprName.THIS)) {
       joinedExpressions.add(currExpr);
     }
     if (k > 0) {
@@ -150,17 +150,19 @@ public class TargetInformation {
           joineableExpressionsByType.put(targetVertex, new HashSet<>());
         joineableExpressionsByType.get(targetVertex).add(adjacentExprStr);
 
-
-        String newStrExpr = currStrExpr + "." + adjacentExprStr;
-        ExprContext newExpr = ExprBuilder.getExpr(newStrExpr);
+        String newStrExpr = ExprBuilder.join(currStrExpr, adjacentExprStr);
+        ExprContext newExpr = ExprBuilder.toExprContext(newStrExpr);
         buildInitialExpressionsRec(newStrExpr, newExpr, targetVertex, k - 1);
 
         if (vertex.equals(targetVertex) && !currStrExpr.contains(adjacentExprStr)) {
           // The current adjacent expression is closable
           // And the adjacent expression is not contained in the current expression
-          System.out.println("Expr "+currStrExpr+".*(" + adjacentExprStr + ") is set of "+targetVertex.getSimpleName());
+
+
           adjacentClosuredExpressionsStr.add(adjacentExprStr);
-          ExprContext closured = ExprBuilder.getExpr(currStrExpr+".*(" + adjacentExprStr + ")");
+          String newRClosureExpr = ExprBuilder.joinWithRClosure(currStrExpr, adjacentExprStr);
+          System.out.println("Expr "+ newRClosureExpr + " is set of "+targetVertex.getSimpleName());
+          ExprContext closured = ExprBuilder.toExprContext(newRClosureExpr);
           simpleClosuredExpressions.add(closured);
         }
 
@@ -168,10 +170,11 @@ public class TargetInformation {
 
       for (int i = 0; i < adjacentClosuredExpressionsStr.size() - 1; i++) {
         for (int j = i + 1; j < adjacentClosuredExpressionsStr.size(); j++) {
-          System.out.println("Double closing expr "+currStrExpr+" with adjacent exprs: "+adjacentClosuredExpressionsStr.get(i)+" and "+adjacentClosuredExpressionsStr.get(j));
           String fst = adjacentClosuredExpressionsStr.get(i);
           String snd = adjacentClosuredExpressionsStr.get(j);
-          ExprContext closured = ExprBuilder.getExpr(currStrExpr+".*(" + fst + "+" + snd + ")");
+          String newRClosureExpr = ExprBuilder.joinWithRClosure(currStrExpr, fst, snd);
+          System.out.println("Expr "+ newRClosureExpr);
+          ExprContext closured = ExprBuilder.toExprContext(newRClosureExpr);
           doubleClosuredExpressions.add(closured);
         }
       }

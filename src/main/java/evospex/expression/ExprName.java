@@ -5,7 +5,7 @@ package evospex.expression;
  *
  * Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class ExprNames {
+public class ExprName {
 
   public static final String THIS = "this"; // Name for expression this
   public static final String THIS_PRE = "this_pre"; // Name for expression old(this)
