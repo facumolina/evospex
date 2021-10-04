@@ -104,7 +104,7 @@ public class EvoSpexGA {
    * Constructor with the method name for which we want to infer the postcondition
    */
   public EvoSpexGA(Class<?> targetClass, String methodName, EvoSpexParameters parameters)
-      throws InvalidConfigurationException, Err {
+      throws InvalidConfigurationException {
     if (parameters == null || targetClass == null)
       throw new IllegalArgumentException("Neither the target class nor the parameters can be null!");
     CustomConfiguration.reset();
@@ -122,8 +122,8 @@ public class EvoSpexGA {
   private void extractDataStructureInformation(Class<?> targetClass) {
     // TODO build a proper dataStructureInformation object !!
     System.out.println();
-    dataStructureInformation = new TargetInformation(targetClass);
     System.out.println("extracting class information");
+    dataStructureInformation = new TargetInformation(targetClass);
 
   }
 

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
+import evospex.expression.ExprNames;
 import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
 import org.jgrapht.DirectedGraph;
@@ -25,14 +26,12 @@ import rfm.dynalloyCompiler.ast.Decl;
 import rfm.dynalloyCompiler.ast.Expr;
 import rfm.dynalloyCompiler.ast.ExprBinary;
 import rfm.dynalloyCompiler.ast.ExprConstant;
-import rfm.dynalloyCompiler.ast.ExprHasName;
 import rfm.dynalloyCompiler.ast.ExprUnary;
 import rfm.dynalloyCompiler.ast.ExprVar;
 import rfm.dynalloyCompiler.ast.Sig;
 import rfm.dynalloyCompiler.ast.Sig.PrimSig;
 import rfm.dynalloyCompiler.ast.Type;
 import rfm.dynalloyCompiler.translator.A4Solution;
-import wrapper.DynAlloyRunner;
 
 /**
  * This class keeps some useful information regarding the target class and method.
@@ -54,7 +53,7 @@ public class TargetInformation {
   private List<ExprContext> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type is int
   private static List<ExprContext> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<ExprContext> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
-  private static Map<Class<?>, Set<ExprContext>> joineableExpressionsByType; // Joineable expressions for each type
+  private static Map<Class<?>, Set<String>> joineableExpressionsByType; // Joineable expressions for each type
   private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
   public static Sig nullSig; // Null signature
@@ -79,15 +78,16 @@ public class TargetInformation {
     // Build the type graph
     cut = targetClass;
     typeGraph = new TypeGraph(targetClass);
-    // Build the structure relations and the relations to eval
+
+    // Build the structure relations and the set of initial expressions to evaluate
     structureRelations = new HashMap<>();
     relationsForEvaluation = new HashMap<>();
-    structureRelations.put("this", targetClass);
-    relationsForEvaluation.put("this", ExprBuilder.getExpr("this"));
+    structureRelations.put(ExprNames.THIS, targetClass);
+    relationsForEvaluation.put(ExprNames.THIS, ExprBuilder.getExpr(ExprNames.THIS));
     buildBaseExpressions(cut, new HashSet<>());
-
     scope = 3;
     buildInitialExpressions();
+
     expressionsByEvaluationValue = new HashMap<>();
 
     methodVarsByType = new HashMap<>();
@@ -128,43 +128,53 @@ public class TargetInformation {
       //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
       //buildAllExpressions(thizPreExpr, "thizPre", scope);
     //}
-    buildInitialExpressionsRec("this", relationsForEvaluation.get("this"), cut, scope);
+    buildInitialExpressionsRec(ExprNames.THIS, relationsForEvaluation.get(ExprNames.THIS), cut, scope);
   }
 
   /**
    * Build all the initial expressions recursively
    */
   private void buildInitialExpressionsRec(String currStrExpr, ExprContext currExpr, Class<?> vertex, int k) {
-    System.out.println("Processing expr: "+currStrExpr);
-    if (!currStrExpr.equals("this")) {
+    System.out.println("Expr "+currStrExpr+" of class "+vertex.getSimpleName());
+    if (!currStrExpr.equals(ExprNames.THIS)) {
       joinedExpressions.add(currExpr);
     }
     if (k > 0) {
       Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(vertex);
-      List<ExprContext> adjacentClosuredExpressions = new LinkedList<>();
+      List<String> adjacentClosuredExpressionsStr = new LinkedList<>();
       for (TypeGraphEdge edge : outgoingEdges) {
         Class<?> targetVertex = typeGraph.getTargetVertex(edge);
-        if (vertex.equals(targetVertex))
-          continue;
-        ExprContext adjacentExpr = relationsForEvaluation.get(edge.getLabel());
+        String adjacentExprStr = edge.getLabel();
 
         if (!joineableExpressionsByType.containsKey(targetVertex))
           joineableExpressionsByType.put(targetVertex, new HashSet<>());
-        joineableExpressionsByType.get(targetVertex).add(adjacentExpr);
+        joineableExpressionsByType.get(targetVertex).add(adjacentExprStr);
 
 
-        String newStrExpr = currStrExpr + "." + edge.getLabel();
+        String newStrExpr = currStrExpr + "." + adjacentExprStr;
         ExprContext newExpr = ExprBuilder.getExpr(newStrExpr);
         buildInitialExpressionsRec(newStrExpr, newExpr, targetVertex, k - 1);
-        // }
-        //if (isClosure(targetVertex) && (!isClosure(vertex))) {
-        //  adjacentClosuredExpressions.add(adjacentExpr);
-        //  Expr closured = expr.join(ExprUnary.Op.RCLOSURE.make(null, adjacentExpr));
-        //  simpleClosuredExpressions.add(closured);
-        //}
+
+        if (vertex.equals(targetVertex) && !currStrExpr.contains(adjacentExprStr)) {
+          // The current adjacent expression is closable
+          // And the adjacent expression is not contained in the current expression
+          System.out.println("Expr "+currStrExpr+".*(" + adjacentExprStr + ") is set of "+targetVertex.getSimpleName());
+          adjacentClosuredExpressionsStr.add(adjacentExprStr);
+          ExprContext closured = ExprBuilder.getExpr(currStrExpr+".*(" + adjacentExprStr + ")");
+          simpleClosuredExpressions.add(closured);
+        }
+
       }
 
-
+      for (int i = 0; i < adjacentClosuredExpressionsStr.size() - 1; i++) {
+        for (int j = i + 1; j < adjacentClosuredExpressionsStr.size(); j++) {
+          System.out.println("Double closing expr "+currStrExpr+" with adjacent exprs: "+adjacentClosuredExpressionsStr.get(i)+" and "+adjacentClosuredExpressionsStr.get(j));
+          String fst = adjacentClosuredExpressionsStr.get(i);
+          String snd = adjacentClosuredExpressionsStr.get(j);
+          ExprContext closured = ExprBuilder.getExpr(currStrExpr+".*(" + fst + "+" + snd + ")");
+          doubleClosuredExpressions.add(closured);
+        }
+      }
 
     }
   }
@@ -648,7 +658,6 @@ public class TargetInformation {
 
   /**
    * Returns true if the current vertex generates an expression than can be closure
-   * 
    * @param vertex
    * @return
    */
