@@ -43,9 +43,8 @@ public class EvoSpexGA {
   private Configuration conf = new CustomConfiguration();
   private DynAlloyRunner runner;
   private int genes_num;
-  private boolean empty_spec;
   private SpecChromosome foundChromosome = null;
-  private TargetInformation dataStructureInformation;
+  private TargetInformation targetInformation; // Contains information regarding the target and method
   private Class<?> targetClass; // Target class under analysis
   private EvoSpexParameters parameters; // Evolutionary process arguments
   private ChromosomeGenesFactory cgfactory;
@@ -66,7 +65,7 @@ public class EvoSpexGA {
     // setup a DynAlloyRunner with the file and the default "repOK" name
     runner = new DynAlloyRunner(f, "catalog", "repOK");
     setUpFile(f);
-    dataStructureInformation = runner.getStructureInformation();
+    targetInformation = runner.getStructureInformation();
     updateParametersAccordingToDataStructureInformation();
     setUpGeneticAlgorithm();
   }
@@ -90,7 +89,7 @@ public class EvoSpexGA {
     if (filePath.endsWith(".als")) {
       runner = new DynAlloyRunner(f, "catalog", "repOK");
       setUpFile(f);
-      dataStructureInformation = runner.getStructureInformation();
+      targetInformation = runner.getStructureInformation();
     } else if (filePath.endsWith(".java")) {
       throw new IllegalArgumentException("Not implemented!");
     } else {
@@ -120,18 +119,14 @@ public class EvoSpexGA {
    * Extract the data structure information for the current target class
    */
   private void extractDataStructureInformation(Class<?> targetClass) {
-    // TODO build a proper dataStructureInformation object !!
-    System.out.println();
-    System.out.println("extracting class information");
-    dataStructureInformation = new TargetInformation(targetClass);
-
+    targetInformation = new TargetInformation(targetClass);
   }
 
   /**
    * Update the parameters according to the data structure information
    */
   private void updateParametersAccordingToDataStructureInformation() {
-    if (dataStructureInformation.getAmountOfDoubleClosuredExpressions() > 0)
+    if (targetInformation.getAmountOfDoubleClosuredExpressions() > 0)
       parameters.setConsiderSimpleClosuredExpressions(false);
   }
 
@@ -173,36 +168,22 @@ public class EvoSpexGA {
   }
 
   /**
-   * Set up the genetic algorithm
-   * 
+   * Set up the Genetic Algorithm
    * @throws InvalidConfigurationException
    */
   private void setUpGeneticAlgorithm() throws InvalidConfigurationException {
-    genes_num = runner.getRepOkElements().size();
-    empty_spec = genes_num == 0 ? true : false;
-    Gene[] sampleGenes;
-    if (empty_spec) {
-      // Use ExprGene
-      // genes_num = determineAmountOfGenes();
-      genes_num = parameters.amountOfGenes();
-      sampleGenes = new Gene[genes_num];
-      for (int i = 0; i < genes_num; i++) {
-        sampleGenes[i] = new ExprGene(conf, dataStructureInformation);
-      }
-    } else {
-      sampleGenes = new Gene[genes_num];
-      // Use IntegerGene
-      for (int i = 0; i < genes_num; i++) {
-        sampleGenes[i] = new IntegerGene(conf, 0, 2);
-      }
+    // Build sample genes and chromosome
+    genes_num = parameters.amountOfGenes();
+    Gene[] sampleGenes = new Gene[genes_num];
+    for (int i = 0; i < genes_num; i++) {
+      sampleGenes[i] = new ExprGene(conf, targetInformation);
     }
-
     SpecChromosome sampleChromosome = new SpecChromosome(conf, sampleGenes);
+    // Set up the configuration
     conf.setSampleChromosome(sampleChromosome);
     conf.setKeepPopulationSizeConstant(false);
     conf.setPreservFittestIndividual(true);
-
-    cgfactory = new ChromosomeGenesFactory(conf, runner, genes_num, dataStructureInformation,
+    cgfactory = new ChromosomeGenesFactory(conf, runner, genes_num, targetInformation,
         parameters, empty_spec);
   }
 
@@ -218,13 +199,13 @@ public class EvoSpexGA {
    */
   private int determineAmountOfGenes() {
     int amountOfEvaluableExpressions = parameters.getConsiderJoinedExpressions()
-        ? dataStructureInformation.getAmountOfNonClosuredExpressions() : 0;
+        ? targetInformation.getAmountOfNonClosuredExpressions() : 0;
     int cardinalityExpr = parameters.getConsiderCardinalityExpressions()
-        ? dataStructureInformation.calculateAmountCardinalityExpressions() : 0;
+        ? targetInformation.calculateAmountCardinalityExpressions() : 0;
     int amountOfQuantifiedExpressions = (parameters.getConsiderSimpleClosuredExpressions()
-        ? dataStructureInformation.getAmountOfSimpleClosuredExpressions() * 2 : 0)
+        ? targetInformation.getAmountOfSimpleClosuredExpressions() * 2 : 0)
         + (parameters.getConsiderDoubleClosuredExpressions()
-            ? dataStructureInformation.getAmountOfDoubleClosuredExpressions() * 2 : 0);
+            ? targetInformation.getAmountOfDoubleClosuredExpressions() * 2 : 0);
     int n = amountOfEvaluableExpressions + amountOfQuantifiedExpressions + cardinalityExpr;
     return n * 2;
   }
