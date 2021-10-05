@@ -31,26 +31,21 @@ public class DynAlloyEquivalenceSpecCounter extends FitnessFunction {
   private int counterexamplesValues;
   private int amountOfGenes;
   private double[][] fitnessMatrix;
-  private boolean initialSpecEmpty;
   private HashMap<String, Double> calculatedFitness;
   private long itime;
   private double bestFitness;
 
   /**
    * Constructor
-   * 
-   * @param targetNumberOfAssertions
-   *          is the amount of assertions
+   *
    */
-  public DynAlloyEquivalenceSpecCounter(DynAlloyRunner runner, int genes_num,
-      boolean initialSpecEmpty) {
+  public DynAlloyEquivalenceSpecCounter(DynAlloyRunner runner, int genes_num) {
     if (runner.getNumberOfAssertions() == 0) {
       throw new IllegalArgumentException();
     }
     this.runner = runner;
     counterexamplesValues = ((Double) runner.getNumberOfCounterexamplesAllowed()).intValue() + 1;
     amountOfGenes = genes_num;
-    this.initialSpecEmpty = initialSpecEmpty;
     calculatedFitness = new HashMap<String, Double>();
     initializeFitnessMatrix();
     itime = System.currentTimeMillis();
@@ -117,7 +112,7 @@ public class DynAlloyEquivalenceSpecCounter extends FitnessFunction {
 
     // if (!containsRepeatedGenes(invChromosome)||c==0) {
     // Evaluates just if not contains repeated genes. But if it is a solution, also evaluate it :)
-    Double a = runner.totalActiveExpressions(initialSpecEmpty);
+    Double a = runner.totalActiveExpressions();
     res = (1000 - c) + (1 / (a + 1));
     // } else {
     // res = 0;

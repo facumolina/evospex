@@ -44,7 +44,6 @@ public class ChromosomeGenesFactory {
 
   private Configuration conf;
   private DynAlloyRunner runner;
-  private boolean empty_spec;
   private int genes_num;
   private TargetInformation contextInfo;
   private EvoSpexParameters parameters;
@@ -53,13 +52,12 @@ public class ChromosomeGenesFactory {
    * Constructor
    */
   public ChromosomeGenesFactory(Configuration conf, DynAlloyRunner runner, int genes,
-                                TargetInformation info, EvoSpexParameters params, boolean emptyspec) {
+                                TargetInformation info, EvoSpexParameters params) {
     this.conf = conf;
     this.runner = runner;
     genes_num = genes;
     contextInfo = info;
     parameters = params;
-    empty_spec = emptyspec;
   }
 
   /**
@@ -68,7 +66,6 @@ public class ChromosomeGenesFactory {
   public List<SpecChromosome> getInitialChromosomesFromAlloy()
       throws InvalidConfigurationException {
     LinkedList<SpecChromosome> chromosomes = new LinkedList<SpecChromosome>();
-    if (empty_spec) {
       // The initial specification is empty
       A4Solution positiveExample = runner.generateExample(true);
       A4Solution negativeExample = runner.generateExample(false);
@@ -92,26 +89,7 @@ public class ChromosomeGenesFactory {
           break;
         }
       }
-    } else {
-      // The initial specification is not empty. So for each gene g creates one chromosome
-      // in which g is active and all the other genes are not considered (using the true
-      // expression).
-      Gene[] genes;
-      for (int i = 0; i < genes_num; i++) {
-        genes = new Gene[genes_num];
-        for (int j = 0; j < genes_num; j++) {
-          IntegerGene gene = new IntegerGene(conf, 0, 2);
-          if (i == j) {
-            gene.setAllele(new Integer(1));
-          } else {
-            gene.setAllele(new Integer(2));
-          }
-          genes[j] = gene;
-        }
-        SpecChromosome chromosome = new SpecChromosome(conf, genes);
-        chromosomes.add(chromosome);
-      }
-    }
+
     return chromosomes;
   }
 
@@ -121,7 +99,7 @@ public class ChromosomeGenesFactory {
   public List<SpecChromosome> getInitialChromosomesForPCs(Object resultExample,
       List<Object> argsExample) throws InvalidConfigurationException {
     LinkedList<SpecChromosome> chromosomes = new LinkedList<SpecChromosome>();
-    if (empty_spec) {
+
       // The initial specification is empty
       A4Solution positiveExample = runner.generateExample(true);
       A4Solution negativeExample = runner.generateExample(false);
@@ -151,26 +129,7 @@ public class ChromosomeGenesFactory {
           && (resultExample instanceof Integer || resultExample instanceof Double)) {
         contextInfo.addVariableForType(Integer.class.getSimpleName(), "result");
       }
-    } else {
-      // The initial specification is not empty. So for each gene g creates one chromosome
-      // in which g is active and all the other genes are not considered (using the true
-      // expression).
-      Gene[] genes;
-      for (int i = 0; i < genes_num; i++) {
-        genes = new Gene[genes_num];
-        for (int j = 0; j < genes_num; j++) {
-          IntegerGene gene = new IntegerGene(conf, 0, 2);
-          if (i == j) {
-            gene.setAllele(new Integer(1));
-          } else {
-            gene.setAllele(new Integer(2));
-          }
-          genes[j] = gene;
-        }
-        SpecChromosome chromosome = new SpecChromosome(conf, genes);
-        chromosomes.add(chromosome);
-      }
-    }
+
     return chromosomes;
   }
 

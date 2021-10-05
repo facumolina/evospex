@@ -184,7 +184,7 @@ public class EvoSpexGA {
     conf.setKeepPopulationSizeConstant(false);
     conf.setPreservFittestIndividual(true);
     cgfactory = new ChromosomeGenesFactory(conf, runner, genes_num, targetInformation,
-        parameters, empty_spec);
+        parameters);
   }
 
   /**
@@ -246,7 +246,7 @@ public class EvoSpexGA {
    */
   public void learnSpecFromSpec() throws InvalidConfigurationException {
 
-    conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num, empty_spec));
+    conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
     List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesFromAlloy();
     conf.setPopulationSize(parameters.getPopulationSize());
 
@@ -338,7 +338,7 @@ public class EvoSpexGA {
     // Add the custom genetic operators
     addCustomGeneticOperators();
     // Add the fitness function
-    conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num, empty_spec));
+    conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
     // Initial chromosomes
     List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesFromAlloy();
     System.out

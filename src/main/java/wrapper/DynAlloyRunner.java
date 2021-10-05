@@ -64,10 +64,7 @@ public class DynAlloyRunner extends Runner {
   /**
    * Creates a DynAlloy runner object, associated to the provided file. repOK predicate name is
    * simply repOK.
-   * 
-   * @param filename
-   *          is the name of the file containing the (Dyn)Alloy model
-   */
+   **/
   public DynAlloyRunner(File file) {
     super(file);
     currentRepOKLine = getCurrentRepOKLineAccordingToFile();
@@ -76,9 +73,6 @@ public class DynAlloyRunner extends Runner {
   /**
    * Creates a DynAlloy runner object, associated to the provided file, and a user provided
    * predicate to be analyzed.
-   * 
-   * @param filename
-   *          is the name of the file containing the (Dyn)Alloy model
    * @param repOkName
    *          is the name of the predicate for analysis (predicate containing) the invariant to be
    *          analyzed.
@@ -769,12 +763,8 @@ public class DynAlloyRunner extends Runner {
   /**
    * Returns the amount of non true expressions
    */
-  public double totalActiveExpressions(boolean initialSpecEmpty) {
-    if (initialSpecEmpty) {
+  public double totalActiveExpressions() {
       return totalExpressions() - totalTrueExpressions();
-    } else {
-      return currentRepOkSize;
-    }
   }
 
   /**
