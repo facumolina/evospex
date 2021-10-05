@@ -50,7 +50,8 @@ public class TargetInformation {
 
   // Structures handling expressions extracted by traversing the type graph
   private List<ExprContext> joinedExpressions; // Contains expressions of the form e.f
-  private List<ExprContext> joinedExpressionsOfTypeInt;// Contains expressions of the from e.f which type is int
+  private List<ExprContext> joinedExpressionsOfTypeInt;// Contains int/Integer expressions build from target
+  private static List<ExprContext> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
   private static List<ExprContext> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<ExprContext> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
   private static Map<Class<?>, Set<String>> joineableExpressionsByType; // Joineable expressions for each type
@@ -68,7 +69,7 @@ public class TargetInformation {
   private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
   private Map<String, String> methodVarsType; // Variables names and their types
 
-  private static List<Expr> allIntExpressions;
+
 
   /**
    * Constructor from a given target class
@@ -84,15 +85,14 @@ public class TargetInformation {
     relationsForEvaluation = new HashMap<>();
     structureRelations.put(ExprName.THIS, targetClass);
     relationsForEvaluation.put(ExprName.THIS, ExprBuilder.toExprContext(ExprName.THIS));
+    allIntExpressions = new LinkedList<>();
     buildBaseExpressions(cut, new HashSet<>());
     scope = 3;
     buildInitialExpressions();
 
     expressionsByEvaluationValue = new HashMap<>();
-
     methodVarsByType = new HashMap<>();
     methodVarsType = new HashMap<>();
-    allIntExpressions = new LinkedList<>();
 
   }
 
@@ -138,6 +138,10 @@ public class TargetInformation {
     System.out.println("Expr "+currStrExpr+" of class "+vertex.getSimpleName());
     if (!currStrExpr.equals(ExprName.THIS)) {
       joinedExpressions.add(currExpr);
+      if (vertex.equals(Integer.class) || vertex.equals(int.class)) {
+        joinedExpressionsOfTypeInt.add(currExpr);
+        allIntExpressions.add(currExpr);
+      }
     }
     if (k > 0) {
       Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(vertex);
@@ -157,8 +161,6 @@ public class TargetInformation {
         if (vertex.equals(targetVertex) && !currStrExpr.contains(adjacentExprStr)) {
           // The current adjacent expression is closable
           // And the adjacent expression is not contained in the current expression
-
-
           adjacentClosuredExpressionsStr.add(adjacentExprStr);
           String newRClosureExpr = ExprBuilder.joinWithRClosure(currStrExpr, adjacentExprStr);
           System.out.println("Expr "+ newRClosureExpr + " is set of "+targetVertex.getSimpleName());
@@ -178,7 +180,6 @@ public class TargetInformation {
           doubleClosuredExpressions.add(closured);
         }
       }
-
     }
   }
 
@@ -304,21 +305,17 @@ public class TargetInformation {
   /**
    * Get evaluable expressions
    */
-  public List<Expr> getEvaluableExpressions() {
-    List<Expr> expressionsList = new LinkedList<Expr>();
-    //expressionsList.addAll(joinedExpressions);
+  public List<ExprContext> getEvaluableExpressions() {
+    List<ExprContext> expressionsList = new LinkedList<>();
     expressionsList.addAll(allIntExpressions);
-    //expressionsList.addAll(simpleClosuredExpressions);
-    //expressionsList.addAll(doubleClosuredExpressions);
     return expressionsList;
   }
 
   /**
    * Get int evaluable expressions
    */
-  public List<Expr> getIntEvaluableExpressions() {
+  public List<ExprContext> getIntEvaluableExpressions() {
     return allIntExpressions;
-    // return joinedExpressionsOfTypeInt;
   }
 
   /**
@@ -490,7 +487,7 @@ public class TargetInformation {
   private void buildAllExpressions(Expr expr, String vertex, int currScope) throws Err {
     if (DynAlloyExpressionsUtils.isNumeric(expr.type())) {
       //joinedExpressionsOfTypeInt.add(expr);
-      allIntExpressions.add(expr);
+      //allIntExpressions.add(expr);
     } else {
       if (!vertex.equals("thiz") && !vertex.equals("thizPre")) {
         //joinedExpressions.add(expr);
@@ -499,7 +496,7 @@ public class TargetInformation {
           if (!collectionsByType.containsKey(exprType.toString()))
             collectionsByType.put(exprType.toString(), new HashSet<Expr>());
           collectionsByType.get(exprType.toString()).add(expr);
-          allIntExpressions.add(ExprVar.make(null, expr.toString() + " . size"));
+          //allIntExpressions.add(ExprVar.make(null, expr.toString() + " . size"));
         }
         if (exprType.toString().contains("this/Map_")) {
           // Type of key
@@ -1050,8 +1047,8 @@ public class TargetInformation {
     if (!methodVarsByType.containsKey(typeName))
       methodVarsByType.put(typeName, new HashSet<String>());
     if (methodVarsByType.get(typeName).add(varName)) {
-      if (typeName.contains("Integer"))
-        allIntExpressions.add(ExprVar.make(null, varName));
+      //if (typeName.contains("Integer"))
+        //allIntExpressions.add(ExprVar.make(null, varName));
     }
   }
 

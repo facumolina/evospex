@@ -439,18 +439,19 @@ public class ChromosomeGenesFactory {
           (Boolean) resultExample ? ExprConstant.TRUE : ExprConstant.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
       genes.add(new ExprGene(conf, newValue, contextInfo));
-      for (Expr e : contextInfo.getEvaluableExpressions()) {
-        if (e.type().toString().contains("this/boolean")) {
-          geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, e);
-          ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-          genes.add(new ExprGene(conf, geneValue, contextInfo));
-        }
-      }
+      //for (Expr e : contextInfo.getEvaluableExpressions()) {
+      //  if (e.type().toString().contains("this/boolean")) {
+      //    geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, e);
+      //    ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
+      //    genes.add(new ExprGene(conf, geneValue, contextInfo));
+      //  }
+      //}
     } else if (resultExample instanceof Integer || resultExample instanceof Double) {
       // The result is int or double, compare it with int expressions
       resultVar = ExprVar.make(null, "result", Type.smallIntType());
       contextInfo.addVariableForType(resultExample.getClass().getSimpleName(), "result");
-      List<Expr> intExprs = contextInfo.getIntEvaluableExpressions();
+      //List<Expr> intExprs = contextInfo.getIntEvaluableExpressions();
+      List<Expr> intExprs = new LinkedList<>();
       for (Expr intExpr : intExprs) {
         Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, intExpr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
@@ -470,14 +471,14 @@ public class ChromosomeGenesFactory {
       contextInfo.addVariableForType(resultExample.getClass().getSimpleName(), "result");
       genes.add(create_gene_expr_equal_null(resultVar));
       // Equal to vars of same type
-      for (Expr e : contextInfo.getEvaluableExpressions()) {
+      /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains(resultExample.getClass().getSimpleName())
             && !e.type().toString().contains("Collection")) {
           Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, e);
           ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
         }
-      }
+      }*/
     } else {
       if (resultExample instanceof Collection) {
         collections_equalities((Collection) resultExample, resultVar, genes);
@@ -486,13 +487,13 @@ public class ChromosomeGenesFactory {
       contextInfo.addVariableForType(resultExample.getClass().getSimpleName(), "result");
       genes.add(create_gene_expr_equal_null(resultVar));
       // Equal to vars of same type
-      for (Expr e : contextInfo.getEvaluableExpressions()) {
+      /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains("this/" + resultExample.getClass().getSimpleName())) {
           Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, e);
           ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
         }
-      }
+      }*/
     }
 
     return genes;
@@ -575,12 +576,12 @@ public class ChromosomeGenesFactory {
       // Equality with other integer expressions
       // argLabel = e.f
       contextInfo.addVariableForType(Integer.class.getSimpleName(), argLabel);
-      for (Expr expr : contextInfo.getIntEvaluableExpressions()) {
+      /*for (Expr expr : contextInfo.getIntEvaluableExpressions()) {
         Expr geneExpr = ExprBinary.Op.EQUALS.make(null, null,
             ExprVar.make(null, argLabel, Type.smallIntType()), expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
         genes.add(new ExprGene(conf, newValue, contextInfo));
-      }
+      }*/
 
       // Quantification stating that int arg belongs to int set
       // argLabel in e.*f
@@ -627,7 +628,8 @@ public class ChromosomeGenesFactory {
       String argClass) throws InvalidConfigurationException {
     if (TargetInformation.hasCollectionsOfType(argClass)
         || "DoublyLinkedListNode".equals(argClass)) {
-      List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+      //List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+      List<Expr> evaluable = new LinkedList<>();
       for (Expr expr : evaluable) {
         if (!expr.type().toString().contains("Collection_")
             && !expr.type().toString().contains("Map_")
@@ -689,7 +691,8 @@ public class ChromosomeGenesFactory {
    */
   private List<Gene> createGenesUsingMaps() throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<Gene>();
-    List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+    //List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+    List<Expr> evaluable = new LinkedList<>();
     for (Expr expr : evaluable) {
       Type exprType = expr.type();
       if (exprType.toString().contains("Map_")) {
@@ -1478,8 +1481,7 @@ public class ChromosomeGenesFactory {
    * Given an evaluated expression and the evaluation result, build an exprgene which expression =
    * evaluatedExpression op null if the evaluation result is a value or expression = no
    * evaluatedExpression if the evaluation result is empty.
-   * 
-   * @param expression
+   *
    * @param evaluation
    * @param isPositive
    * @return
