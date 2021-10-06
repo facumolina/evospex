@@ -1,4 +1,4 @@
-package evospex;
+package evospex.ga;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,22 +9,24 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Random;
 
+import evospex.ConfigurationProperties;
+import evospex.CustomConfiguration;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 
-import geneticalgorithm.chromosome.ChromosomeGenesFactory;
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.ExprGeneValueCloneHandler;
-import geneticalgorithm.chromosome.SpecChromosome;
-import geneticalgorithm.fitnessfunction.DynAlloyEquivalenceSpecCounter;
-import geneticalgorithm.fitnessfunction.DynAlloyPassingAssertionsCounter;
-import geneticalgorithm.fitnessfunction.PostConditionSpecEvaluator;
-import geneticalgorithm.operator.ChromosomeCrossoverOperator;
-import geneticalgorithm.operator.ExprGeneMutationOperator;
-import geneticalgorithm.operator.SpecChromosomeNaturalSelector;
+import evospex.ga.chromosome.ChromosomeGenesFactory;
+import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.ExprGeneValueCloneHandler;
+import evospex.ga.chromosome.SpecChromosome;
+import evospex.ga.fitnessfunction.DynAlloyEquivalenceSpecCounter;
+import evospex.ga.fitnessfunction.DynAlloyPassingAssertionsCounter;
+import evospex.ga.fitnessfunction.PostConditionSpecEvaluator;
+import evospex.ga.operator.ChromosomeCrossoverOperator;
+import evospex.ga.operator.ExprGeneMutationOperator;
+import evospex.ga.operator.SpecChromosomeNaturalSelector;
 import report.Report;
 import report.Stats;
 import rfm.dynalloy.Err;

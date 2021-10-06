@@ -1,9 +1,11 @@
-package geneticalgorithm.operator;
+package evospex.ga.operator;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import evospex.ga.chromosome.ExprGeneType;
+import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -13,10 +15,8 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 import org.jgap.data.config.Configurable;
 
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.ExprGeneType;
-import geneticalgorithm.chromosome.ExprGeneValue;
-import geneticalgorithm.chromosome.SpecChromosome;
+import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.ExprGeneValue;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.EvoSpexParameters;

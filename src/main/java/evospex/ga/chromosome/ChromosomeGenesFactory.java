@@ -1,4 +1,4 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,7 +11,6 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
-import org.jgap.impl.IntegerGene;
 
 import evospex.ConfigurationProperties;
 import evospex.target.MethodExecution;

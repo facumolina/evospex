@@ -1,5 +1,6 @@
 package evospex;
 
+import evospex.ga.EvoSpexGA;
 import utils.EvoSpexParameters;
 
 public class CatalogueLearner {

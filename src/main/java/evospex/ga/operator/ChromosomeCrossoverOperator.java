@@ -1,4 +1,4 @@
-package geneticalgorithm.operator;
+package evospex.ga.operator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -16,8 +17,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.SpecChromosome;
+import evospex.ga.chromosome.ExprGene;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.TargetInformation;

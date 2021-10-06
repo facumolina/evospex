@@ -1,4 +1,4 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import rfm.dynalloyCompiler.ast.Decl;
 import rfm.dynalloyCompiler.ast.Expr;

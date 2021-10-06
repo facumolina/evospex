@@ -2,6 +2,7 @@ package evospex;
 
 import static org.junit.Assert.assertTrue;
 
+import evospex.ga.EvoSpexGA;
 import org.junit.Before;
 import org.junit.Test;
 

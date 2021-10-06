@@ -1,4 +1,4 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import java.util.HashSet;
 import java.util.List;

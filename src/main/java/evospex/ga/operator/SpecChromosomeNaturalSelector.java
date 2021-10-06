@@ -1,10 +1,11 @@
-package geneticalgorithm.operator;
+package evospex.ga.operator;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
+import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.Configuration;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
@@ -12,7 +13,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.NaturalSelector;
 import org.jgap.Population;
 
-import geneticalgorithm.chromosome.SpecChromosome;
 import report.Stats;
 
 /**

@@ -6,9 +6,9 @@ import java.util.List;
 import org.jgap.Gene;
 import org.jgap.impl.IntegerGene;
 
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.ExprGeneValue;
-import geneticalgorithm.chromosome.SpecChromosome;
+import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.SpecChromosome;
 import hamcrest.assertion.HamcrestAssertion;
 import hamcrest.assertion.QuantifiedHamcrestAssertion;
 import hamcrest.assertion.SimpleHamcrestAssertion;

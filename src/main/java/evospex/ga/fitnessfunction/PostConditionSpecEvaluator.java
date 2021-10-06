@@ -1,18 +1,18 @@
-package geneticalgorithm.fitnessfunction;
+package evospex.ga.fitnessfunction;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.SpecChromosome;
 import org.apache.commons.jexl3.JexlEngine;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.ExprGeneValue;
-import geneticalgorithm.chromosome.SpecChromosome;
 import hamcrest.assertion.HamcrestAssertion;
 import hamcrest.expression.NonEvaluableExpressionException;
 import evospex.target.MethodExecution;

@@ -1,9 +1,9 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import geneticalgorithm.operator.GASpecLearnerMutations;
+import evospex.ga.operator.GASpecLearnerMutations;
 
 /**
  * This class represents the types of the gene's value depending which type of expression contains

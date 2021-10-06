@@ -1,4 +1,4 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import org.jgap.ICloneHandler;
 

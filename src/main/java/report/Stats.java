@@ -1,6 +1,6 @@
 package report;
 
-import geneticalgorithm.chromosome.SpecChromosome;
+import evospex.ga.chromosome.SpecChromosome;
 
 /**
  * Class containing statistics and numbers collected during the GA execution

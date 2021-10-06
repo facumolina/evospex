@@ -1,4 +1,4 @@
-package geneticalgorithm.operator;
+package evospex.ga.operator;
 
 import java.util.Random;
 

@@ -1,9 +1,10 @@
-package geneticalgorithm.chromosome;
+package evospex.ga.chromosome;
 
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import evospex.ga.operator.GASpecLearnerMutations;
 import org.jgap.BaseGene;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -11,7 +12,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
 
-import geneticalgorithm.operator.GASpecLearnerMutations;
 import rfm.dynalloy.Err;
 import rfm.dynalloyCompiler.ast.Expr;
 import rfm.dynalloyCompiler.ast.ExprBinary;

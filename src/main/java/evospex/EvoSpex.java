@@ -1,5 +1,6 @@
 package evospex;
 
+import evospex.ga.EvoSpexGA;
 import org.jgap.InvalidConfigurationException;
 
 import utils.EvoSpexParameters;

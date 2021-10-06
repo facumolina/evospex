@@ -1,18 +1,18 @@
-package geneticalgorithm.fitnessfunction;
+package evospex.ga.fitnessfunction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
 
-import geneticalgorithm.chromosome.ExprGene;
-import geneticalgorithm.chromosome.ExprGeneValue;
-import geneticalgorithm.chromosome.SpecChromosome;
+import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.ExprGeneValue;
 import evospex.ConfigurationProperties;
 import rfm.dynalloyCompiler.ast.Expr;
 import wrapper.DynAlloyRunner;

@@ -1,4 +1,4 @@
-package geneticalgorithm.fitnessfunction;
+package evospex.ga.fitnessfunction;
 
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
