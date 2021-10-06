@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import evospex.expression.ExprGrammarParser.ExprContext;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -34,17 +35,17 @@ import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
 
 /**
- * Class to create the initial population of Chromosomes
+ * This class represents a Genes Factory, which allows to create the initial population of
+ * Chromosomes as well as provides methods to create specific genes.
  * 
- * @author fmolina
- *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class ChromosomeGenesFactory {
 
   private Configuration conf;
   private DynAlloyRunner runner;
   private int genes_num;
-  private TargetInformation contextInfo;
+  private final TargetInformation contextInfo;
   private EvoSpexParameters parameters;
 
   /**
@@ -93,50 +94,16 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Get the initial chromosomes using an alloy spec
+   * Build the initial population of chromosomes
+   * The initial population is built by the following process:
+   * 1. Randomly obtain positive and negative example from the provided test suite
+   * 2. For each example, use the information extracted from the target class and method
+   * to evaluate a set of expressions on each example, and then creating candidate specs
+   * from the evaluations results.
+   * @return the initial population
    */
-  public List<SpecChromosome> getInitialChromosomesForPCs(Object resultExample,
-      List<Object> argsExample) throws InvalidConfigurationException {
-    LinkedList<SpecChromosome> chromosomes = new LinkedList<SpecChromosome>();
-
-      // The initial specification is empty
-      A4Solution positiveExample = runner.generateExample(true);
-      A4Solution negativeExample = runner.generateExample(false);
-      // Save the null signature
-      contextInfo.saveSignaturesInformation(positiveExample);
-      int examplesConsidered = 0;
-      boolean addComplex = true; // Add complex formulas (comparisons, qantifications, result, args)
-      while (examplesConsidered < parameters.getAmountOfExamplesForInitialChromosomesGeneration()) {
-        if (positiveExample.satisfiable() && negativeExample.satisfiable()) {
-          try {
-            chromosomes.addAll(generateChromosomesFromExample(positiveExample, true, resultExample,
-                argsExample, addComplex));
-            chromosomes.addAll(generateChromosomesFromExample(negativeExample, false, resultExample,
-                argsExample, addComplex));
-            positiveExample = positiveExample.next();
-            negativeExample = negativeExample.next();
-            addComplex = false; // Only once
-            examplesConsidered += 2;
-          } catch (Err e) {
-            e.printStackTrace();
-          }
-        } else {
-          break;
-        }
-      }
-      if (resultExample != null
-          && (resultExample instanceof Integer || resultExample instanceof Double)) {
-        contextInfo.addVariableForType(Integer.class.getSimpleName(), "result");
-      }
-
-    return chromosomes;
-  }
-
-  /**
-   * Get the initial chromosomes from previously created java objects
-   */
-  public List<SpecChromosome> getInitialChromosomesFromJavaObjects() {
-    LinkedList<SpecChromosome> chromosomes = new LinkedList<SpecChromosome>();
+  public List<SpecChromosome> buildInitialPopulation() {
+    LinkedList<SpecChromosome> chromosomes = new LinkedList<>();
     int examplesConsidered = 0;
     Object resultExample = EvoSpexParameters.RESULT_EXAMPLE;
     List<Object> argsExample = EvoSpexParameters.ARGS_EXAMPLES;
@@ -144,7 +111,7 @@ public class ChromosomeGenesFactory {
     List<MethodExecution> allNegatives = parameters.getNegativeObjects();
 
     Random r = new Random();
-    boolean addComplex = true; // Add complex formulas (comparisons, qantifications, result, args)
+    boolean addComplex = true; // Add complex formulas (comparisons, quantifications, result, args)
     while (examplesConsidered < parameters.getAmountOfExamplesForInitialChromosomesGeneration()) {
       // Get a random positive and negative objects
       MethodExecution pos = allPositives.get(r.nextInt(allPositives.size()));
@@ -172,12 +139,18 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Generates a list of chromosomes from an object
+   * Generates a list of individuals from an instance of the target class
+   * @param o is an instance of the target class
+   * @param isPositive indicates if belongs to a positive or negative example
+   * @param resultExample is an example of a method execution result
+   * @param argsExamples is an example of a method execution arguments
+   * @param addComplex indicates if complex expressions (quantification, etc) must be computed from the example
+   * @return a list of individuals computed from the given arguments
    */
   public List<SpecChromosome> generateChromosomesFromObject(Object o, boolean isPositive,
       Object resultExample, List<Object> argsExamples, boolean addComplex)
       throws InvalidConfigurationException, Err {
-    List<SpecChromosome> chromosomes = new LinkedList<SpecChromosome>();
+    List<SpecChromosome> chromosomes = new LinkedList<>();
     List<Gene> genes = createGenesFromObject(o, isPositive, resultExample, argsExamples,
         addComplex);
 
@@ -234,11 +207,73 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Creates the genes that represents the object
+   * Generates a list of genes to be part of the chromosome built from an instance of the target class
+   * @param o is an instance of the target class
+   * @param isPositive indicates if belongs to a positive or negative example
+   * @param resultExample is an example of a method execution result
+   * @param argsExamples is an example of a method execution arguments
+   * @param addComplex indicates if complex expressions (quantification, etc) must be computed from the example
+   * @return a list of individuals computed from the given arguments
    */
   public List<Gene> createGenesFromObject(Object o, boolean isPositive, Object resultExample,
       List<Object> argsExamples, boolean addComplex) {
-    return null;
+    // Get the evaluable expressions for the current example
+    List<ExprContext> evaluableJoinedExpressions = contextInfo.getJoinedExpressions();
+    List<ExprContext> evaluableJoinedExpressionsOfTypeInt = contextInfo.getJoinedExpressionsOfTypeInt();
+    evaluableJoinedExpressions.addAll(evaluableJoinedExpressionsOfTypeInt);
+    List<ExprContext> evaluableSimpleClosuredExpressions = contextInfo.getSimpleClosuredExpressions();
+    List<ExprContext> evaluableDoubleClosuredExpressions = contextInfo.getDoubleClosuredExpressions();
+
+    List<Gene> genes = new LinkedList<>();
+    try {
+      // Create the chromosome genes
+
+      // Create the genes according to the evaluation of each evaluable expression
+      if (parameters.getConsiderJoinedExpressions() && isPositive) {
+        genes.addAll(createsGenesFromEvaluableJoinedExpressions(evaluableJoinedExpressions, o, isPositive));
+      }
+
+      if (parameters.getConsiderJoinedExpressionsComparisons()) {
+        // Create the genes comparing joined expressions of the thiz object
+        genes.addAll(createsGenesComparingEvaluableExpressions());
+        // Create the genes comparing joined expressions of the thiz object with the thizPre object
+        // (if possible)
+        genes.addAll(createGenesComparingJoinedExpressionsDifferentObjects(evaluableJoinedExpressions));
+      }
+
+      if (addComplex) {
+        // Create genes quantifying the simple closured expressions
+        if (parameters.getConsiderSimpleClosuredExpressions())
+          genes.addAll(createsGenesFromSimpleClosuredExpressionsAndIntExpressions(evaluableSimpleClosuredExpressions,
+                  evaluableJoinedExpressionsOfTypeInt));
+
+        // Create genes quantifying the double closured expressions
+        if (parameters.getConsiderDoubleClosuredExpressions())
+          genes.addAll(createsGenesFromDoubleClosuredExpressionsAndIntExpressions(evaluableDoubleClosuredExpressions, evaluableJoinedExpressionsOfTypeInt));
+
+        // Create genes using the example result expression
+        if (resultExample != null)
+          genes.addAll(createGenesUsingTheResultObject(resultExample));
+
+        // Create genes using the example arguments
+        if (argsExamples != null) {
+          int argPos = 0;
+          for (Object arg : argsExamples) {
+            String argLabel = "arg" + argPos;
+            genes.addAll(createGenesUsingArguments(arg, argLabel, evaluableSimpleClosuredExpressions,
+                    evaluableDoubleClosuredExpressions));
+            argPos++;
+          }
+        }
+
+        // Create genes using Maps
+        genes.addAll(createGenesUsingMaps());
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    contextInfo.clearExpressionsByEvaluationValue();
+    return genes;
   }
 
   /**
@@ -523,6 +558,16 @@ public class ChromosomeGenesFactory {
 
   /**
    * Create genes using the result example
+   *
+   * @throws InvalidConfigurationException
+   */
+  public List<Gene> createGenesUsingArguments(Object arg, String argLabel, List<ExprContext> simpleClosuredExprs,
+                                        List<ExprContext> doubleClosuredExprs) throws InvalidConfigurationException {
+    return null;
+  }
+
+  /**
+   * Create genes using the result example
    * 
    * @throws InvalidConfigurationException
    */
@@ -695,6 +740,22 @@ public class ChromosomeGenesFactory {
   /**
    * Creates genes from joined expressions and its evaluation result. Given an expression e, the
    * gene expression built from e can be:
+   *
+   * - e = null when the evaluation result is null
+   *
+   * - e != null when the evaluation result is not null
+   *
+   * - no e when the evaluation result is empty
+   */
+  public List<Gene> createsGenesFromEvaluableJoinedExpressions(
+          List<ExprContext> evaluableJoinedExpressions, Object o, boolean isPositive)
+          throws Exception {
+    return null;
+  }
+
+  /**
+   * Creates genes from joined expressions and its evaluation result. Given an expression e, the
+   * gene expression built from e can be:
    * 
    * - e = null when the evaluation result is null
    * 
@@ -800,6 +861,15 @@ public class ChromosomeGenesFactory {
 
   /**
    * Creates genes comparing evalable expressions over thiz and thizPre
+   *
+   * @throws InvalidConfigurationException
+   */
+  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjects(List<ExprContext> evaluableJoinedExpressions) {
+    return null;
+  }
+
+  /**
+   * Creates genes comparing evalable expressions over thiz and thizPre
    * 
    * @throws InvalidConfigurationException
    */
@@ -840,6 +910,14 @@ public class ChromosomeGenesFactory {
     int lastJoinIdx1 = strExpr1.lastIndexOf(".");
     int lastJoinIdx2 = strExpr2.lastIndexOf(".");
     return strExpr1.substring(lastJoinIdx1).equals(strExpr2.substring(lastJoinIdx2));
+  }
+
+  /**
+   * Creates genes from simple closured expressions considering: - Quantified expressions with body
+   * predicating about shapes - Quantified expressions with body predicating about values
+   */
+  public List<Gene> createsGenesFromSimpleClosuredExpressionsAndIntExpressions(List<ExprContext> simpleClosuredExpressions, List<ExprContext> joinedExpressionsOfTypeInt) {
+    return null;
   }
 
   /**
@@ -955,6 +1033,15 @@ public class ChromosomeGenesFactory {
       }
     }
     return genes;
+  }
+
+  /**
+   * Creates genes from double closured expressions considering: - Quantified expressions with body
+   * predicating about shapes - Quantified expressions with body predicating about values
+   */
+  public List<Gene> createsGenesFromDoubleClosuredExpressionsAndIntExpressions(List<ExprContext> doubleClosuredExpressions,
+                                                              List<ExprContext> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
+    return null;
   }
 
   /**

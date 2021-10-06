@@ -399,18 +399,15 @@ public class EvoSpexGA {
     conf.setFitnessFunction(new PostConditionSpecEvaluator(genes_num, parameters));
 
     // Initial chromosomes
-    List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesForPCs(
-        EvoSpexParameters.RESULT_EXAMPLE, EvoSpexParameters.ARGS_EXAMPLES);
+    List<SpecChromosome> initialPopulation = cgfactory.buildInitialPopulation();
     conf.setPopulationSize(parameters.getPopulationSize());
 
-    // cgfactory.getInitialChromosomesFromJavaObjects();
-
     // Initial report
-    Report.initialReport(initialChromosomes.get(0).getGenes().length, initialChromosomes.size(),
+    Report.initialReport(initialPopulation.get(0).getGenes().length, initialPopulation.size(),
         parameters);
 
     Genotype population = Genotype.randomInitialGenotype(conf);
-    population.getPopulation().setChromosomes(initialChromosomes);
+    population.getPopulation().setChromosomes(initialPopulation);
 
     if (parameters.randomSearch()) {
       // Randomized search. Only get the best individual in the initial random population
@@ -419,8 +416,8 @@ public class EvoSpexGA {
       Random rand = new Random();
       double current = 0;
       for (int i = 0; i < parameters.getPopulationSize(); i++) {
-        int r = rand.nextInt(initialChromosomes.size());
-        SpecChromosome randomChrom = initialChromosomes.get(r);
+        int r = rand.nextInt(initialPopulation.size());
+        SpecChromosome randomChrom = initialPopulation.get(r);
         double randomChromFitness = conf.getFitnessFunction().getFitnessValue(randomChrom);
         if (randomChromFitness > current) {
           foundChromosome = (SpecChromosome) randomChrom;

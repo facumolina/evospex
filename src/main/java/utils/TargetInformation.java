@@ -366,6 +366,34 @@ public class TargetInformation {
   }
 
   /**
+   * Get all the joined expressions
+   */
+  public List<ExprContext> getJoinedExpressions() {
+    return joinedExpressions;
+  }
+
+  /**
+   * Get all the joined expressions of type int
+   */
+  public List<ExprContext> getJoinedExpressionsOfTypeInt() {
+    return joinedExpressionsOfTypeInt;
+  }
+
+  /**
+   * Get all the simple closured expressions
+   */
+  public List<ExprContext> getSimpleClosuredExpressions() {
+    return simpleClosuredExpressions;
+  }
+
+  /**
+   * Get all the double closured expressions
+   */
+  public List<ExprContext> getDoubleClosuredExpressions() {
+    return doubleClosuredExpressions;
+  }
+
+  /**
    * Translate all the joined expressions
    */
   public List<Expr> getCommandJoinedExpressions(Iterable<ExprVar> skolems) {
