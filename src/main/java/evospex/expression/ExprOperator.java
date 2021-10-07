@@ -17,10 +17,10 @@ public class ExprOperator {
   public static final String NOT_EQ = "!=";
   public static final String IN = "in";
   public static final String NOT_IN = "not in";
-  public static final String LESS = "<";
-  public static final String LESS_EQ = "<=";
-  public static final String GREAT = ">";
-  public static final String GREAT_EQ = ">=";
+  public static final String LT = "<";
+  public static final String LTE = "<=";
+  public static final String GT = ">";
+  public static final String GTE = ">=";
 
   // Binary operators
   public static final String OR_1 = "||";
