@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import evospex.expression.ExprGrammarConstantSymbols;
 import evospex.expression.ExprGrammarLexer;
 import evospex.expression.ExprGrammarParser;
 import evospex.expression.ExprGrammarParser.ParseContext;
@@ -18,6 +19,7 @@ import evospex.expression.ExprGrammarParser.Compare_opContext;
 import evospex.expression.ExprGrammarParser.Unary_opContext;
 import evospex.expression.ExprGrammarParser.NameContext;
 
+import evospex.expression.ExprName;
 import evospex.expression.validator.ExpressionValidator;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -39,17 +41,15 @@ public class ExpressionEvaluator {
   /**
    * Setup the parser
    */
-  private static void setup(String strExpr) {
-    ExprGrammarLexer lexer = new ExprGrammarLexer(CharStreams.fromString(strExpr));
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    parser = new ExprGrammarParser(tokens);
+  private static void setup(ExprContext expr,Object o) {
     vars = new HashMap<>();
+    vars.put(ExprName.THIS, o);
   }
 
   /**
    * Check the arguments for evaluation
    */
-  private static void checkEvalArgs(String strExpr, Object base) {
+  private static void checkEvalArgs(ExprContext strExpr, Object base) {
     if (strExpr == null || base == null)
       throw new IllegalArgumentException("Neither the expression nor the object can be null.");
   }
@@ -57,44 +57,12 @@ public class ExpressionEvaluator {
   /**
    * Evaluate the given unary expression with the given object
    */
-  public static boolean eval(String strExpr, Object o) {
-    return eval(strExpr, o, null, null);
+  public static boolean eval(ExprContext expr, Object o) {
+    checkEvalArgs(expr, o);
+    setup(expr, o);
+    return eval(expr, o);
   }
 
-
-  /**
-   * Evaluate the given binary expression with the given objects
-   */
-  public static boolean eval(String strExpr, Object o1, Object o2) {
-    return eval(strExpr, o1, o2, null);
-  }
-
-  /**
-   * Evaluate the given ternary expression with the given objects
-   */
-  public static boolean eval(String strExpr, Object o1, Object o2, Object o3) {
-    checkEvalArgs(strExpr, o1);
-    ExpressionValidator.validate(strExpr, o1.getClass(), o2!=null?o2.getClass():null, o3!=null?o3.getClass():null);
-    setup(strExpr);
-
-    // Parse the expression and get the tree
-    ParseTree tree = parser.parse();
-
-    if (parser.getNumberOfSyntaxErrors() > 0)
-      throw new IllegalArgumentException("The given expression contains syntax errors");
-
-    // Evaluate the expression on the object
-    ParseContext ctx = (ParseContext) tree;
-    setVars(strExpr, o1, o2, o3);
-    return (Boolean) eval(ctx.expr());
-  }
-
-  /**
-   * Set the variable values in the map
-   */
-  private static void setVars(String alloy_expr, Object o1, Object o2, Object o3) {
-
-  }
 
   /**
    * Set the collection var
@@ -109,24 +77,10 @@ public class ExpressionEvaluator {
   /**
    * Evaluate the given any expr (not necessarily boolean) on the given object
    */
-  public static Object evalAnyExpr(String strExpr, Object o) {
-    if (strExpr == null || o == null)
-      throw new IllegalArgumentException("Neither the expression nor the object can be null.");
-
-    ExpressionValidator.validate(strExpr, o.getClass(), null, null);
-
-    setup(strExpr);
-
-    // Parse the expression and get the tree
-    ParseTree tree = parser.parse();
-
-    if (parser.getNumberOfSyntaxErrors() > 0)
-      throw new IllegalArgumentException("The given expression contains syntax errors");
-
-    // Evaluate the expression on the object
-    ParseContext ctx = (ParseContext) tree;
-    vars.put(o.getClass().getSimpleName(), o);
-    return eval(ctx.expr());
+  public static Object evalAnyExpr(ExprContext expr, Object o) throws NonEvaluableExpressionException {
+    checkEvalArgs(expr, o);
+    setup(expr, o);
+    return eval(expr);
   }
 
   /**
