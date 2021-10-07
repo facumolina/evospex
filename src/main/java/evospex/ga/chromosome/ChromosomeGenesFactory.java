@@ -8,6 +8,10 @@ import java.util.Random;
 import java.util.Set;
 
 import evospex.expression.ExprGrammarParser.ExprContext;
+import evospex.expression.ExprName;
+import evospex.expression.ExprOperator;
+import evospex.expression.evaluator.ExpressionEvaluator;
+import evospex.expression.evaluator.NonEvaluableExpressionException;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -750,6 +754,18 @@ public class ChromosomeGenesFactory {
   public List<Gene> createsGenesFromEvaluableJoinedExpressions(
           List<ExprContext> evaluableJoinedExpressions, Object o, boolean isPositive)
           throws Exception {
+    List<Gene> genes = new LinkedList<>();
+    for (ExprContext expr : evaluableJoinedExpressions) {
+      try {
+        Object result = ExpressionEvaluator.evalAnyExpr(expr, o);
+        String resultStr = result!=null?result.toString(): ExprName.NULL;
+        String opStr = isPositive ? ExprOperator.EQ : ExprOperator.NOT_EQ;
+        String newExprStr = expr.getText() + " " + opStr + " " + resultStr;
+
+      } catch (NonEvaluableExpressionException e) {
+      }
+
+    }
     return null;
   }
 
@@ -1520,6 +1536,20 @@ public class ChromosomeGenesFactory {
 
     ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
     return geneValue;
+  }
+
+  /**
+   * Given an evaluated expression and the evaluation result, build a new expr gene which expression
+   * is expr = result if the evaluation comes from a positive example or expr != result if the evaluation
+   * comes from a negative example
+   *
+   * @param expr is the evaluated expression
+   * @param result is the result of evaluating expr
+   * @param isPositive indicates if the evaluation comes from a positive example or not
+   * @return a new gene
+   */
+  public Gene buildExprGeneFromEval(ExprContext expr, Object result, boolean isPositive) throws InvalidConfigurationException{
+    return null;
   }
 
   /**
