@@ -15,6 +15,13 @@ public class ExprBuilder {
 
   private static ExprGrammarParser parser; // Expressions Parser
 
+  public static final ExprContext TRUE = toExprContext(ExprName.TRUE);
+  public static final ExprContext FALSE = toExprContext(ExprName.FALSE);
+  public static final ExprContext RESULT = toExprContext(ExprName.RESULT);
+  public static final ExprContext NULL = toExprContext(ExprName.NULL);
+  public static final ExprContext ZERO = toExprContext(ExprName.ZERO);
+  public static final ExprContext ONE = toExprContext(ExprName.ONE);
+
   /**
    * Setup the parser
    */
@@ -42,8 +49,38 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1.expr2
    */
-  public static String join(String expr1, String expr2) {
-    return expr1 + ExprOperator.JOIN + expr2;
+  public static ExprContext join(ExprContext expr1, ExprContext expr2) {
+    return toExprContext(expr1.getText() + ExprOperator.JOIN  + expr2.getText());
+  }
+
+  /**
+   * Compare the two given expressions with the eq operator
+   * @param expr1 is the first expression
+   * @param expr2 is the second expression
+   * @return the expression expr1 = expr2
+   */
+  public static ExprContext eq(ExprContext expr1, ExprContext expr2) {
+    return toExprContext(expr1.getText() + " " + ExprOperator.EQ + " " + expr2.getText());
+  }
+
+  /**
+   * Compare the two given expressions with the not eq operator
+   * @param expr1 is the first expression
+   * @param expr2 is the second expression
+   * @return the expression expr1 != expr2
+   */
+  public static ExprContext neq(ExprContext expr1, ExprContext expr2) {
+    return toExprContext(expr1.getText() + " " + ExprOperator.NOT_EQ + " " + expr2.getText());
+  }
+
+  /**
+   * Compare the two given expressions with the in operator
+   * @param expr1 is the first expression
+   * @param expr2 is the second expression
+   * @return the expression expr1 in expr2
+   */
+  public static ExprContext in(ExprContext expr1, ExprContext expr2) {
+    return toExprContext(expr1.getText() + " " + ExprOperator.IN + " " + expr2.getText());
   }
 
   /**

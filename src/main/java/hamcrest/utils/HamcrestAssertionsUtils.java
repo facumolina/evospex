@@ -3,6 +3,7 @@ package hamcrest.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import evospex.expression.ExprGrammarParser;
 import org.jgap.Gene;
 import org.jgap.impl.IntegerGene;
 
@@ -48,43 +49,7 @@ public class HamcrestAssertionsUtils {
    * @param chromosome
    */
   public static List<HamcrestAssertion> generateHamcrestAssertions(SpecChromosome chromosome) {
-
-    // Validate the genes
-    Gene[] genes = chromosome.getGenes();
-    if (genes[0] instanceof IntegerGene) {
-      throw new IllegalStateException("Integer genes not supported for tranlsation");
-    }
-
-    // Extract the alloy expression from each gene, and then convert it to the corresponding
-    // Hamcrest expression
-    List<HamcrestAssertion> hamcrestAssertions = new ArrayList<HamcrestAssertion>();
-    for (int i = 0; i < genes.length; i++) {
-      ExprGene gene = (ExprGene) genes[i];
-      Expr alloyExpr = ((ExprGeneValue) gene.getInternalValue()).getExpression();
-      if (alloyExpr != ExprConstant.TRUE) {
-        if (alloyExpr instanceof ExprQt) {
-          // Quantified expression
-          hamcrestAssertions.add(alloyQt2HamcrestAssertion((ExprQt) alloyExpr));
-        } else {
-          if (alloyExpr instanceof ExprCall) {
-            // Expression call, e.g., integer/eq[exp1,exp2]
-            ExprCall call = (ExprCall) alloyExpr;
-            // If neither exp1 nor exp2 contains a set, then it should be handled like a simple
-            // assertion
-            if (containsSet(call)) {
-              hamcrestAssertions.add(alloyCall2HamcrestAssertion(call));
-            } else {
-              throw new IllegalArgumentException("Implement this case!!!");
-            }
-          } else {
-            HamcrestExpr hamcrestExpr = alloyExpr2HamcrestExpr(alloyExpr);
-            hamcrestAssertions.add(new SimpleHamcrestAssertion(hamcrestExpr));
-          }
-        }
-      }
-    }
-    return hamcrestAssertions;
-
+    throw new UnsupportedOperationException("implement this");
   }
 
   /**

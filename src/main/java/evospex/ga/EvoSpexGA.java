@@ -219,7 +219,7 @@ public class EvoSpexGA {
    */
   public void learnSpec() throws InvalidConfigurationException {
     conf.setFitnessFunction(new DynAlloyPassingAssertionsCounter(runner));
-    List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesFromAlloy();
+    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
     conf.setPopulationSize(initialChromosomes.size());
 
     Genotype population = Genotype.randomInitialGenotype(conf);
@@ -249,7 +249,7 @@ public class EvoSpexGA {
   public void learnSpecFromSpec() throws InvalidConfigurationException {
 
     conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
-    List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesFromAlloy();
+    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
     conf.setPopulationSize(parameters.getPopulationSize());
 
     Genotype population = Genotype.randomInitialGenotype(conf);
@@ -342,7 +342,7 @@ public class EvoSpexGA {
     // Add the fitness function
     conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
     // Initial chromosomes
-    List<SpecChromosome> initialChromosomes = cgfactory.getInitialChromosomesFromAlloy();
+    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
     System.out
         .println("Amount of genes per Chromosome: " + initialChromosomes.get(0).getGenes().length);
     conf.setPopulationSize(parameters.getPopulationSize());
