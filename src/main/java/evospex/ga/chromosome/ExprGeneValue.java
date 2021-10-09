@@ -1,5 +1,7 @@
 package evospex.ga.chromosome;
 
+import evospex.expression.ExprBuilder;
+import evospex.expression.ExprGrammarParser.ExprContext;
 import rfm.dynalloyCompiler.ast.Decl;
 import rfm.dynalloyCompiler.ast.Expr;
 import rfm.dynalloyCompiler.ast.ExprBinary;
@@ -19,7 +21,7 @@ import utils.DynAlloyExpressionsUtils;
  */
 public class ExprGeneValue {
 
-  private Expr expression;
+  private ExprContext expression;
   private ExprGeneType geneType;
   private ExprGeneValue previous;
 
@@ -27,48 +29,40 @@ public class ExprGeneValue {
    * Default Constructor
    */
   public ExprGeneValue() {
-    expression = ExprConstant.TRUE;
+    expression = ExprBuilder.toExprContext("true");
     geneType = ExprGeneType.CONSTANT;
     previous = null;
   }
 
   /**
-   * Constructor
-   * 
-   * @param expr
-   *          is the expression
+   * Constructor from an expression
+   * @param expr is the expression
    */
-  public ExprGeneValue(Expr expr) {
+  public ExprGeneValue(ExprContext expr) {
     this.expression = expr;
     this.geneType = getGeneTypeFromExpression(expr);
     this.previous = null;
   }
 
   /**
-   * Constructor
-   * 
-   * @param expr
-   *          is the expression
-   * @param geneType
-   *          is the gene type associated with the given expression
+   * Constructor from an expression and a gene type
+   * @param expr is the expression
+   * @param geneType is the gene type associated with the given expression
    */
-  public ExprGeneValue(Expr expr, ExprGeneType geneType) {
+  public ExprGeneValue(ExprContext expr, ExprGeneType geneType) {
     this.expression = expr;
     this.geneType = geneType;
     this.previous = null;
   }
 
   /**
-   * Constructor
+   * Constructor from an expression, a gene type and a previous value
    * 
-   * @param expr
-   *          is the expression
-   * @param geneType
-   *          is the gene type associated with the given expression
-   * @param is
-   *          the previous gene value from which the current was evolved
+   * @param expr is the expression
+   * @param geneType is the gene type associated with the given expression
+   * @param previous is the previous gene value from which the current was evolved
    */
-  public ExprGeneValue(Expr expr, ExprGeneType geneType, ExprGeneValue previous) {
+  public ExprGeneValue(ExprContext expr, ExprGeneType geneType, ExprGeneValue previous) {
     this.expression = expr;
     this.geneType = geneType;
     this.previous = previous;
@@ -77,14 +71,14 @@ public class ExprGeneValue {
   /**
    * Get the expression
    */
-  public Expr getExpression() {
+  public ExprContext getExpression() {
     return expression;
   }
 
   /**
    * Set the expression
    */
-  public void setExpression(Expr newExpression, boolean calculateGeneType) {
+  public void setExpression(ExprContext newExpression, boolean calculateGeneType) {
     expression = newExpression;
     if (calculateGeneType) {
       geneType = getGeneTypeFromExpression(expression);
@@ -108,54 +102,10 @@ public class ExprGeneValue {
   /**
    * Get the gene type for the given expr
    */
-  private ExprGeneType getGeneTypeFromExpression(Expr expr) {
-    if (expr instanceof ExprConstant) {
-      return ExprGeneType.CONSTANT;
-    } else if (expr instanceof ExprUnary) {
-      ExprUnary exprUnary = (ExprUnary) expr;
-      if (exprUnary.op.equals(ExprUnary.Op.NO)) {
-        return ExprGeneType.EMPTYNESS;
-      } else if (exprUnary.op.equals(ExprUnary.Op.SOME)) {
-        return ExprGeneType.SOME;
-      } else if (exprUnary.op.equals(ExprUnary.Op.NOT)) {
-        return ExprGeneType.NEGATION;
-      }
-    } else if (expr instanceof ExprBinary) {
-      ExprBinary exprBinary = (ExprBinary) expr;
-      if (exprBinary.left instanceof ExprUnary) {
-        ExprUnary left = (ExprUnary) exprBinary.left;
-        if (left.op.equals(ExprUnary.Op.CARDINALITY)) {
-          return ExprGeneType.CARDINALITY;
-        } else {
-          if (exprBinary.op.equals(ExprBinary.Op.IN) || exprBinary.op.equals(ExprBinary.Op.NOT_IN))
-            return ExprGeneType.INCLUSION;
-          else
-            return ExprGeneType.INT_COMPARISON;
-        }
-      }
-      if ((exprBinary.op.equals(ExprBinary.Op.EQUALS)
-          || exprBinary.op.equals(ExprBinary.Op.NOT_EQUALS))
-          && !DynAlloyExpressionsUtils.isNumeric(exprBinary.left.type())) {
-        return ExprGeneType.EQUALITY;
-      } else if (DynAlloyExpressionsUtils.isNumeric(exprBinary.left.type())) {
-        return ExprGeneType.INT_COMPARISON;
-      }
-      if (exprBinary.op.equals(ExprBinary.Op.IN) || exprBinary.op.equals(ExprBinary.Op.NOT_IN))
-        return ExprGeneType.INCLUSION;
-    } else if (expr instanceof ExprQt) {
-      ExprQt exprQt = (ExprQt) expr;
-      if (exprQt.op.equals(ExprQt.Op.ALL)) {
-        return determineGeneTypeOfAllExpressionFromTheBody(exprQt.sub);
-      } else if (exprQt.op.equals(ExprQt.Op.SOME)) {
-        return determineGeneTypeOfSomeExpressionFromTheBody(exprQt.sub);
-      } else if (exprQt.op.equals(ExprQt.Op.NO)) {
-        return ExprGeneType.NO;
-      }
-    } else if (expr instanceof ExprCall) {
-      return ExprGeneType.CARDINALITY;
-    }
+  private ExprGeneType getGeneTypeFromExpression(ExprContext expr) {
     throw new IllegalStateException(
-        "ExprGeneType can't be computed for the given epression: " + expr.toString());
+        "ExprGeneType can't be computed for the given expression: " + expr.getText()
+    );
   }
 
   /**
@@ -269,8 +219,7 @@ public class ExprGeneValue {
 
   /**
    * Sets the previous expr gene
-   * 
-   * @param exprGene
+   * @param exprGeneValue is the previous value to set
    */
   public void setPrevious(ExprGeneValue exprGeneValue) {
     this.previous = exprGeneValue;
@@ -278,16 +227,7 @@ public class ExprGeneValue {
 
   @Override
   public String toString() {
-    if (expression instanceof ExprQt) {
-      ExprQt qt = (ExprQt) expression;
-      Decl decl = qt.decls.get(0);
-      String s = qt.op.toString() + " " + decl.names.get(0).label + " : ";
-      s += decl.expr.toString() + " : ";
-      s += qt.sub.toString();
-      return s;
-    } else {
-      return expression.toString();
-    }
+    return "don't know how to print this new genes";
   }
 
   @Override
@@ -303,38 +243,11 @@ public class ExprGeneValue {
 
   /**
    * Clone the given expression
-   * 
-   * @param expr
+   * @param expr is the expression to clone
    * @return
    */
-  private Expr cloneExpression(Expr expr) {
-    if (expr instanceof ExprConstant) {
-      return expr;
-    } else if (expr instanceof ExprVar) {
-      ExprVar var = (ExprVar) expr;
-      return var;
-    } else if (expr instanceof Sig) {
-      return expr;
-    } else if (expr instanceof ExprUnary) {
-      ExprUnary exprUnary = (ExprUnary) expr;
-      return exprUnary.op.make(null, cloneExpression(exprUnary.sub));
-    } else if (expr instanceof ExprBinary) {
-      ExprBinary exprBinary = (ExprBinary) expr;
-      return exprBinary.op.make(null, null, cloneExpression(exprBinary.left),
-          cloneExpression(exprBinary.right));
-    } else if (expr instanceof ExprQt) {
-      ExprQt exprQt = (ExprQt) expr;
-      return exprQt.op.make(null, null, exprQt.decls, cloneExpression(exprQt.sub));
-    } else if (expr instanceof ExprCall) {
-      ExprCall exprCall = (ExprCall) expr;
-      return ExprCall.make(null, null, exprCall.fun, exprCall.args, 0);
-    } else if (expr instanceof ExprList) {
-      ExprList exprList = (ExprList) expr;
-      return ExprBinary.Op.AND.make(null, null, cloneExpression(exprList.args.get(0)),
-          cloneExpression(exprList.args.get(1)));
-    }
-    System.out.println("Error cloning: " + expr.toString());
-    return null;
+  private ExprContext cloneExpression(ExprContext expr) {
+    return ExprBuilder.toExprContext(expr.getText());
   }
 
   /**
@@ -348,17 +261,7 @@ public class ExprGeneValue {
     case EQUALITY:
       return 1;
     case INT_COMPARISON:
-      if (expression instanceof ExprBinary) {
-        ExprBinary bin = (ExprBinary) expression;
-        if (bin.op.equals(ExprBinary.Op.EQUALS)) {
-          // Equalities are less complex than the other operators
-          return 0.5;
-        }
-      }
-      if (expression instanceof ExprCall) {
-        ExprCall call = (ExprCall) expression;
-        call.toString();
-      }
+      // TODO re implement this as originally
       return 1;
     case EMPTYNESS:
       return 1;
@@ -391,7 +294,7 @@ public class ExprGeneValue {
     case SOME:
       return 3;
     default:
-      throw new IllegalStateException("Complexity can't be calculated:" + geneType.toString());
+      throw new IllegalStateException("Complexity can't be calculated:" + geneType);
     }
   }
 }

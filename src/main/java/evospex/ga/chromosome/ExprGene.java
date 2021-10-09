@@ -58,7 +58,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Constructor with a given value
    * 
    * @param a_conf
-   * @param expression
    * @throws InvalidConfigurationException
    */
   public ExprGene(Configuration a_conf, ExprGeneValue value, TargetInformation info)
@@ -122,8 +121,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   /**
    * Update the previous expression
-   * 
-   * @param expression2
    */
   private void updatePreviousExpression(ExprGeneValue newValue) {
     if (this.value.getPrevious() == null || !newValue.getExpression().equals(ExprConstant.TRUE)) {
@@ -273,23 +270,17 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applySomeQuantifierMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt someExpr = (ExprQt) value.getExpression();
+
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
       // Negate the body
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(someExpr.sub);
-      value.setExpression(ExprQt.Op.SOME.make(null, null, someExpr.decls, negatedBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_ALL:
       // Create a new expression with the all quantifier
-      value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, someExpr.sub), false);
-      value.setGeneType(ExprGeneType.FORALL_VAR_VAR);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
       break;
     }
@@ -301,22 +292,15 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applySomeVarVarMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt someExpr = (ExprQt) value.getExpression();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(someExpr.sub);
-      value.setExpression(ExprQt.Op.SOME.make(null, null, someExpr.decls, negatedBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_ALL:
       // Create a new expression with the all quantifier
-      value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, someExpr.sub), false);
-      value.setGeneType(ExprGeneType.FORALL_VAR_VAR);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
       break;
     }
@@ -329,19 +313,14 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   private void applySomeVarSetMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
-      ExprQt someExpr = (ExprQt) value.getExpression();
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(someExpr.sub);
-      value.setExpression(ExprQt.Op.SOME.make(null, null, someExpr.decls, negatedBody), false);
+      throw new UnsupportedOperationException("implement this");
     } else {
       if (mutationToApply.equals(GASpecLearnerMutations.TO_ALL)) {
         // Create a new expression with the all quantifier
-        ExprQt someExpr = (ExprQt) value.getExpression();
-        value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, someExpr.sub), false);
-        value.setGeneType(ExprGeneType.FORALL_VAR_SET);
+        throw new UnsupportedOperationException("implement this");
       } else {
         // Set the expression to true
-        value.setExpression(ExprConstant.TRUE, false);
-        value.setGeneType(ExprGeneType.CONSTANT);
+        throw new UnsupportedOperationException("implement this");
       }
     }
   }
@@ -352,39 +331,20 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applySomeSetSetMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt someExpr = (ExprQt) value.getExpression();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
       // Negate the body
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(someExpr.sub);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, negatedBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.INTERSECTION_NULL:
       // Take the set s1 and s2 from the body of the expression, and create
       // the body s1 & s2 in Null
-      System.out.println("INTERSECTION IN NULL GENERATED");
-      ExprBinary expressionWithSets;
-      if (someExpr.sub instanceof ExprUnary) {
-        expressionWithSets = (ExprBinary) ((ExprUnary) someExpr.sub).sub;
-      } else {
-        expressionWithSets = (ExprBinary) someExpr.sub;
-      }
-      Expr intersection = ExprBinary.Op.INTERSECT.make(null, null, expressionWithSets.left,
-          expressionWithSets.right);
-      Expr intersectionNull = ExprBinary.Op.IN.make(null, null, intersection,
-          TargetInformation.nullSig);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, intersectionNull), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_ALL:
       // Create a new expression with the all quantifier
-      value.setExpression(ExprQt.Op.ALL.make(null, null, someExpr.decls, someExpr.sub), false);
-      value.setGeneType(ExprGeneType.FORALL_SET_SET);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
     }
   }
@@ -396,13 +356,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.SOME)) {
       // Change some expr to no expr
-      ExprUnary emptyExpr = (ExprUnary) value.getExpression();
-      value.setExpression(ExprUnary.Op.SOME.make(null, emptyExpr.sub), false);
-      value.setGeneType(ExprGeneType.SOME);
+      throw new UnsupportedOperationException("implement this");
     } else {
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -420,13 +377,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.EMPTYNESS)) {
       // Change some expr to no expr
-      ExprUnary someExpr = (ExprUnary) value.getExpression();
-      value.setExpression(ExprUnary.Op.NO.make(null, someExpr.sub), false);
-      value.setGeneType(ExprGeneType.EMPTYNESS);
+      throw new UnsupportedOperationException("implement this");
     } else {
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -437,13 +391,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.TO_SOME)) {
       // Change no expr to some expr
-      ExprQt noExpr = (ExprQt) value.getExpression();
-      value.setExpression(ExprQt.Op.SOME.make(null, null, noExpr.decls, noExpr.sub), false);
-      value.setGeneType(ExprGeneType.SOMEQT);
+      throw new UnsupportedOperationException("implement this");
     } else {
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -454,19 +405,14 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
       // Create the for all expression with the negated body
-      ExprQt allExpr = (ExprQt) value.getExpression();
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(allExpr.sub);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, negatedBody), false);
+      throw new UnsupportedOperationException("implement this");
     } else {
       if (mutationToApply.equals(GASpecLearnerMutations.TO_SOME)) {
         // Create a new expression with the some quantifier
-        ExprQt allExpr = (ExprQt) value.getExpression();
-        value.setExpression(ExprQt.Op.SOME.make(null, null, allExpr.decls, allExpr.sub), false);
-        value.setGeneType(ExprGeneType.SOMEQT);
+        throw new UnsupportedOperationException("implement this");
       } else {
         // Set the expression to true
-        value.setExpression(ExprConstant.TRUE, false);
-        value.setGeneType(ExprGeneType.CONSTANT);
+        throw new UnsupportedOperationException("implement this");
       }
     }
   }
@@ -477,34 +423,19 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyForAllVarVarMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt allExpr = (ExprQt) value.getExpression();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
       // Create the for all expression with the negated body
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(allExpr.sub);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, negatedBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR:
       // Append a compatible expression in the right side of the body
-      ExprBinary binaryBody = (ExprBinary) allExpr.sub;
-      List<Expr> joineableExprs = contextInfo
-          .getJoineableExpressionsOfCurrentTypeMaintinigReturnType(binaryBody.right);
-      if (joineableExprs.size() > 0) {
-        Expr expr = joineableExprs.get(0);
-        Expr join = ExprBinary.Op.JOIN.make(null, null, binaryBody.right, expr);
-        Expr newBody = binaryBody.op.make(null, null, binaryBody.left, join);
-        value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      }
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_SOME:
       // Create a new expression with the some quantifier
-      value.setExpression(ExprQt.Op.SOME.make(null, null, allExpr.decls, allExpr.sub), false);
-      value.setGeneType(ExprGeneType.SOME_VAR_VAR);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -514,72 +445,16 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyForAllVarValueVarValueMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt allExpr = (ExprQt) value.getExpression();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(allExpr.sub);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, negatedBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.REPLACE_VALUE:
-      Expr expr = ((ExprBinary) allExpr.sub).left;
-      if (expr instanceof ExprBinary) {
-        ExprBinary binaryLeft = (ExprBinary) expr;
-        Type currentType = binaryLeft.left.type();
-        Expr newValue = TargetInformation.getRandomValueForType(currentType);
-
-        Expr newBinaryLeft = binaryLeft.op.make(null, null, binaryLeft.left,
-            ExprUnary.Op.NOOP.make(null, newValue));
-
-        Expr right = ((ExprBinary) allExpr.sub).right;
-        if (right instanceof ExprList) {
-          // Two equalities at right
-          ExprList listRight = (ExprList) right;
-          ExprBinary fstEquality = (ExprBinary) listRight.args.get(0);
-          ExprBinary sndEquality = (ExprBinary) listRight.args.get(1);
-
-          Expr newFstEquality = fstEquality.op.make(null, null, fstEquality.left,
-              ExprUnary.Op.NOOP.make(null, newValue));
-          Expr newSndEquality = sndEquality.op.make(null, null, sndEquality.left,
-              ExprUnary.Op.NOOP.make(null, newValue));
-
-          Expr newList = ExprBinary.Op.AND.make(null, null, newFstEquality, newSndEquality);
-          Expr newBody = ((ExprBinary) allExpr.sub).op.make(null, null, newBinaryLeft, newList);
-          value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-        } else {
-          // One equality at right
-          ExprBinary binaryRight = (ExprBinary) right;
-          Expr newBinaryRight = binaryRight.op.make(null, null, binaryRight.left,
-              ExprUnary.Op.NOOP.make(null, newValue));
-          Expr newBody = ((ExprBinary) allExpr.sub).op.make(null, null, newBinaryLeft,
-              newBinaryRight);
-          value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-        }
-      }
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.NEGATE_RIGHT_EQUALITY:
-      ExprBinary left = (ExprBinary) ((ExprBinary) allExpr.sub).left;
-      Expr right = ((ExprBinary) allExpr.sub).right;
-      if (right instanceof ExprList) {
-        // Two equalities at right
-        ExprList rightList = (ExprList) right;
-        Expr fstEqualityNegated = DynAlloyExpressionsUtils.negateExpression(rightList.args.get(0));
-        Expr sndEqualityNegated = DynAlloyExpressionsUtils.negateExpression(rightList.args.get(1));
-        Expr newBinary = ((ExprBinary) allExpr.sub).op.make(null, null, left,
-            ExprBinary.Op.AND.make(null, null, fstEqualityNegated, sndEqualityNegated));
-        value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBinary), false);
-
-      } else {
-        // One equality at right
-        Expr negatedRight = DynAlloyExpressionsUtils.negateExpression(right);
-        Expr newBinary = ((ExprBinary) allExpr.sub).op.make(null, null, left, negatedRight);
-        value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBinary), false);
-      }
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     }
 
   }
@@ -590,57 +465,27 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyForAllVarValueVarValueIntComparisonMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt allExpr = (ExprQt) value.getExpression();
-    ExprBinary body = (ExprBinary) allExpr.sub;
-    ExprCall rightExpr = (ExprCall) body.right;
     Expr expr;
     Expr newBody;
     switch (mutationToApply) {
     case GASpecLearnerMutations.OP_NOT_EQ:
       // Change the operator to !=
-      expr = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr,
-          ExprBinary.Op.NOT_EQUALS);
-      newBody = ExprBinary.Op.IMPLIES.make(null, null, body.left, expr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LT:
       // Change the operator to <
-      expr = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr,
-          ExprBinary.Op.LT);
-      newBody = ExprBinary.Op.IMPLIES.make(null, null, body.left, expr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LTE:
       // Change the operator to <=
-      expr = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr,
-          ExprBinary.Op.LTE);
-      newBody = ExprBinary.Op.IMPLIES.make(null, null, body.left, expr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GT:
       // Change the operator to >
-      expr = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr,
-          ExprBinary.Op.GT);
-      newBody = ExprBinary.Op.IMPLIES.make(null, null, body.left, expr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GTE:
       // Change the operator to >=
-      expr = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr,
-          ExprBinary.Op.GTE);
-      newBody = ExprBinary.Op.IMPLIES.make(null, null, body.left, expr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.CHANGE_IMPLIES:
       // Change implies equality
-      ExprBinary impliesExpr = ((ExprBinary) body.left);
-      Expr impliesExprLeft = impliesExpr.left;
-      Expr toCompare = TargetInformation.getUnarySigForType(impliesExprLeft.type());
-      newBody = ExprBinary.Op.IMPLIES.make(null, null,
-          impliesExpr.op.make(null, null, impliesExprLeft, toCompare), rightExpr);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     }
 
   }
@@ -651,10 +496,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyForAllVarValuesDoubleIntComparisonMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt allExpr = (ExprQt) value.getExpression();
-    ExprList body = (ExprList) allExpr.sub;
-    ExprBinary leftExpr = (ExprBinary) body.args.get(0);
-    ExprBinary rightExpr = (ExprBinary) body.args.get(1);
     Expr newLeft;
     Expr newRight;
     Expr exprR1;
@@ -663,79 +504,22 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     switch (mutationToApply) {
     case GASpecLearnerMutations.OP_NOT_EQ:
       // Change the operator to != in the left
-      exprR1 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) leftExpr.right,
-          ExprBinary.Op.NOT_EQUALS);
-      // Change the operator to != in the right
-      exprR2 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr.right,
-          ExprBinary.Op.NOT_EQUALS);
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null, leftExpr.left, exprR1);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null, rightExpr.left, exprR2);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LT:
       // Change the operator to < in the left
-      exprR1 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) leftExpr.right,
-          ExprBinary.Op.LT);
-      // Change the operator to < in the right
-      exprR2 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr.right,
-          ExprBinary.Op.LT);
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null, leftExpr.left, exprR1);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null, rightExpr.left, exprR2);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LTE:
       // Change the operator to <= in the left
-      exprR1 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) leftExpr.right,
-          ExprBinary.Op.LTE);
-      // Change the operator to <= in the right
-      exprR2 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr.right,
-          ExprBinary.Op.LTE);
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null, leftExpr.left, exprR1);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null, rightExpr.left, exprR2);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GT:
       // Change the operator to > in the left
-      exprR1 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) leftExpr.right,
-          ExprBinary.Op.GT);
-      // Change the operator to > in the right
-      exprR2 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr.right,
-          ExprBinary.Op.GT);
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null, leftExpr.left, exprR1);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null, rightExpr.left, exprR2);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GTE:
       // Change the operator to >= in the left
-      exprR1 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) leftExpr.right,
-          ExprBinary.Op.GTE);
-      // Change the operator to >= in the right
-      exprR2 = DynAlloyExpressionsUtils.changeOperatorInIntComparison((ExprCall) rightExpr.right,
-          ExprBinary.Op.GTE);
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null, leftExpr.left, exprR1);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null, rightExpr.left, exprR2);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.CHANGE_IMPLIES:
       // Change implies equality
-      ExprBinary impliesExpr = ((ExprBinary) leftExpr.left);
-      ExprBinary impliesExprR = ((ExprBinary) rightExpr.left);
-      Expr impliesExprLeft = impliesExpr.left;
-      Expr impliesExprRLeft = impliesExprR.left;
-      Expr toCompare = TargetInformation.getUnarySigForType(impliesExprLeft.type());
-      newLeft = ExprBinary.Op.IMPLIES.make(null, null,
-          impliesExpr.op.make(null, null, impliesExprLeft, toCompare), leftExpr.right);
-      newRight = ExprBinary.Op.IMPLIES.make(null, null,
-          impliesExprR.op.make(null, null, impliesExprRLeft, toCompare), rightExpr.right);
-      newBody = ExprBinary.Op.AND.make(null, null, newLeft, newRight);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, newBody), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -745,9 +529,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   private void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
     if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
-      // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -759,19 +541,14 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
       // Create the for all expression with the negated body
-      ExprQt allExpr = (ExprQt) value.getExpression();
-      Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(allExpr.sub);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, negatedBody), false);
+      throw new UnsupportedOperationException("implement this");
     } else {
       if (mutationToApply.equals(GASpecLearnerMutations.TO_SOME)) {
         // Create a new expression with the some quantifier
-        ExprQt allExpr = (ExprQt) value.getExpression();
-        value.setExpression(ExprQt.Op.SOME.make(null, null, allExpr.decls, allExpr.sub), false);
-        value.setGeneType(ExprGeneType.SOME_VAR_SET);
+        throw new UnsupportedOperationException("implement this");
       } else {
         // Set the expression to true
-        value.setExpression(ExprConstant.TRUE, false);
-        value.setGeneType(ExprGeneType.CONSTANT);
+        throw new UnsupportedOperationException("implement this");
       }
     }
   }
@@ -782,44 +559,21 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyForAllSetSetMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
-    ExprQt allExpr = (ExprQt) value.getExpression();
+
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
       // Negate the body just if gene expression is not the intersection in null
-      if (!DynAlloyExpressionsUtils.isIntersectionInNullExpr(allExpr.sub)) {
-        Expr negatedBody = DynAlloyExpressionsUtils.negateExpression(allExpr.sub);
-        value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, negatedBody), false);
-      }
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.INTERSECTION_NULL:
       // Take the set s1 and s2 from the body of the expression, and create
       // the body s1 & s2 in Null
-      ExprBinary expressionWithSets;
-      if (allExpr.sub instanceof ExprUnary) {
-        expressionWithSets = (ExprBinary) ((ExprUnary) allExpr.sub).sub;
-      } else {
-        if (((ExprBinary) allExpr.sub).right.equals(TargetInformation.nullSig)) {
-          expressionWithSets = (ExprBinary) ((ExprBinary) allExpr.sub).left;
-        } else {
-          expressionWithSets = (ExprBinary) allExpr.sub;
-        }
-      }
-      Expr intersection = ExprBinary.Op.INTERSECT.make(null, null, expressionWithSets.left,
-          expressionWithSets.right);
-      Expr intersectionNull = ExprBinary.Op.IN.make(null, null, intersection,
-          TargetInformation.nullSig);
-      value.setExpression(ExprQt.Op.ALL.make(null, null, allExpr.decls, intersectionNull), false);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_SOME:
       // Create a new expression with the some quantifier
-      value.setExpression(ExprQt.Op.SOME.make(null, null, allExpr.decls, allExpr.sub), false);
-      value.setGeneType(ExprGeneType.SOME_SET_SET);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
     }
   }
@@ -831,41 +585,13 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE:
-      // Negate the expression
-      value.setExpression(ExprUnary.Op.NOT.make(null, value.getExpression()), false);
-      value.setGeneType(ExprGeneType.INCLUSION);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.REPLACE_INCLUDED:
-      ExprBinary bin = ((ExprBinary) value.getExpression());
-      String leftVarName = bin.left.toString();
-      Set<String> sameTypeVars = contextInfo
-          .getVariablesOfType(contextInfo.getVarType(leftVarName));
-      sameTypeVars.toString();
-      Random random = new Random();
-      int randomNumber = random.nextInt(sameTypeVars.size());
-      String newVarName = (String) sameTypeVars.toArray()[randomNumber];
-      value.setExpression(bin.op.make(null, null, ExprVar.make(null, newVarName), bin.right),
-          false);
-      value.setGeneType(ExprGeneType.INCLUSION);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.REPLACE_SET:
-      ExprBinary bin2 = ((ExprBinary) value.getExpression());
-      ExprVar var = (ExprVar) bin2.left;
-      String varType = contextInfo.getVarType(var.label);
-      List<Expr> possibleCollections = TargetInformation.getCollectionsOfType(varType);
-      if (possibleCollections.size() > 0) {
-        Random r = new Random();
-        int rN = r.nextInt(possibleCollections.size());
-        Expr newRight = possibleCollections.get(rN);
-        value.setExpression(bin2.op.make(null, null, var, newRight), false);
-        value.setGeneType(ExprGeneType.INCLUSION);
-      }
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
-      // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
     }
   }
@@ -874,21 +600,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is equal or not equal
    */
   private void applyEqualityMutation() {
-    ExprBinary equalityExpr = (ExprBinary) value.getExpression();
-    if (equalityExpr.right instanceof PrimSig) {
-      String mutationToApply = getSomeApplicableMutation();
-      if (mutationToApply.equals(GASpecLearnerMutations.NEGATE)) {
-        // Negate the expression
-        value.setExpression(ExprUnary.Op.NOT.make(null, value.getExpression()), false);
-        value.setGeneType(ExprGeneType.NEGATION);
-      } else {
-        // Set the expression to true
-        value.setExpression(ExprConstant.TRUE, false);
-        value.setGeneType(ExprGeneType.CONSTANT);
-      }
-    } else {
-
-    }
+    throw new UnsupportedOperationException("implement this");
   }
 
   /**
@@ -900,99 +612,45 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE:
-      // Negate the expression
-      value.setExpression(ExprUnary.Op.NOT.make(null, value.getExpression()), false);
-      value.setGeneType(ExprGeneType.NEGATION);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.ADD_ONE:
       // Add one at the right expression
-      value.setExpression(DynAlloyExpressionsUtils
-          .addOrSubtractOneToIntComparison((ExprBinary) value.getExpression(), true), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.SUB_ONE:
       // Subtract one at the right expression
-      value.setExpression(DynAlloyExpressionsUtils
-          .addOrSubtractOneToIntComparison((ExprBinary) value.getExpression(), false), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.ADD_EXPR:
       // Add a random integer expression to the right expression
-      ExprBinary bin = (ExprBinary) value.getExpression();
-      Expr randomExpr = contextInfo.getRandomIntExpr();
-      if (ExprConstant.ZERO.equals(bin.right))
-        value.setExpression(bin.op.make(null, null, bin.left, randomExpr), false);
-      else
-        value.setExpression(bin.op.make(null, null, bin.left,
-            ExprBinary.Op.PLUS.make(null, null, bin.right, randomExpr)), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.SUB_EXPR:
       // Subtract a random integer expression to the right expression
-      ExprBinary b2 = (ExprBinary) value.getExpression();
-      Expr rExpr2 = contextInfo.getRandomIntExpr();
-      value.setExpression(
-          b2.op.make(null, null, b2.left, ExprBinary.Op.MINUS.make(null, null, b2.right, rExpr2)),
-          false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.REPLACE_RIGHT:
       // Replace the right expression
-      ExprBinary bin1 = (ExprBinary) value.getExpression();
-      Expr newRight = contextInfo.getRandomIntExpr();
-      value.setExpression(bin1.op.make(null, null, bin1.left, newRight), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.REPLACE_OP:
-      ExprBinary actualBin = (ExprBinary) value.getExpression();
-      Op newOp = GASpecLearnerMutations.getRandomBinaryOperator();
-      value.setExpression(newOp.make(null, null, actualBin.left, actualBin.right), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.EQ_SUB_ONE:
       // Create eq expression and subtract one at the right expression
-      ExprBinary bin2 = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.EQUALS.make(null, null, bin2.left, bin2.right), false);
-      value.setExpression(DynAlloyExpressionsUtils
-          .addOrSubtractOneToIntComparison((ExprBinary) value.getExpression(), false), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_EQ:
       // Now the operator will be =
-      ExprBinary currBin = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.EQUALS.make(null, null, currBin.left, currBin.right),
-          false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LT:
       // Now the operator will be <
-      ExprBinary currBin2 = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.LT.make(null, null, currBin2.left, currBin2.right), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_LTE:
       // Now the operator will be <=
-      ExprBinary currBin3 = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.LTE.make(null, null, currBin3.left, currBin3.right), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GT:
       // Now the operator will be >
-      ExprBinary currBin4 = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.GT.make(null, null, currBin4.left, currBin4.right), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.OP_GTE:
       // Now the operator will be >=
-      ExprBinary currBin5 = (ExprBinary) value.getExpression();
-      value.setExpression(ExprBinary.Op.GTE.make(null, null, currBin5.left, currBin5.right), false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
-      break;
+      throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
-      break;
+      throw new UnsupportedOperationException("implement this");
     default:
       throw new IllegalStateException("Mutation " + mutationToApply + " not implemented!");
     }
@@ -1019,11 +677,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals("Negate")) {
       // Negate the expression, that is remove the not operator
-      value.setExpression(((ExprUnary) value.getExpression()).sub, true);
+      throw new UnsupportedOperationException("implement this");
     } else {
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -1047,21 +704,14 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.ADD_ONE)) {
       // Add one at the right expression
-      Expr expr = DynAlloyExpressionsUtils
-          .addOrSubtractOneToIntComparissonFromCall((ExprCall) value.getExpression(), true);
-
-      value.setExpression(expr, false);
+      throw new UnsupportedOperationException("implement this");
 
     } else if (mutationToApply.equals(GASpecLearnerMutations.SUB_ONE)) {
       // Subtract one at the right expression
-      Expr expr = DynAlloyExpressionsUtils
-          .addOrSubtractOneToIntComparissonFromCall((ExprCall) value.getExpression(), false);
-
-      value.setExpression(expr, false);
+      throw new UnsupportedOperationException("implement this");
     } else {
       // Set the expression to true
-      value.setExpression(ExprConstant.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      throw new UnsupportedOperationException("implement this");
     }
   }
 

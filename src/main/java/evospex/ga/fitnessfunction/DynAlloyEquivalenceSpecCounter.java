@@ -89,12 +89,7 @@ public class DynAlloyEquivalenceSpecCounter extends FitnessFunction {
       runner.setRepOKbody(runnerParam);
     } else {
       // Gene is instanceof ExprGene
-      ArrayList<Expr> list = new ArrayList<Expr>();
-      for (int i = 0; i < genes.length; i++) {
-        ExprGene gene = (ExprGene) genes[i];
-        list.add(((ExprGeneValue) gene.getInternalValue()).getExpression());
-      }
-      runner.setRepOkbodyFromExpressionList(list);
+      throw new UnsupportedOperationException("implement this!");
     }
 
     // If the chromosome has not genes return 0

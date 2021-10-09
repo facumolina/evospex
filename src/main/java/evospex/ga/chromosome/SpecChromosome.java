@@ -725,8 +725,7 @@ public class SpecChromosome extends BaseChromosome {
     for (int i = 0; i < getGenes().length; i++) {
       ExprGene gene = (ExprGene) getGenes()[i];
       if (!gene.isDefault()) {
-        String currentExprString = DynAlloyExpressionsUtils
-            .getExpressionAsAlloyString(gene.getValue().getExpression());
+        String currentExprString = gene.getValue().getExpression().getText();
         repOKString += "(" + currentExprString + ")";
         if (i < getGenes().length - 1)
           repOKString += " and ";

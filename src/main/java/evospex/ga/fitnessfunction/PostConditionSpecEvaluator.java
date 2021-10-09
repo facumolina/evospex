@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.ExprGene;
 import evospex.ga.chromosome.ExprGeneValue;
 import evospex.ga.chromosome.SpecChromosome;
@@ -17,6 +18,7 @@ import hamcrest.assertion.HamcrestAssertion;
 import hamcrest.expression.NonEvaluableExpressionException;
 import evospex.target.MethodExecution;
 import report.Stats;
+import rfm.dynalloyCompiler.ast.ExprBinary;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.EvoSpexParameters;
 import utils.FitnessValue;
@@ -240,7 +242,7 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     for (int i = 0; i < genes.length; i++) {
       ExprGene gene = (ExprGene) genes[i];
       ExprGeneValue geneValue = (ExprGeneValue) gene.getInternalValue();
-      if (geneValue.getExpression() != ExprConstant.TRUE) {
+      if (geneValue.getExpression() != ExprBuilder.TRUE) {
         // The gene is not "empty"
         complexity += geneValue.getComplexity();
       }
