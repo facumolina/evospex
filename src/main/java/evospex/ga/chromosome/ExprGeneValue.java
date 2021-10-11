@@ -1,9 +1,10 @@
 package evospex.ga.chromosome;
 
+import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import rfm.dynalloyCompiler.ast.Decl;
-import rfm.dynalloyCompiler.ast.Expr;
+
 import rfm.dynalloyCompiler.ast.ExprBinary;
 import rfm.dynalloyCompiler.ast.ExprCall;
 import rfm.dynalloyCompiler.ast.ExprConstant;
@@ -21,7 +22,7 @@ import utils.DynAlloyExpressionsUtils;
  */
 public class ExprGeneValue {
 
-  private ExprContext expression;
+  private Expr expression;
   private ExprGeneType geneType;
   private ExprGeneValue previous;
 
@@ -29,7 +30,7 @@ public class ExprGeneValue {
    * Default Constructor
    */
   public ExprGeneValue() {
-    expression = ExprBuilder.toExprContext("true");
+    expression = ExprBuilder.TRUE;
     geneType = ExprGeneType.CONSTANT;
     previous = null;
   }
@@ -38,7 +39,7 @@ public class ExprGeneValue {
    * Constructor from an expression
    * @param expr is the expression
    */
-  public ExprGeneValue(ExprContext expr) {
+  public ExprGeneValue(Expr expr) {
     this.expression = expr;
     this.geneType = getGeneTypeFromExpression(expr);
     this.previous = null;
@@ -49,7 +50,7 @@ public class ExprGeneValue {
    * @param expr is the expression
    * @param geneType is the gene type associated with the given expression
    */
-  public ExprGeneValue(ExprContext expr, ExprGeneType geneType) {
+  public ExprGeneValue(Expr expr, ExprGeneType geneType) {
     this.expression = expr;
     this.geneType = geneType;
     this.previous = null;
@@ -62,7 +63,7 @@ public class ExprGeneValue {
    * @param geneType is the gene type associated with the given expression
    * @param previous is the previous gene value from which the current was evolved
    */
-  public ExprGeneValue(ExprContext expr, ExprGeneType geneType, ExprGeneValue previous) {
+  public ExprGeneValue(Expr expr, ExprGeneType geneType, ExprGeneValue previous) {
     this.expression = expr;
     this.geneType = geneType;
     this.previous = previous;
@@ -71,14 +72,14 @@ public class ExprGeneValue {
   /**
    * Get the expression
    */
-  public ExprContext getExpression() {
+  public Expr getExpression() {
     return expression;
   }
 
   /**
    * Set the expression
    */
-  public void setExpression(ExprContext newExpression, boolean calculateGeneType) {
+  public void setExpression(Expr newExpression, boolean calculateGeneType) {
     expression = newExpression;
     if (calculateGeneType) {
       geneType = getGeneTypeFromExpression(expression);
@@ -102,9 +103,9 @@ public class ExprGeneValue {
   /**
    * Get the gene type for the given expr
    */
-  private ExprGeneType getGeneTypeFromExpression(ExprContext expr) {
+  private ExprGeneType getGeneTypeFromExpression(Expr expr) {
     throw new IllegalStateException(
-        "ExprGeneType can't be computed for the given expression: " + expr.getText()
+        "ExprGeneType can't be computed for the given expression: " + expr
     );
   }
 
@@ -113,63 +114,7 @@ public class ExprGeneValue {
    * given expression
    */
   private ExprGeneType determineGeneTypeOfAllExpressionFromTheBody(Expr body) {
-    if (body instanceof ExprUnary) {
-      ExprUnary unaryBody = (ExprUnary) body;
-      if (unaryBody.sub instanceof ExprUnary) {
-        return ExprGeneType.FORALL;
-      } else {
-        return determineGeneTypeOfAllExpressionFromTheBody(unaryBody.sub);
-      }
-    } else if (body instanceof ExprBinary) {
-      ExprBinary binaryBody = (ExprBinary) body;
-      boolean leftClosured = DynAlloyExpressionsUtils.hasClosuredExpr(binaryBody.left);
-      boolean rightClosured = DynAlloyExpressionsUtils.hasClosuredExpr(binaryBody.right);
-      if (leftClosured) {
-        if (rightClosured) {
-          return ExprGeneType.FORALL_SET_SET;
-        } else {
-          if (binaryBody.right instanceof Sig && ((Sig) binaryBody.right).label.contains("Null")) {
-            return determineGeneTypeOfAllExpressionFromTheBody(binaryBody.left);
-          } else {
-            return ExprGeneType.FORALL_VAR_SET;
-          }
-        }
-      } else {
-        if (rightClosured) {
-          return ExprGeneType.FORALL_VAR_SET;
-        } else {
-          if (binaryBody.left instanceof ExprCall) {
-            return ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE;
-          } else {
-            if (binaryBody.left instanceof ExprBinary) {
-              if (((ExprBinary) binaryBody).right.toString().contains("Null")) {
-                return ExprGeneType.FORALL_VAR_VALUE;
-              }
-              if (((ExprBinary) binaryBody.left).right instanceof ExprUnary) {
-                return ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE;
-              }
-              if (binaryBody.right instanceof ExprCall) {
-                ExprCall call = (ExprCall) binaryBody.right;
-                if (call.fun.label.contains("integer")) {
-                  return ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON;
-                }
-              }
-            }
-            return ExprGeneType.FORALL_VAR_VAR;
-          }
-        }
-      }
-    } else if (body instanceof ExprCall) {
-      ExprCall exprCall = (ExprCall) body;
-      return ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE;
-    } else if (body instanceof ExprList) {
-      ExprList exprList = (ExprList) body;
-      if (exprList.args.get(0) instanceof ExprQt)
-        return ExprGeneType.FORALL_VAR_VALUES_DOUBLE_QT_INT_COMPARISON;
-      return ExprGeneType.FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON;
-    }
-    System.out.println("Error calculating gene type of expression: " + this.expression.toString());
-    return null;
+    throw new UnsupportedOperationException("");
   }
 
   /**
@@ -177,37 +122,7 @@ public class ExprGeneValue {
    * given expression
    */
   private ExprGeneType determineGeneTypeOfSomeExpressionFromTheBody(Expr body) {
-    if (body instanceof ExprUnary) {
-      ExprUnary unaryBody = (ExprUnary) body;
-      if (unaryBody.sub instanceof ExprUnary) {
-        return ExprGeneType.SOMEQT;
-      } else {
-        return determineGeneTypeOfAllExpressionFromTheBody(unaryBody.sub);
-      }
-    } else if (body instanceof ExprBinary) {
-      ExprBinary binaryBody = (ExprBinary) body;
-      boolean leftClosured = DynAlloyExpressionsUtils.hasClosuredExpr(binaryBody.left);
-      boolean rightClosured = DynAlloyExpressionsUtils.hasClosuredExpr(binaryBody.right);
-      if (leftClosured) {
-        if (rightClosured) {
-          return ExprGeneType.SOME_SET_SET;
-        } else {
-          if (binaryBody.right instanceof Sig && ((Sig) binaryBody.right).label.contains("Null")) {
-            return determineGeneTypeOfSomeExpressionFromTheBody(binaryBody.left);
-          } else {
-            return ExprGeneType.SOME_VAR_SET;
-          }
-        }
-      } else {
-        if (rightClosured) {
-          return ExprGeneType.SOME_VAR_SET;
-        } else {
-          return ExprGeneType.SOME_VAR_VAR;
-        }
-      }
-    } else {
-      return null;
-    }
+    throw new UnsupportedOperationException("imeplement this");
   }
 
   /**
@@ -246,8 +161,8 @@ public class ExprGeneValue {
    * @param expr is the expression to clone
    * @return
    */
-  private ExprContext cloneExpression(ExprContext expr) {
-    return ExprBuilder.toExprContext(expr.getText());
+  private Expr cloneExpression(Expr expr) {
+    return ExprBuilder.toExpr(expr.exprCtx().getText(), expr.type());
   }
 
   /**

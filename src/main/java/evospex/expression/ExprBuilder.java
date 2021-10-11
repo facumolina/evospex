@@ -3,9 +3,9 @@ package evospex.expression;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprGrammarParser.ParseContext;
-import rfm.dynalloyCompiler.ast.Expr;
+
+import java.util.Collection;
 
 /**
  * ExprBuilder class allows to build expressions from their string representation
@@ -15,12 +15,12 @@ public class ExprBuilder {
 
   private static ExprGrammarParser parser; // Expressions Parser
 
-  public static final ExprContext TRUE = toExprContext(ExprName.TRUE);
-  public static final ExprContext FALSE = toExprContext(ExprName.FALSE);
-  public static final ExprContext RESULT = toExprContext(ExprName.RESULT);
-  public static final ExprContext NULL = toExprContext(ExprName.NULL);
-  public static final ExprContext ZERO = toExprContext(ExprName.ZERO);
-  public static final ExprContext ONE = toExprContext(ExprName.ONE);
+  public static final Expr TRUE = toExpr(ExprName.TRUE, Boolean.class);
+  public static final Expr FALSE = toExpr(ExprName.FALSE, Boolean.class);
+  public static final Expr RESULT = toExpr(ExprName.RESULT, Object.class);
+  public static final Expr NULL = toExpr(ExprName.NULL, Object.class);
+  public static final Expr ZERO = toExpr(ExprName.ZERO, Number.class);
+  public static final Expr ONE = toExpr(ExprName.ONE, Number.class);
 
   /**
    * Setup the parser
@@ -34,13 +34,13 @@ public class ExprBuilder {
   /**
    * Returns the ExprContext representing the given string expression
    */
-  public static ExprContext toExprContext(String str_expr) {
+  public static Expr toExpr(String str_expr,Class<?> c) {
     setup(str_expr);
     ParseTree tree = parser.parse();
     if (parser.getNumberOfSyntaxErrors() > 0)
       throw new IllegalArgumentException("The given expression contains syntax errors");
     ParseContext ctx = (ParseContext) tree;
-    return ctx.expr();
+    return new Expr(ctx.expr(),c);
   }
 
   /**
@@ -49,8 +49,8 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1.expr2
    */
-  public static ExprContext join(ExprContext expr1, ExprContext expr2) {
-    return toExprContext(expr1.getText() + ExprOperator.JOIN  + expr2.getText());
+  public static Expr join(Expr expr1, Expr expr2) {
+    return toExpr(expr1.exprCtx().getText() + ExprOperator.JOIN  + expr2.exprCtx().getText(), expr2.type());
   }
 
   /**
@@ -59,8 +59,8 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1 = expr2
    */
-  public static ExprContext eq(ExprContext expr1, ExprContext expr2) {
-    return toExprContext(expr1.getText() + " " + ExprOperator.EQ + " " + expr2.getText());
+  public static Expr eq(Expr expr1, Expr expr2) {
+    return toExpr(expr1.exprCtx().getText() + " " + ExprOperator.EQ + " " + expr2.exprCtx().getText(), Boolean.class);
   }
 
   /**
@@ -69,8 +69,18 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1 != expr2
    */
-  public static ExprContext neq(ExprContext expr1, ExprContext expr2) {
-    return toExprContext(expr1.getText() + " " + ExprOperator.NOT_EQ + " " + expr2.getText());
+  public static Expr neq(Expr expr1, Expr expr2) {
+    return toExpr(expr1.exprCtx().getText() + " " + ExprOperator.NOT_EQ + " " + expr2.exprCtx().getText(), Boolean.class);
+  }
+
+  /**
+   * Apply the two given expressions with the given operator
+   * @param expr1 is the first expression
+   * @param expr2 is the second expression
+   * @return the expression expr1 op expr2
+   */
+  public static Expr applyOp(Expr expr1, String op, Expr expr2, Class<?> cl) {
+    return toExpr(expr1.exprCtx().getText() + " " + op + " " + expr2.exprCtx().getText(), cl);
   }
 
   /**
@@ -79,8 +89,8 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1 in expr2
    */
-  public static ExprContext in(ExprContext expr1, ExprContext expr2) {
-    return toExprContext(expr1.getText() + " " + ExprOperator.IN + " " + expr2.getText());
+  public static Expr in(Expr expr1, Expr expr2) {
+    return toExpr(expr1.toString() + " " + ExprOperator.IN + " " + expr2.toString(), Boolean.class);
   }
 
   /**
@@ -89,8 +99,8 @@ public class ExprBuilder {
    * @param expr2 is the second expression
    * @return the expression expr1.*(expr2)
    */
-  public static String joinWithRClosure(String expr1, String expr2) {
-    return expr1 + ExprOperator.JOIN + ExprOperator.R_CLOSURE + "(" + expr2 + ")";
+  public static Expr joinWithRClosure(Expr expr1, String expr2) {
+    return toExpr(expr1.toString() + ExprOperator.JOIN + ExprOperator.R_CLOSURE + "(" + expr2 + ")", Collection.class);
   }
 
   /**
@@ -100,8 +110,8 @@ public class ExprBuilder {
    * @param expr3 is the third expression
    * @return the expression expr1.*(expr2+expr3)
    */
-  public static String joinWithRClosure(String expr1, String expr2, String expr3) {
-    return expr1 + ExprOperator.JOIN + ExprOperator.R_CLOSURE + "(" + expr2 + "+" + expr3 + ")";
+  public static Expr joinWithRClosure(Expr expr1, String expr2, String expr3) {
+    return toExpr(expr1 + ExprOperator.JOIN + ExprOperator.R_CLOSURE + "(" + expr2 + "+" + expr3 + ")", Collection.class);
   }
 
 }

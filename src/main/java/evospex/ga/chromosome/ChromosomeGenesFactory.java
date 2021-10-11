@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import cucumber.api.java.lv.Un;
+import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprName;
@@ -22,15 +22,14 @@ import org.jgap.RandomGenerator;
 import evospex.ConfigurationProperties;
 import evospex.target.MethodExecution;
 import rfm.dynalloy.Err;
-import rfm.dynalloy.SafeList;
-import rfm.dynalloyCompiler.ast.Expr;
+
 import rfm.dynalloyCompiler.ast.ExprBinary;
-import rfm.dynalloyCompiler.ast.ExprCall;
+
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import rfm.dynalloyCompiler.ast.ExprQt;
 import rfm.dynalloyCompiler.ast.ExprUnary;
 import rfm.dynalloyCompiler.ast.ExprVar;
-import rfm.dynalloyCompiler.ast.Sig;
+
 import rfm.dynalloyCompiler.ast.Type;
 import rfm.dynalloyCompiler.translator.A4Solution;
 import rfm.dynalloyCompiler.translator.A4Tuple;
@@ -134,8 +133,8 @@ public class ChromosomeGenesFactory {
         Gene[] new_genes = new Gene[genes_num];
         ExprGene exprGene = (ExprGene) genes.get(i);
         ExprGene newExprGene = new ExprGene(conf, exprGene.getValue().clone(), contextInfo);
-        ExprContext expr = exprGene.getValue().getExpression();
-        if (!isPositive && expr.qt_expr() == null) {
+        Expr expr = exprGene.getValue().getExpression();
+        if (!isPositive && !expr.isQuantified()) {
           // Negate the expression
           throw new UnsupportedOperationException("negate the expression expr and set it the new expr gene");
         }
@@ -143,7 +142,7 @@ public class ChromosomeGenesFactory {
         new_genes[0] = newExprGene;
         // The rest of the genes vales is : true
         for (int j = 1; j < new_genes.length; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.toExprContext(ExprName.TRUE)), contextInfo);
+          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -151,7 +150,7 @@ public class ChromosomeGenesFactory {
       }
     } else {
       // Create chromosomes with each gene randomly picked.
-      genes.add(new ExprGene(conf, new ExprGeneValue(ExprBuilder.toExprContext(ExprName.TRUE)), contextInfo));
+      genes.add(new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo));
       int chromosomesToCreate = parameters.getPopulationSize()
           / parameters.getAmountOfExamplesForInitialChromosomesGeneration();
       for (int i = 0; i < chromosomesToCreate; i++) {
@@ -167,7 +166,7 @@ public class ChromosomeGenesFactory {
             new_genes[j] = ((ExprGene) genes.get(r)).clone();
         }
         for (int j = genes_to_fill; j < genes_num; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.toExprContext(ExprName.TRUE)), contextInfo);
+          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -189,11 +188,11 @@ public class ChromosomeGenesFactory {
   public List<Gene> createGenesFromObject(Object o, boolean isPositive, Object resultExample,
       List<Object> argsExamples, boolean addComplex) {
     // Get the evaluable expressions for the current example
-    List<ExprContext> evaluableJoinedExpressions = contextInfo.getJoinedExpressions();
-    List<ExprContext> evaluableJoinedExpressionsOfTypeInt = contextInfo.getJoinedExpressionsOfTypeInt();
+    List<Expr> evaluableJoinedExpressions = contextInfo.getJoinedExpressions();
+    List<Expr> evaluableJoinedExpressionsOfTypeInt = contextInfo.getJoinedExpressionsOfTypeInt();
     evaluableJoinedExpressions.addAll(evaluableJoinedExpressionsOfTypeInt);
-    List<ExprContext> evaluableSimpleClosuredExpressions = contextInfo.getSimpleClosuredExpressions();
-    List<ExprContext> evaluableDoubleClosuredExpressions = contextInfo.getDoubleClosuredExpressions();
+    List<Expr> evaluableSimpleClosuredExpressions = contextInfo.getSimpleClosuredExpressions();
+    List<Expr> evaluableDoubleClosuredExpressions = contextInfo.getDoubleClosuredExpressions();
 
     List<Gene> genes = new LinkedList<>();
     try {
@@ -255,11 +254,10 @@ public class ChromosomeGenesFactory {
   public List<Gene> createGenesUsingTheResultObject(Object resultExample)
       throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
-    Expr resultVar = ExprVar.make(null, "result");
     if (resultExample instanceof Boolean) {
       // The result is boolean, add it directly
       contextInfo.addVariableForType(Boolean.class.getSimpleName(), ExprName.RESULT);
-      ExprContext geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
+      Expr geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
       genes.add(new ExprGene(conf, newValue, contextInfo));
       //for (Expr e : contextInfo.getEvaluableExpressions()) {
@@ -272,16 +270,16 @@ public class ChromosomeGenesFactory {
     } else if (resultExample instanceof Integer || resultExample instanceof Double) {
       // The result is int or double, compare it with int expressions
       contextInfo.addVariableForType(resultExample.getClass().getSimpleName(), ExprName.RESULT);
-      List<ExprContext> intExprs = contextInfo.getIntEvaluableExpressions();
-      for (ExprContext intExpr : intExprs) {
-        ExprContext geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, intExpr);
+      List<Expr> intExprs = contextInfo.getIntEvaluableExpressions();
+      for (Expr intExpr : intExprs) {
+        Expr geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, intExpr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
         genes.add(new ExprGene(conf, newValue, contextInfo));
       }
       if (TargetInformation.hasCollections()) {
-        List<ExprContext> collections = TargetInformation.getCollections();
-        for (ExprContext collectionExpr : collections) {
-          ExprContext geneExpr = ExprBuilder.eq(ExprBuilder.toExprContext(collectionExpr+".size"),ExprBuilder.RESULT);
+        List<Expr> collections = TargetInformation.getCollections();
+        for (Expr collectionExpr : collections) {
+          Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(collectionExpr+".size", Number.class),ExprBuilder.RESULT);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
           genes.add(new ExprGene(conf, newValue, contextInfo));
         }
@@ -324,14 +322,14 @@ public class ChromosomeGenesFactory {
    * 
    * @throws InvalidConfigurationException
    */
-  private void collections_equalities(Collection c, ExprContext collection_expr, List<Gene> genes)
+  private void collections_equalities(Collection c, Expr collection_expr, List<Gene> genes)
       throws InvalidConfigurationException {
     Class<?> collection_type = guessElementType(c);
     if (collection_type != null) {
-      List<ExprContext> collections = TargetInformation
+      List<Expr> collections = TargetInformation
           .getCollectionsOfType(collection_type.getSimpleName());
-      for (ExprContext collection : collections) {
-        ExprContext geneExpr = ExprBuilder.eq(collection_expr, collection);
+      for (Expr collection : collections) {
+        Expr geneExpr = ExprBuilder.eq(collection_expr, collection);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
         genes.add(new ExprGene(conf, geneValue, contextInfo));
       }
@@ -343,15 +341,15 @@ public class ChromosomeGenesFactory {
    * 
    * @throws InvalidConfigurationException
    */
-  private Gene create_gene_expr_equal_null(ExprContext e) throws InvalidConfigurationException {
-    ExprContext geneExpr = ExprBuilder.eq(e, ExprBuilder.NULL);
+  private Gene create_gene_expr_equal_null(Expr e) throws InvalidConfigurationException {
+    Expr geneExpr = ExprBuilder.eq(e, ExprBuilder.NULL);
     ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
     return new ExprGene(conf, geneValue, contextInfo);
   }
 
   private Set<Class<?>> supers(Class<?> c) {
     if (c == null)
-      return new HashSet<Class<?>>();
+      return new HashSet<>();
 
     Set<Class<?>> s = supers(c.getSuperclass());
     s.add(c);
@@ -388,8 +386,8 @@ public class ChromosomeGenesFactory {
    *
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesUsingArguments(Object arg, String argLabel, List<ExprContext> simpleClosuredExprs,
-                                        List<ExprContext> doubleClosuredExprs) throws InvalidConfigurationException {
+  public List<Gene> createGenesUsingArguments(Object arg, String argLabel, List<Expr> simpleClosuredExprs,
+                                        List<Expr> doubleClosuredExprs) throws InvalidConfigurationException {
     throw new UnsupportedOperationException("implement this");
   }
 
@@ -398,8 +396,8 @@ public class ChromosomeGenesFactory {
    * 
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesUsingArg(Object arg, String argLabel, List<ExprContext> simpleClosuredExprs,
-      List<ExprContext> doubleClosuredExprs) throws InvalidConfigurationException {
+  public List<Gene> createGenesUsingArg(Object arg, String argLabel, List<Expr> simpleClosuredExprs,
+      List<Expr> doubleClosuredExprs) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
     // if (arg instanceof Integer || arg instanceof Double) {
     if (arg instanceof Integer) {
@@ -416,18 +414,18 @@ public class ChromosomeGenesFactory {
       // Quantification stating that int arg belongs to int set
       // argLabel in e.*f
       for (int j = 0; j < simpleClosuredExprs.size(); j++) {
-        ExprContext evaluableExpr = simpleClosuredExprs.get(j);
+        Expr evaluableExpr = simpleClosuredExprs.get(j);
         if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
           continue;
-        genes.addAll(createGeneFromIntArgumentAndClosuredExpr(ExprBuilder.toExprContext(argLabel),
+        genes.addAll(createGeneFromIntArgumentAndClosuredExpr(ExprBuilder.toExpr(argLabel, evaluableExpr.type()),
                 evaluableExpr, null));
       }
       // argLabel in e.*(f+g)
       for (int j = 0; j < doubleClosuredExprs.size(); j++) {
-        ExprContext evaluableExpr = doubleClosuredExprs.get(j);
+        Expr evaluableExpr = doubleClosuredExprs.get(j);
         if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
           continue;
-        genes.addAll(createGeneFromIntArgumentAndClosuredExpr(ExprBuilder.toExprContext(argLabel),
+        genes.addAll(createGeneFromIntArgumentAndClosuredExpr(ExprBuilder.toExpr(argLabel, evaluableExpr.type()),
             evaluableExpr, null));
       }
       // Inclusion in collection of same type than argument
@@ -453,18 +451,18 @@ public class ChromosomeGenesFactory {
       String argClass) throws InvalidConfigurationException {
     if (TargetInformation.hasCollectionsOfType(argClass)
         || "DoublyLinkedListNode".equals(argClass)) {
-      List<ExprContext> evaluable = contextInfo.getEvaluableExpressions();
-      for (ExprContext expr : evaluable) {
+      List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+      for (Expr expr : evaluable) {
         if (expr != null)
           throw new UnsupportedOperationException("Check if expr is a collection");
-        ExprContext geneExpr = ExprBuilder.eq(ExprBuilder.toExprContext(argLabel), expr);
+        Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(argLabel,expr.type()), expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
         genes.add(new ExprGene(conf, newValue, contextInfo));
       }
-      List<ExprContext> collections = TargetInformation.getCollectionsOfType(argClass);
-      for (ExprContext expr : collections) {
+      List<Expr> collections = TargetInformation.getCollectionsOfType(argClass);
+      for (Expr expr : collections) {
         // Create a gene with the expression argLabel in collection
-        ExprContext geneExpr = ExprBuilder.in(ExprBuilder.toExprContext(argLabel), expr);
+        Expr geneExpr = ExprBuilder.in(ExprBuilder.toExpr(argLabel, expr.type()), expr);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.INCLUSION);
         genes.add(new ExprGene(conf, geneValue, contextInfo));
       }
@@ -476,31 +474,18 @@ public class ChromosomeGenesFactory {
    * 
    * @throws InvalidConfigurationException
    */
-  private List<Gene> createGeneFromIntArgumentAndClosuredExpr(ExprContext argExpr, ExprContext closuredExpr,
-      Type typeOfElementsInSet) throws InvalidConfigurationException {
-    Set<ExprContext> joinableExpressions = contextInfo
+  private List<Gene> createGeneFromIntArgumentAndClosuredExpr(Expr argExpr, Expr closuredExpr,
+      Class<?> typeOfElementsInSet) throws InvalidConfigurationException {
+    Set<Expr> joinableExpressions = contextInfo
         .getJoineableExpressionsOfCurrentType(typeOfElementsInSet);
 
     List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
 
     // For each joineable expr generate the quantified expressions
-    for (ExprContext joineableExpr : joinableExpressions) {
+    for (Expr joineableExpr : joinableExpressions) {
 
-      Type returnType = contextInfo.getReturnType(joineableExpr);
-
-      if (returnType.is_int() || returnType.toString().equals("{this/NodeValue}")) {
-
-        if (ConfigurationProperties.getIntEvaluations()) {
-          // Join the expression with the set
-          // arg in set.joinExpr
-          ExprContext setJoinExpr = ExprBuilder.join(closuredExpr, joineableExpr);
-          ExprContext geneExpr = ExprBuilder.in(argExpr, setJoinExpr);
-          geneValue = new ExprGeneValue(geneExpr,ExprGeneType.INCLUSION);
-          genes.add(new ExprGene(conf, geneValue, contextInfo));
-
-        }
-      }
+      throw new UnsupportedOperationException("Implement this!");
     }
     return genes;
   }
@@ -512,45 +497,9 @@ public class ChromosomeGenesFactory {
    */
   private List<Gene> createGenesUsingMaps() throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<Gene>();
-    List<ExprContext> evaluable = contextInfo.getEvaluableExpressions();
-    for (ExprContext expr : evaluable) {
-      Type exprType = Type.smallIntType();
-      if (expr!=null)
-        throw new UnsupportedOperationException("extract type from expr");
-      if (exprType.toString().contains("Map_")) {
-        // The expr is a Map
-        String keyTypeStr = exprType.toString().replace("{this/Map_", "").split("_")[0];
-        String valueTypeStr = exprType.toString().replace("{this/Map_", "").split("_")[1]
-            .split(",")[0];
-        if (keyTypeStr.equals("Integer")) {
-          // The key type is integer, so create random expressions of the form expr[int] for integer
-          // expressions
-          ExprContext intExpr = contextInfo.getRandomIntExpr();
-          ExprContext leftExpr = ExprBuilder.join(ExprBuilder.join(expr, ExprBuilder.toExprContext("getValueOfKey")),intExpr);
-          ExprContext geneExpr;
-          ExprGeneValue newValue;
-          if (valueTypeStr.equals("Integer")) {
-            // The map value is Integer
-            geneExpr = ExprBuilder.eq(leftExpr, ExprBuilder.ZERO);
-            newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
-            genes.add(new ExprGene(conf, newValue, contextInfo));
-            geneExpr = ExprBuilder.eq(leftExpr, ExprBuilder.ONE);
-            newValue = new ExprGeneValue(geneExpr, ExprGeneType.INT_COMPARISON);
-            genes.add(new ExprGene(conf, newValue, contextInfo));
-          } else if (valueTypeStr.equals("Boolean")) {
-            // The map value is Boolean
-            geneExpr = ExprBuilder.eq(leftExpr, ExprBuilder.TRUE);
-            newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-            genes.add(new ExprGene(conf, newValue, contextInfo));
-          } else {
-            // The map value is Object
-            geneExpr = ExprBuilder.neq(leftExpr, ExprBuilder.NULL);
-            newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-            genes.add(new ExprGene(conf, newValue, contextInfo));
-          }
-
-        }
-      }
+    List<Expr> evaluable = contextInfo.getEvaluableExpressions();
+    for (Expr expr : evaluable) {
+      throw new UnsupportedOperationException("Implement this!");
     }
     return genes;
   }
@@ -566,21 +515,21 @@ public class ChromosomeGenesFactory {
    * - no e when the evaluation result is empty
    */
   public List<Gene> createsGenesFromEvaluableJoinedExpressions(
-          List<ExprContext> evaluableJoinedExpressions, Object o, boolean isPositive)
-          throws Exception {
+          List<Expr> evaluableJoinedExpressions, Object o, boolean isPositive) throws Exception {
     List<Gene> genes = new LinkedList<>();
-    for (ExprContext expr : evaluableJoinedExpressions) {
+    for (Expr expr : evaluableJoinedExpressions) {
+      // TODO reimplement the below if
+      //if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
+      //  continue;
       try {
-        Object result = ExpressionEvaluator.evalAnyExpr(expr, o);
-        String resultStr = result!=null?result.toString(): ExprName.NULL;
-        String opStr = isPositive ? ExprOperator.EQ : ExprOperator.NOT_EQ;
-        String newExprStr = expr.getText() + " " + opStr + " " + resultStr;
-
+        Object result = ExpressionEvaluator.evalAnyExpr(expr.exprCtx(), o);
+        genes.add(buildExprGeneFromEval(expr, result, isPositive));
       } catch (NonEvaluableExpressionException e) {
+        // The evaluation result is empty
       }
 
     }
-    return null;
+    return genes;
   }
 
   /**
@@ -597,17 +546,17 @@ public class ChromosomeGenesFactory {
     List<Gene> genes = new LinkedList<Gene>();
     Object[] values = contextInfo.getExpressionsByEvaluationValue().keySet().toArray();
     for (int j = 0; j < values.length; j++) {
-      List<ExprContext> expressionsThatEvaluateToValue = contextInfo.getExpressionsByEvaluationValue()
+      List<Expr> expressionsThatEvaluateToValue = contextInfo.getExpressionsByEvaluationValue()
           .get(values[j]);
       // Add a equality gene for each pair of expressions that evaluate to the same value
       for (int k = 0; k < expressionsThatEvaluateToValue.size() - 1; k++) {
-        ExprContext leftExpression = expressionsThatEvaluateToValue.get(k);
+        Expr leftExpression = expressionsThatEvaluateToValue.get(k);
         for (int l = k + 1; l < expressionsThatEvaluateToValue.size(); l++) {
-          ExprContext rightExpression = expressionsThatEvaluateToValue.get(l);
+          Expr rightExpression = expressionsThatEvaluateToValue.get(l);
           if (rightExpression != null)
             throw new UnsupportedOperationException("Add proper checks here");
           ExprGeneType geneType = ExprGeneType.EQUALITY;
-          ExprContext geneExpr = ExprBuilder.eq(leftExpression, rightExpression);
+          Expr geneExpr = ExprBuilder.eq(leftExpression, rightExpression);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, geneType);
           genes.add(new ExprGene(conf, newValue, contextInfo));
         }
@@ -616,11 +565,11 @@ public class ChromosomeGenesFactory {
       // Add an equality gene for each of pair in which the left side expression evaluates to the
       // current value
       // and the right side expression evaluates to some other value
-      for (ExprContext leftExpression : expressionsThatEvaluateToValue) {
+      for (Expr leftExpression : expressionsThatEvaluateToValue) {
         for (int k = j + 1; k < values.length; k++) {
-          List<ExprContext> rightExpressions = contextInfo.getExpressionsByEvaluationValue()
+          List<Expr> rightExpressions = contextInfo.getExpressionsByEvaluationValue()
               .get(values[k]);
-          for (ExprContext rightExpression : rightExpressions) {
+          for (Expr rightExpression : rightExpressions) {
               throw new UnsupportedOperationException("add proper checkings here ");
           }
         }
@@ -635,8 +584,18 @@ public class ChromosomeGenesFactory {
    *
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjects(List<ExprContext> evaluableJoinedExpressions) {
-    return null;
+  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjects(List<Expr> evaluableJoinedExpressions) {
+    List<Gene> genes = new LinkedList<>();
+    for (int j = 0; j < evaluableJoinedExpressions.size() - 1; j++) {
+      Expr leftExpr = evaluableJoinedExpressions.get(j);
+      for (int k = j + 1; k < evaluableJoinedExpressions.size(); k++) {
+        Expr rightExpr = evaluableJoinedExpressions.get(k);
+        if (rightExpr.toString().contains("thizPre"))
+          continue;
+        throw new UnsupportedOperationException("Implement this properly");
+      }
+    }
+    return genes;
   }
 
   /**
@@ -674,7 +633,7 @@ public class ChromosomeGenesFactory {
    * Creates genes from simple closured expressions considering: - Quantified expressions with body
    * predicating about shapes - Quantified expressions with body predicating about values
    */
-  public List<Gene> createsGenesFromSimpleClosuredExpressionsAndIntExpressions(List<ExprContext> simpleClosuredExpressions, List<ExprContext> joinedExpressionsOfTypeInt) {
+  public List<Gene> createsGenesFromSimpleClosuredExpressionsAndIntExpressions(List<Expr> simpleClosuredExpressions, List<Expr> joinedExpressionsOfTypeInt) {
     return null;
   }
 
@@ -689,7 +648,7 @@ public class ChromosomeGenesFactory {
       Expr evaluableExpr = simpleClosuredExpressions.get(j);
       if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
         continue;
-      Expr correctedEvaluableExpr = correctExpressionName(evaluableExpr);
+      Expr correctedEvaluableExpr = evaluableExpr;
 
       // Create genes with expressions which body is a predicate about shapes
       genes.addAll(createsGenesFromSimpleClosuredExpressionsForShape(correctedEvaluableExpr));
@@ -701,7 +660,7 @@ public class ChromosomeGenesFactory {
         // For each expression i of type int: #(e.*f)=i
         for (int k = 0; k < joinedExpressionsOfTypeInt.size(); k++) {
 
-          Expr correctedIntExpr = correctExpressionName(joinedExpressionsOfTypeInt.get(k));
+          Expr correctedIntExpr = joinedExpressionsOfTypeInt.get(k);
           ExprGeneValue geneValue = createsCardinalityExpression(correctedEvaluableExpr,
               correctedIntExpr);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
@@ -761,15 +720,15 @@ public class ChromosomeGenesFactory {
   public List<Gene> createsGenesFromSimpleClosuredExpressionsForValues(Expr simpleClosuredExpr)
       throws InvalidConfigurationException, Err {
 
-    Type typeOfElementsInSet = DynAlloyExpressionsUtils.getTypeOfElementsInSet(simpleClosuredExpr);
-    Set<ExprContext> joinableExpressions = contextInfo
+    Class<?> typeOfElementsInSet = simpleClosuredExpr.type();
+    Set<Expr> joinableExpressions = contextInfo
         .getJoineableExpressionsOfCurrentType(typeOfElementsInSet);
 
-    List<Gene> genes = new LinkedList<Gene>();
+    List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
 
     // For each joineable expr generate the quantified expressions
-    for (ExprContext joineableExpr : joinableExpressions) {
+    for (Expr joineableExpr : joinableExpressions) {
       throw new UnsupportedOperationException("imeplement this properly");
     }
     return genes;
@@ -779,8 +738,8 @@ public class ChromosomeGenesFactory {
    * Creates genes from double closured expressions considering: - Quantified expressions with body
    * predicating about shapes - Quantified expressions with body predicating about values
    */
-  public List<Gene> createsGenesFromDoubleClosuredExpressionsAndIntExpressions(List<ExprContext> doubleClosuredExpressions,
-                                                              List<ExprContext> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
+  public List<Gene> createsGenesFromDoubleClosuredExpressionsAndIntExpressions(List<Expr> doubleClosuredExpressions,
+                                                              List<Expr> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
     return null;
   }
 
@@ -795,19 +754,18 @@ public class ChromosomeGenesFactory {
       Expr evaluableExpr = doubleClosuredExpressions.get(j);
       if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
         continue;
-      Expr correctedEvaluableExpr = correctExpressionName(evaluableExpr);
 
       // Create genes with expressions which body is a predicate about shapes
-      genes.addAll(createsGenesFromDoubleClosuredExpressionsForShape(correctedEvaluableExpr));
+      genes.addAll(createsGenesFromDoubleClosuredExpressionsForShape(evaluableExpr));
 
       // Create genes with expressions which body is a predicate about values
-      genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(correctedEvaluableExpr));
+      genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(evaluableExpr));
 
       if (parameters.getConsiderCardinalityExpressions()) {
         // For each expression i of type int: #(e.*f)=i
         for (int k = 0; k < joinedExpressionsOfIntType.size(); k++) {
-          Expr correctedIntExpr = correctExpressionName(joinedExpressionsOfIntType.get(k));
-          ExprGeneValue geneValue = createsCardinalityExpression(correctedEvaluableExpr,
+          Expr correctedIntExpr = joinedExpressionsOfIntType.get(k);
+          ExprGeneValue geneValue = createsCardinalityExpression(evaluableExpr,
               correctedIntExpr);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
         }
@@ -919,16 +877,15 @@ public class ChromosomeGenesFactory {
   public List<Gene> createsGenesFromDoubleClosuredExpressionsForValues(Expr doubleClosuredExpr)
       throws InvalidConfigurationException, Err {
 
-    Type typeOfElementsInSet = DynAlloyExpressionsUtils.getTypeOfElementsInSet(doubleClosuredExpr,
-        1);
-    Set<ExprContext> joinableExpressions = contextInfo
+    Class<?> typeOfElementsInSet = doubleClosuredExpr.type();
+    Set<Expr> joinableExpressions = contextInfo
         .getJoineableExpressionsOfCurrentType(typeOfElementsInSet);
 
     List<Gene> genes = new LinkedList<Gene>();
     ExprGeneValue geneValue;
 
     // For each joineable expr generate the quantified expressions
-    for (ExprContext joineableExpr : joinableExpressions) {
+    for (Expr joineableExpr : joinableExpressions) {
       throw new UnsupportedOperationException("implement this properly");
     }
     return genes;
@@ -1067,67 +1024,21 @@ public class ChromosomeGenesFactory {
    * @param isPositive indicates if the evaluation comes from a positive example or not
    * @return a new gene
    */
-  public Gene buildExprGeneFromEval(ExprContext expr, Object result, boolean isPositive) throws InvalidConfigurationException{
-    return null;
-  }
+  public Gene buildExprGeneFromEval(Expr expr, Object result, boolean isPositive) throws InvalidConfigurationException {
+    String opStr = isPositive ? ExprOperator.EQ : ExprOperator.NOT_EQ;
 
-  /**
-   * Get the correct expression from a evaluation
-   * 
-   * @param example
-   *          is the example in which the evaluation was performed
-   * @param evaluation
-   *          is the evaluation performed
-   * @return the expression corresponding to the evaluation result
-   */
-  private static Expr evaluationToExpression(A4Solution example, A4TupleSet evaluation) {
-    if (evaluation.iterator().hasNext()) {
-      A4Tuple firstEval = evaluation.iterator().next();
-      Expr expr = ExprConstant.TRUE;
-      if (firstEval.type().toString().equals("{seq/Int}")
-          || firstEval.type().toString().equals("{Int}")) {
-        // The evaluation is of type int
-        expr = ExprConstant.makeNUMBER(Integer.parseInt(firstEval.toString()));
-      } else {
-        for (ExprVar e : example.getAllAtoms()) {
-          if (e.toString().equals(firstEval.toString())) {
-            expr = e;
-            break;
-          }
-        }
-      }
-      return expr;
+    // TODO the if condition should be done based on the expression type
+    if (result != null && Number.class.isAssignableFrom(result.getClass())) {
+      Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.toExpr(result.toString(), result.getClass()), Boolean.class);
+      ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
+      return new ExprGene(conf, newValue, contextInfo);
     } else {
-      return ExprConstant.EMPTYNESS;
+      // The result is not a number, then compare with null
+      Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.NULL, Boolean.class);
+      ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
+      return new ExprGene(conf, newValue, contextInfo);
     }
 
-  }
-
-  /**
-   * Corrects the expression name of the given expression for allow to evaluate it
-   * 
-   * @param expression
-   * @return the same expression with a evaluable name
-   */
-  private Expr correctExpressionName(Expr expression) {
-    if (expression instanceof ExprVar) {
-      return runner.translateExpression((ExprVar) expression);
-    } else {
-      if (expression instanceof ExprUnary) {
-        // The expression is closure
-        ExprUnary closure = ((ExprUnary) expression);
-        return closure.op.make(null, correctExpressionName(closure.sub));
-      } else {
-        // The expression is a joined expr
-        Expr leftExpr = ((ExprBinary) expression).left;
-        Expr rightExpr = ((ExprBinary) expression).right;
-
-        Expr newLeftExpr = correctExpressionName(leftExpr);
-        Expr newRightExpr = correctExpressionName(rightExpr);
-        return ((ExprBinary) expression).op.make(null, null, newLeftExpr, newRightExpr);
-      }
-
-    }
   }
 
 }
