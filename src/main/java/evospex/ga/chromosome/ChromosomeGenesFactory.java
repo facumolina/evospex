@@ -746,21 +746,13 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Creates genes from double closured expressions considering: - Quantified expressions with body
-   * predicating about shapes - Quantified expressions with body predicating about values
+   * Creates genes from double closured expressions considering:
+   * - Quantified expressions with body predicating about shapes
+   * - Quantified expressions with body predicating about values
    */
   public List<Gene> createsGenesFromDoubleClosuredExpressionsAndIntExpressions(List<Expr> doubleClosuredExpressions,
                                                               List<Expr> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
-    return null;
-  }
-
-  /**
-   * Creates genes from double closured expressions considering: - Quantified expressions with body
-   * predicating about shapes - Quantified expressions with body predicating about values
-   */
-  public List<Gene> createsGenesFromDoubleClosuredExpressions(List<Expr> doubleClosuredExpressions,
-      List<Expr> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
-    List<Gene> genes = new LinkedList<Gene>();
+    List<Gene> genes = new LinkedList<>();
     for (int j = 0; j < doubleClosuredExpressions.size(); j++) {
       Expr evaluableExpr = doubleClosuredExpressions.get(j);
       if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
@@ -773,11 +765,11 @@ public class ChromosomeGenesFactory {
       genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(evaluableExpr));
 
       if (parameters.getConsiderCardinalityExpressions()) {
-        // For each expression i of type int: #(e.*f)=i
+        // For each expression i of type int: #(e.*f) = i
         for (int k = 0; k < joinedExpressionsOfIntType.size(); k++) {
-          Expr correctedIntExpr = joinedExpressionsOfIntType.get(k);
+          Expr intExpr = joinedExpressionsOfIntType.get(k);
           ExprGeneValue geneValue = createsCardinalityExpression(evaluableExpr,
-              correctedIntExpr);
+                  evaluableExpr);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
         }
       }
@@ -819,11 +811,11 @@ public class ChromosomeGenesFactory {
     // (all + some) n: e.*(f+g) : n.g != null
 
     // (all + some) n: e.*(f+g) : n != n.f
-    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, "all",
+    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL,
         1);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
     // (all + some) n: e.*(f+g) : n != n.g
-    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, "all",
+    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL,
         2);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
 
@@ -833,20 +825,20 @@ public class ChromosomeGenesFactory {
      * ExprGene(conf,geneValue));
      */
     // (all + some) n : e.*(f+g) : n = n.f.g
-    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, "all",
+    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL,
         4);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^f
-    geneValue = createsQtExpressionVarSetPredicate(doubleClosuredExpr, "all", 1);
+    geneValue = createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
     // (all + some) n: e.*(f+g) : n in n.^g
-    geneValue = createsQtExpressionVarSetPredicate(doubleClosuredExpr, "all", 2);
+    geneValue = createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^(f+g)
     geneValue = ChromosomeGenesFactory.createsQtExpressionVarSetPredicate(doubleClosuredExpr,
-        "all");
+            ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
 
     // geneValue =
@@ -855,7 +847,7 @@ public class ChromosomeGenesFactory {
 
     // all n: e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
     geneValue = ChromosomeGenesFactory.createsQtExpressionSetSetPredicate(doubleClosuredExpr,
-        "all");
+            ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, contextInfo));
 
     return genes;
@@ -988,8 +980,7 @@ public class ChromosomeGenesFactory {
    * 
    * - op n : e.*(f+g) : n = n.f.g if i = 4
    */
-  public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op,
-      int i) {
+  public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op, int i) {
     throw new UnsupportedOperationException("Implement this!");
   }
 
