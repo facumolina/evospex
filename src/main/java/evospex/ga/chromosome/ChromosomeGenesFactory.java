@@ -584,7 +584,7 @@ public class ChromosomeGenesFactory {
    *
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjects(List<Expr> evaluableJoinedExpressions) {
+  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjects(List<Expr> evaluableJoinedExpressions) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
     for (int j = 0; j < evaluableJoinedExpressions.size() - 1; j++) {
       Expr leftExpr = evaluableJoinedExpressions.get(j);
@@ -592,7 +592,18 @@ public class ChromosomeGenesFactory {
         Expr rightExpr = evaluableJoinedExpressions.get(k);
         if (rightExpr.toString().contains("thizPre"))
           continue;
-        throw new UnsupportedOperationException("Implement this properly");
+        if (leftExpr.type().equals(rightExpr)) {
+          if (Number.class.isAssignableFrom(leftExpr.type())) {
+            // We are comparing numeric expressions
+            Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
+            ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.INT_COMPARISON);
+            genes.add(new ExprGene(conf, newValue, contextInfo));
+          } else {
+            Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
+            ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.EQUALITY);
+            genes.add(new ExprGene(conf, newValue, contextInfo));
+          }
+        }
       }
     }
     return genes;
