@@ -13,6 +13,7 @@ public class ExprName {
   public static final String TRUE = "true"; // Name for expression true
   public static final String FALSE = "false"; // Name for expression false
   public static final String RESULT = "result"; // Name for the result expression (result of the method)
+  public static final String QT_VAR = "n"; // Name for a quantified variable
   public static final String ZERO = "0"; // Name for the result expression 0
   public static final String ONE = "1"; // Name for the result expression 1
 
