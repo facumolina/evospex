@@ -973,15 +973,22 @@ public class ChromosomeGenesFactory {
    * value with expression:
    * 
    * - op n : e.*(f+g) : n != n.f if i = 1
-   * 
    * - op n : e.*(f+g) : n != n.g if i = 2
-   * 
    * - op n : e.*(f+g) : n.f != n.g if i = 3
-   * 
    * - op n : e.*(f+g) : n = n.f.g if i = 4
    */
   public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op, int i) {
-    throw new UnsupportedOperationException("Implement this!");
+    ExprGeneType geneType;
+
+    Expr qtExpr = ExprBuilder.qtExpr(op, closuredExpression, i);
+
+    if (op.equals(ExprOperator.ALL)) {
+      geneType = ExprGeneType.FORALL_VAR_VAR;
+    } else {
+      geneType = ExprGeneType.SOME_VAR_VAR;
+    }
+    ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
+    return geneValue;
   }
 
   /**
