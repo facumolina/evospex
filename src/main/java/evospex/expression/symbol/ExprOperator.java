@@ -1,7 +1,7 @@
-package evospex.expression;
+package evospex.expression.symbol;
 
 /**
- * This class all the expressions operators
+ * This class maintains all the expressions operators
  *
  * Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */

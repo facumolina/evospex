@@ -2,7 +2,7 @@ package evospex.expression.evaluator;
 
 import evospex.expression.ExprGrammarParser.Set_exprContext;
 import evospex.expression.ExprGrammarParser.Set_binary_opContext;
-import evospex.expression.ExprOperator;
+import evospex.expression.symbol.ExprOperator;
 
 import java.util.Set;
 

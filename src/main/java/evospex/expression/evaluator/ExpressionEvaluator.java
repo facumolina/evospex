@@ -1,14 +1,10 @@
 package evospex.expression.evaluator;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import evospex.expression.ExprGrammarConstantSymbols;
-import evospex.expression.ExprGrammarLexer;
 import evospex.expression.ExprGrammarParser;
-import evospex.expression.ExprGrammarParser.ParseContext;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprGrammarParser.Qt_exprContext;
 import evospex.expression.ExprGrammarParser.Num_binary_opContext;
@@ -19,12 +15,7 @@ import evospex.expression.ExprGrammarParser.Compare_opContext;
 import evospex.expression.ExprGrammarParser.Unary_opContext;
 import evospex.expression.ExprGrammarParser.NameContext;
 
-import evospex.expression.ExprName;
-import evospex.expression.validator.ExpressionValidator;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import evospex.expression.symbol.ExprName;
 
 /**
  * This class represents an Expression Evaluator. Provides a method that given a Java object and an

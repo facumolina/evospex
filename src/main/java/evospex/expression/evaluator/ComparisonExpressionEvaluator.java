@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import evospex.expression.ExprGrammarParser.Compare_opContext;
 import evospex.expression.ExprGrammarParser.ExprContext;
-import evospex.expression.ExprOperator;
+import evospex.expression.symbol.ExprOperator;
 
 /**
  * This class provides methods to evaluate comparison expressions.

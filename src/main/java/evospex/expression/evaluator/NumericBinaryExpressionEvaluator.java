@@ -2,7 +2,7 @@ package evospex.expression.evaluator;
 
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprGrammarParser.Num_binary_opContext;
-import evospex.expression.ExprOperator;
+import evospex.expression.symbol.ExprOperator;
 
 /**
  * This class provides methods to evaluate binary expressions that evaluate to a number.

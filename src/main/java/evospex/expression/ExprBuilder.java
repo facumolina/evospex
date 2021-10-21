@@ -1,18 +1,21 @@
 package evospex.expression;
 
+import evospex.expression.symbol.ExprDelimiter;
+import evospex.expression.symbol.ExprName;
+import evospex.expression.symbol.ExprOperator;
+import evospex.expression.util.ExprUtils;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import evospex.expression.ExprGrammarParser.Closure_opContext;
 import evospex.expression.ExprGrammarParser.Closure_fieldContext;
 import evospex.expression.ExprGrammarParser.ParseContext;
 import evospex.expression.ExprGrammarParser.Set_exprContext;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * ExprBuilder class allows to build expressions from their string representation
+ *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class ExprBuilder {
@@ -119,7 +122,8 @@ public class ExprBuilder {
   }
 
   /**
-   * Quantify the given closured expression with the given operator. The quantified expressions body is determined as follow:
+   * Quantify the given closured expression with the given operator. The quantified expression body will specify a property
+   * involving two variables and it is determined as follow:
    * - op n : e.*(f+g) : n != n.f if code = 1
    * - op n : e.*(f+g) : n != n.g if code = 2
    * - op n : e.*(f+g) : n.f != n.g if code = 3
@@ -130,22 +134,16 @@ public class ExprBuilder {
    * @param code the code determining the quantified expression body
    * @return the expression op n : closuredExpr : body
    */
-  public static Expr qtExpr(String operator, Expr closuredExpr, int code) {
-    // Build the declaration
-    String decl = operator + " " + ExprName.QT_VAR + " : " + closuredExpr;
-
+  public static Expr qtExprTwoVars(String operator, Expr closuredExpr, int code) {
     // Get the set expression
-    List<Set_exprContext> l = closuredExpr.exprCtx().set_expr();
-    if (l.size() != 1)
-      throw new IllegalStateException("Invalid closured expression: "+closuredExpr);
-
-    Set_exprContext s = l.get(0);
+    Set_exprContext s = ExprUtils.getClosuredExprSet(closuredExpr);
     Closure_fieldContext field_1 = s.closure_field();
     Closure_fieldContext field_2 = field_1.closure_field();
 
     if (field_2 == null)
       throw new IllegalArgumentException("The closured expression is supposed to be double closured");
 
+    // Build the quantified expression body depending on the provided code
     String body = "";
     switch (code) {
       case 1:
@@ -155,13 +153,50 @@ public class ExprBuilder {
         body = ExprName.QT_VAR + " " + ExprOperator.NOT_EQ + " " + ExprName.QT_VAR + ExprOperator.JOIN + field_2.ID();
         break;
       case 4:
-        body = ExprName.QT_VAR + " " + ExprOperator.NOT_EQ + " " + ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID() + ExprOperator.JOIN + field_2.ID();
+        body = ExprName.QT_VAR + " " + ExprOperator.EQ + " " + ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID() + ExprOperator.JOIN + field_2.ID();
         break;
       default:
         throw new UnsupportedOperationException("Code still not supported: "+code);
     }
 
-    return toExpr(decl + " : " + body, Boolean.class);
+    return toExpr(getDecl(operator, closuredExpr) + " : " + body, Boolean.class);
+  }
+
+  /**
+   * Quantify the given closured expression with the given operator. The quantified expression body will specify a property
+   * involving one variable and a set and it is determined as follow:
+   * - op n : e.*(f+g) : n in n.^f if code=1
+   * - op n : e.*(f+g) : n in n.^g if code=2
+   */
+  public static Expr qtExprVarSet(String operator, Expr closuredExpr, int code) {
+    // Get the set expression
+    Set_exprContext s = ExprUtils.getClosuredExprSet(closuredExpr);
+    Closure_fieldContext field_1 = s.closure_field();
+    Closure_fieldContext field_2 = field_1.closure_field();
+
+    if (field_2 == null)
+      throw new IllegalArgumentException("The closured expression is supposed to be double closured");
+
+    // Build the quantified expression body depending on the provided code
+    String body = "";
+    if (code == 1) {
+      body = ExprName.QT_VAR + " " + ExprOperator.IN + " " +
+              ExprName.QT_VAR + ExprOperator.JOIN + ExprOperator.RT_CLOSURE + ExprDelimiter.LP + field_1.ID() + ExprDelimiter.RP;
+    } else if (code == 2) {
+      body = ExprName.QT_VAR + " " + ExprOperator.IN + " " +
+              ExprName.QT_VAR + ExprOperator.JOIN + ExprOperator.RT_CLOSURE + ExprDelimiter.LP + field_2.ID() + ExprDelimiter.RP;
+    } else {
+      throw new UnsupportedOperationException("Code still not supported: "+code);
+    }
+
+    return toExpr(getDecl(operator, closuredExpr) + " : " + body, Boolean.class);
+  }
+
+  /**
+   * Returns the declaration part for a future quantified expression
+   */
+  private static String getDecl(String operator, Expr closuredExpr) {
+    return operator + " " + ExprName.QT_VAR + " : " + closuredExpr;
   }
 
   /**

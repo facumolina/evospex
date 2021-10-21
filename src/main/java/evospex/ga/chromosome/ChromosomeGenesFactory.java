@@ -10,8 +10,8 @@ import java.util.Set;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
-import evospex.expression.ExprName;
-import evospex.expression.ExprOperator;
+import evospex.expression.symbol.ExprName;
+import evospex.expression.symbol.ExprOperator;
 import evospex.expression.evaluator.ExpressionEvaluator;
 import evospex.expression.evaluator.NonEvaluableExpressionException;
 import org.jgap.Configuration;
@@ -19,23 +19,13 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 
-import evospex.ConfigurationProperties;
 import evospex.target.MethodExecution;
 import rfm.dynalloy.Err;
 
-import rfm.dynalloyCompiler.ast.ExprBinary;
-
-import rfm.dynalloyCompiler.ast.ExprConstant;
 import rfm.dynalloyCompiler.ast.ExprQt;
-import rfm.dynalloyCompiler.ast.ExprUnary;
-import rfm.dynalloyCompiler.ast.ExprVar;
 
 import rfm.dynalloyCompiler.ast.Type;
-import rfm.dynalloyCompiler.translator.A4Solution;
-import rfm.dynalloyCompiler.translator.A4Tuple;
-import rfm.dynalloyCompiler.translator.A4TupleSet;
 import utils.TargetInformation;
-import utils.DynAlloyExpressionsUtils;
 import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
 
@@ -923,12 +913,23 @@ public class ChromosomeGenesFactory {
 
   /**
    * Given an evaluable closured expression e.*(f+g), a quantification operator and an int i creates
-   * a gene value with the expression : - op n : e.*f : n in n.^f if i=1 - op n : e.*f : n in n.^g
-   * if i=2
+   * a gene value with the following expressions :
+   * - op n : e.*(f+g) : n in n.^f if i=1
+   * - op n : e.*(f+g) : n in n.^g if i=2
    */
   public static ExprGeneValue createsQtExpressionVarSetPredicate(Expr closuredExpression, String op,
       int i) {
-    throw new UnsupportedOperationException("Implement this!");
+    ExprGeneType geneType;
+
+    Expr qtExpr = ExprBuilder.qtExprVarSet(op, closuredExpression, i);
+
+    if (op.equals(ExprOperator.ALL)) {
+      geneType = ExprGeneType.FORALL_VAR_VAR;
+    } else {
+      geneType = ExprGeneType.SOME_VAR_VAR;
+    }
+    ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
+    return geneValue;
   }
 
   /**
@@ -980,7 +981,7 @@ public class ChromosomeGenesFactory {
   public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op, int i) {
     ExprGeneType geneType;
 
-    Expr qtExpr = ExprBuilder.qtExpr(op, closuredExpression, i);
+    Expr qtExpr = ExprBuilder.qtExprTwoVars(op, closuredExpression, i);
 
     if (op.equals(ExprOperator.ALL)) {
       geneType = ExprGeneType.FORALL_VAR_VAR;

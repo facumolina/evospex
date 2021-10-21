@@ -6,7 +6,7 @@ import evospex.expression.ExprGrammarConstantSymbols;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprGrammarParser.Qt_exprContext;
 import evospex.expression.ExprGrammarParser.QuantifierContext;
-import evospex.expression.ExprOperator;
+import evospex.expression.symbol.ExprOperator;
 
 
 /**

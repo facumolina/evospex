@@ -1,4 +1,4 @@
-package evospex.expression;
+package evospex.expression.symbol;
 
 /**
  * This class contains fixed expressions names
