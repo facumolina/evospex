@@ -118,11 +118,6 @@ public class ChromosomeGenesFactory {
         Gene[] new_genes = new Gene[genes_num];
         ExprGene exprGene = (ExprGene) genes.get(i);
         ExprGene newExprGene = new ExprGene(conf, exprGene.getValue().clone(), contextInfo);
-        Expr expr = exprGene.getValue().getExpression();
-        if (!isPositive && !expr.isQuantified()) {
-          // Negate the expression
-          throw new UnsupportedOperationException("negate the expression expr and set it the new expr gene");
-        }
         // Always the gene must be in the first position
         new_genes[0] = newExprGene;
         // The rest of the genes vales is : true
@@ -184,7 +179,7 @@ public class ChromosomeGenesFactory {
       // Create the chromosome genes
 
       // Create the genes according to the evaluation of each evaluable expression
-      if (parameters.getConsiderJoinedExpressions() && isPositive) {
+      if (parameters.getConsiderJoinedExpressions()) {
         genes.addAll(createsGenesFromEvaluableJoinedExpressions(evaluableJoinedExpressions, o, isPositive));
       }
 
@@ -1022,8 +1017,7 @@ public class ChromosomeGenesFactory {
   public Gene buildExprGeneFromEval(Expr expr, Object result, boolean isPositive) throws InvalidConfigurationException {
     String opStr = isPositive ? ExprOperator.EQ : ExprOperator.NOT_EQ;
 
-    // TODO the if condition should be done based on the expression type
-    if (result != null && Number.class.isAssignableFrom(result.getClass())) {
+    if (result != null && Number.class.isAssignableFrom(expr.type())) {
       Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.toExpr(result.toString(), result.getClass()), Boolean.class);
       ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
       return new ExprGene(conf, newValue, contextInfo);
