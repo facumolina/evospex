@@ -21,9 +21,8 @@ public class ExprGrammarParser extends Parser {
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
-		T__38=39, T__39=40, T__40=41, T__41=42, ID=43, ID_START=44, ID_CHAR=45, 
-		WS=46;
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, UNSIGNED_NUMBER=37, 
+		ID=38, ID_START=39, ID_CHAR=40, WS=41;
 	public static final int
 		RULE_parse = 0, RULE_expr = 1, RULE_qt_expr = 2, RULE_set_expr = 3, RULE_collection = 4, 
 		RULE_num_binary_op = 5, RULE_binary_op = 6, RULE_set_binary_op = 7, RULE_compare_op = 8, 
@@ -40,14 +39,13 @@ public class ExprGrammarParser extends Parser {
 		"'%'", "'||'", "'or'", "'&&'", "'and'", "'implies'", "'=>'", "'iff'", 
 		"'xor'", "'&'", "'='", "'!='", "'in'", "'not in'", "'<'", "'>'", "'<='", 
 		"'>='", "'!'", "'not'", "'no'", "'#'", "'^'", "'all'", "'some'", "'lone'", 
-		"'one'", "'0'", "'1'", "'-1'", "'0.0'", "'1.0'", "'-1.0'"
+		"'one'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, "ID", "ID_START", "ID_CHAR", 
-		"WS"
+		null, "UNSIGNED_NUMBER", "ID", "ID_START", "ID_CHAR", "WS"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -987,6 +985,7 @@ public class ExprGrammarParser extends Parser {
 	}
 
 	public static class NumberContext extends ParserRuleContext {
+		public TerminalNode UNSIGNED_NUMBER() { return getToken(ExprGrammarParser.UNSIGNED_NUMBER, 0); }
 		public NumberContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1004,20 +1003,28 @@ public class ExprGrammarParser extends Parser {
 	public final NumberContext number() throws RecognitionException {
 		NumberContext _localctx = new NumberContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_number);
-		int _la;
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(143);
-			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41))) != 0)) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
+			setState(146);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T__6:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(143);
+				match(T__6);
+				setState(144);
+				match(UNSIGNED_NUMBER);
+				}
+				break;
+			case UNSIGNED_NUMBER:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(145);
+				match(UNSIGNED_NUMBER);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1051,28 +1058,28 @@ public class ExprGrammarParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\60\u0094\4\2\t\2"+
-		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
-		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\3\3\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3+\u0097\4\2\t\2\4"+
+		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3B\n\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\7\3P\n\3\f\3\16\3S\13\3\3\4\3\4\3\4\3"+
-		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4c\n\4\3\5\3\5\3\5\3\5\3"+
-		"\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5t\n\5\3\6\3\6\3\7\3\7\3"+
-		"\b\3\b\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\r\3\r\3\16\3\16\3\16\3\16\5"+
-		"\16\u008a\n\16\3\17\3\17\3\17\3\17\5\17\u0090\n\17\3\20\3\20\3\20\2\3"+
-		"\4\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\t\3\2\b\f\3\2\r\24\3\2"+
-		"\26\35\3\2\36!\4\2\n\n\"\"\4\2  #&\3\2\',\2\u0092\2 \3\2\2\2\4A\3\2\2"+
-		"\2\6b\3\2\2\2\bs\3\2\2\2\nu\3\2\2\2\fw\3\2\2\2\16y\3\2\2\2\20{\3\2\2\2"+
-		"\22}\3\2\2\2\24\177\3\2\2\2\26\u0081\3\2\2\2\30\u0083\3\2\2\2\32\u0089"+
-		"\3\2\2\2\34\u008f\3\2\2\2\36\u0091\3\2\2\2 !\5\4\3\2!\"\7\2\2\3\"\3\3"+
-		"\2\2\2#$\b\3\1\2$B\5\6\4\2%&\7\3\2\2&\'\5\4\3\2\'(\7\4\2\2()\5\16\b\2"+
-		")*\7\3\2\2*+\5\4\3\2+,\7\4\2\2,B\3\2\2\2-.\5\24\13\2./\7\3\2\2/\60\5\4"+
-		"\3\2\60\61\7\4\2\2\61B\3\2\2\2\62\63\7\3\2\2\63\64\5\b\5\2\64\65\7\4\2"+
-		"\2\65\66\5\20\t\2\66\67\7\3\2\2\678\5\b\5\289\7\4\2\29B\3\2\2\2:;\7\3"+
-		"\2\2;<\5\4\3\2<=\7\4\2\2=B\3\2\2\2>B\5\b\5\2?B\5\32\16\2@B\5\36\20\2A"+
-		"#\3\2\2\2A%\3\2\2\2A-\3\2\2\2A\62\3\2\2\2A:\3\2\2\2A>\3\2\2\2A?\3\2\2"+
-		"\2A@\3\2\2\2BQ\3\2\2\2CD\f\f\2\2DE\5\f\7\2EF\5\4\3\rFP\3\2\2\2GH\f\13"+
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3B\n\3\3\3\3\3\3\3\3\3\3"+
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\7\3P\n\3\f\3\16\3S\13\3\3\4\3\4\3\4\3\4"+
+		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4c\n\4\3\5\3\5\3\5\3\5\3\5"+
+		"\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5t\n\5\3\6\3\6\3\7\3\7\3\b"+
+		"\3\b\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\r\3\r\3\16\3\16\3\16\3\16\5\16"+
+		"\u008a\n\16\3\17\3\17\3\17\3\17\5\17\u0090\n\17\3\20\3\20\3\20\5\20\u0095"+
+		"\n\20\3\20\2\3\4\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\b\3\2\b\f"+
+		"\3\2\r\24\3\2\26\35\3\2\36!\4\2\n\n\"\"\4\2  #&\2\u0096\2 \3\2\2\2\4A"+
+		"\3\2\2\2\6b\3\2\2\2\bs\3\2\2\2\nu\3\2\2\2\fw\3\2\2\2\16y\3\2\2\2\20{\3"+
+		"\2\2\2\22}\3\2\2\2\24\177\3\2\2\2\26\u0081\3\2\2\2\30\u0083\3\2\2\2\32"+
+		"\u0089\3\2\2\2\34\u008f\3\2\2\2\36\u0094\3\2\2\2 !\5\4\3\2!\"\7\2\2\3"+
+		"\"\3\3\2\2\2#$\b\3\1\2$B\5\6\4\2%&\7\3\2\2&\'\5\4\3\2\'(\7\4\2\2()\5\16"+
+		"\b\2)*\7\3\2\2*+\5\4\3\2+,\7\4\2\2,B\3\2\2\2-.\5\24\13\2./\7\3\2\2/\60"+
+		"\5\4\3\2\60\61\7\4\2\2\61B\3\2\2\2\62\63\7\3\2\2\63\64\5\b\5\2\64\65\7"+
+		"\4\2\2\65\66\5\20\t\2\66\67\7\3\2\2\678\5\b\5\289\7\4\2\29B\3\2\2\2:;"+
+		"\7\3\2\2;<\5\4\3\2<=\7\4\2\2=B\3\2\2\2>B\5\b\5\2?B\5\32\16\2@B\5\36\20"+
+		"\2A#\3\2\2\2A%\3\2\2\2A-\3\2\2\2A\62\3\2\2\2A:\3\2\2\2A>\3\2\2\2A?\3\2"+
+		"\2\2A@\3\2\2\2BQ\3\2\2\2CD\f\f\2\2DE\5\f\7\2EF\5\4\3\rFP\3\2\2\2GH\f\13"+
 		"\2\2HI\5\22\n\2IJ\5\4\3\fJP\3\2\2\2KL\f\t\2\2LM\5\16\b\2MN\5\4\3\nNP\3"+
 		"\2\2\2OC\3\2\2\2OG\3\2\2\2OK\3\2\2\2PS\3\2\2\2QO\3\2\2\2QR\3\2\2\2R\5"+
 		"\3\2\2\2SQ\3\2\2\2TU\5\30\r\2UV\5\32\16\2VW\7\5\2\2WX\5\b\5\2XY\7\5\2"+
@@ -1084,11 +1091,12 @@ public class ExprGrammarParser extends Parser {
 		"\t\2\2\2x\r\3\2\2\2yz\t\3\2\2z\17\3\2\2\2{|\7\25\2\2|\21\3\2\2\2}~\t\4"+
 		"\2\2~\23\3\2\2\2\177\u0080\t\5\2\2\u0080\25\3\2\2\2\u0081\u0082\t\6\2"+
 		"\2\u0082\27\3\2\2\2\u0083\u0084\t\7\2\2\u0084\31\3\2\2\2\u0085\u008a\7"+
-		"-\2\2\u0086\u0087\7-\2\2\u0087\u0088\7\6\2\2\u0088\u008a\5\32\16\2\u0089"+
-		"\u0085\3\2\2\2\u0089\u0086\3\2\2\2\u008a\33\3\2\2\2\u008b\u0090\7-\2\2"+
-		"\u008c\u008d\7-\2\2\u008d\u008e\7\b\2\2\u008e\u0090\5\34\17\2\u008f\u008b"+
-		"\3\2\2\2\u008f\u008c\3\2\2\2\u0090\35\3\2\2\2\u0091\u0092\t\b\2\2\u0092"+
-		"\37\3\2\2\2\tAOQbs\u0089\u008f";
+		"(\2\2\u0086\u0087\7(\2\2\u0087\u0088\7\6\2\2\u0088\u008a\5\32\16\2\u0089"+
+		"\u0085\3\2\2\2\u0089\u0086\3\2\2\2\u008a\33\3\2\2\2\u008b\u0090\7(\2\2"+
+		"\u008c\u008d\7(\2\2\u008d\u008e\7\b\2\2\u008e\u0090\5\34\17\2\u008f\u008b"+
+		"\3\2\2\2\u008f\u008c\3\2\2\2\u0090\35\3\2\2\2\u0091\u0092\7\t\2\2\u0092"+
+		"\u0095\7\'\2\2\u0093\u0095\7\'\2\2\u0094\u0091\3\2\2\2\u0094\u0093\3\2"+
+		"\2\2\u0095\37\3\2\2\2\nAOQbs\u0089\u008f\u0094";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

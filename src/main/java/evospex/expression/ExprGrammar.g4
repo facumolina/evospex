@@ -97,6 +97,8 @@ closure_field:
   | ID '+' closure_field
   ;
 
+UNSIGNED_NUMBER:  ('0' .. '9') + ('.' ('0' .. '9') +)?;
+
 ID
   : ID_START ID_CHAR*
   ;
@@ -112,13 +114,11 @@ ID_CHAR:
   | [0-9]
   ;
 
-number: 
-  '0'
-  | '1'
-  | '-1'
-  | '0.0'
-  | '1.0'
-  | '-1.0'
+number:
+  '-' UNSIGNED_NUMBER
+  | UNSIGNED_NUMBER
   ;
+
+
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
