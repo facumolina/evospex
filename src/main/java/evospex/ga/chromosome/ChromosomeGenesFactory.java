@@ -1,11 +1,6 @@
 package evospex.ga.chromosome;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
@@ -132,7 +127,7 @@ public class ChromosomeGenesFactory {
         new_genes[0] = newExprGene;
         // The rest of the genes vales is : true
         for (int j = 1; j < new_genes.length; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo);
+          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), contextInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -140,7 +135,7 @@ public class ChromosomeGenesFactory {
       }
     } else {
       // Create chromosomes with each gene randomly picked.
-      genes.add(new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo));
+      genes.add(new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), contextInfo));
       int chromosomesToCreate = parameters.getPopulationSize()
           / parameters.getAmountOfExamplesForInitialChromosomesGeneration();
       for (int i = 0; i < chromosomesToCreate; i++) {
@@ -156,7 +151,7 @@ public class ChromosomeGenesFactory {
             new_genes[j] = ((ExprGene) genes.get(r)).clone();
         }
         for (int j = genes_to_fill; j < genes_num; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE), contextInfo);
+          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), contextInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -486,10 +481,17 @@ public class ChromosomeGenesFactory {
    * @throws InvalidConfigurationException
    */
   private List<Gene> createGenesUsingMaps() throws InvalidConfigurationException {
-    List<Gene> genes = new LinkedList<Gene>();
+    List<Gene> genes = new LinkedList<>();
     List<Expr> evaluable = contextInfo.getEvaluableExpressions();
     for (Expr expr : evaluable) {
-      throw new UnsupportedOperationException("Implement this!");
+      if (Map.class.isAssignableFrom(expr.type())) {
+        // The expression denotes a Map
+        // TODO consider if the key type is integer, create random expressions of the form expr[int] for integer
+        // TODO consider if the map values are integer
+        // TODO consider if the map values are booleans
+        // TODO consider if the map values are objects
+        throw new UnsupportedOperationException("Implement genes creation using Maps!");
+      }
     }
     return genes;
   }
@@ -660,12 +662,9 @@ public class ChromosomeGenesFactory {
       if (parameters.getConsiderCardinalityExpressions()) {
         // For each expression i of type int: #(e.*f)=i
         for (int k = 0; k < joinedExpressionsOfTypeInt.size(); k++) {
-
-          Expr correctedIntExpr = joinedExpressionsOfTypeInt.get(k);
-          ExprGeneValue geneValue = createsCardinalityExpression(correctedEvaluableExpr,
-              correctedIntExpr);
+          Expr intExpression = joinedExpressionsOfTypeInt.get(k);
+          ExprGeneValue geneValue = createsCardinalityExpression(correctedEvaluableExpr,intExpression);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
-
         }
       }
     }
@@ -757,9 +756,8 @@ public class ChromosomeGenesFactory {
       if (parameters.getConsiderCardinalityExpressions()) {
         // For each expression i of type int: #(e.*f) = i
         for (int k = 0; k < joinedExpressionsOfIntType.size(); k++) {
-          Expr intExpr = joinedExpressionsOfIntType.get(k);
-          ExprGeneValue geneValue = createsCardinalityExpression(evaluableExpr,
-                  evaluableExpr);
+          Expr intExpression = joinedExpressionsOfIntType.get(k);
+          ExprGeneValue geneValue = createsCardinalityExpression(evaluableExpr,intExpression);
           genes.add(new ExprGene(conf, geneValue, contextInfo));
         }
       }
@@ -885,17 +883,19 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Given a closured expression e.*f and an expression i of type int creates the gene value with
-   * the expression #(e.*f) = i
+   * Given a closured expression e.*f and an expression i of type int creates a gene value with
+   * the following expression:
+   * - #(e.*f) = i
    */
-  public ExprGeneValue createsCardinalityExpression(Expr closuredExpression, Expr intExpr)
-      throws Err {
-    throw new UnsupportedOperationException("Implement this!");
+  public ExprGeneValue createsCardinalityExpression(Expr closuredExpression, Expr intExpr) {
+    Expr qtExpr = ExprBuilder.cardinalityExpr(closuredExpression, intExpr);
+    return new ExprGeneValue(qtExpr, ExprGeneType.CARDINALITY);
   }
 
   /**
    * Given a simple closured expression e.*f, an expression r and a quantification operator creates
-   * a gene value with expression - op n : e.*f : n.r = n.f.r
+   * a gene value with the following expression:
+   * - op n : e.*f : n.r = n.f.r
    */
   public static ExprGeneValue createsSimpleQtExpressionVarValueVarValueComparisonPredicate(
       ExprContext closuredExpr, ExprContext toJoinWithVarExpr, Type returnTypeExpr, ExprQt.Op op) throws Err {
@@ -903,42 +903,37 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Given an evaluable closured expression e.*f and a quantification operator creates the gene
-   * value op n : e.*f : n in n.^f
+   * Given an evaluable closured expression e.*f and a quantification operator creates a gene
+   * value with the following expression:
+   * - op n : e.*f : n in n.^f
    */
-  public static ExprGeneValue createsQtExpressionVarSetPredicate(Expr closuredExpression,
-      String op) {
-    throw new UnsupportedOperationException("Implement thiss!");
+  public static ExprGeneValue createsQtExpressionVarSetPredicate(Expr closuredExpression, String op) {
+    Expr qtExpr = ExprBuilder.qtExprVarSet(op, closuredExpression, 1);
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_SET : ExprGeneType.SOME_VAR_SET;
+    return new ExprGeneValue(qtExpr, geneType);
   }
 
   /**
    * Given an evaluable closured expression e.*(f+g), a quantification operator and an int i creates
-   * a gene value with the following expressions :
+   * a gene value with the following expressions:
    * - op n : e.*(f+g) : n in n.^f if i=1
    * - op n : e.*(f+g) : n in n.^g if i=2
    */
-  public static ExprGeneValue createsQtExpressionVarSetPredicate(Expr closuredExpression, String op,
-      int i) {
-    ExprGeneType geneType;
-
+  public static ExprGeneValue createsQtExpressionVarSetPredicate(Expr closuredExpression, String op, int i) {
     Expr qtExpr = ExprBuilder.qtExprVarSet(op, closuredExpression, i);
-
-    if (op.equals(ExprOperator.ALL)) {
-      geneType = ExprGeneType.FORALL_VAR_VAR;
-    } else {
-      geneType = ExprGeneType.SOME_VAR_VAR;
-    }
-    ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
-    return geneValue;
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_SET : ExprGeneType.SOME_VAR_SET;
+    return new ExprGeneValue(qtExpr, geneType);
   }
 
   /**
-   * Given a double closured expression e.*(f+g) and a quantification operator creates the
-   * expression op n : e.*(f+g) : e.f.*(f+g) != e.g.*(f+g)
+   * Given a double closured expression e.*(f+g) and a quantification operator creates  a gene value
+   * with the following expression:
+   * - op n : e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
    */
-  public static ExprGeneValue createsQtExpressionSetSetPredicate(Expr closuredExpression,
-      String op) {
-    throw new UnsupportedOperationException("Implement this!");
+  public static ExprGeneValue createsQtExpressionSetSetPredicate(Expr closuredExpression, String op) {
+    Expr qtExpr = ExprBuilder.qtExprSetSet(op, closuredExpression);
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_SET : ExprGeneType.SOME_VAR_SET;
+    return new ExprGeneValue(qtExpr, geneType);
   }
 
   /**
@@ -946,8 +941,7 @@ public class ChromosomeGenesFactory {
    * e.*f : n != null
    */
   public static ExprGeneValue createsQtExpressionVarPredicate(Expr closuredExpression, String op) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Implement this!");
   }
 
   /**
@@ -956,8 +950,7 @@ public class ChromosomeGenesFactory {
    */
   public static ExprGeneValue createsQtExpressionNextVarPredicate(Expr closuredExpression,
       String op) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Implement this!");
   }
 
   /**
@@ -979,17 +972,9 @@ public class ChromosomeGenesFactory {
    * - op n : e.*(f+g) : n = n.f.g if i = 4
    */
   public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op, int i) {
-    ExprGeneType geneType;
-
     Expr qtExpr = ExprBuilder.qtExprTwoVars(op, closuredExpression, i);
-
-    if (op.equals(ExprOperator.ALL)) {
-      geneType = ExprGeneType.FORALL_VAR_VAR;
-    } else {
-      geneType = ExprGeneType.SOME_VAR_VAR;
-    }
-    ExprGeneValue geneValue = new ExprGeneValue(qtExpr, geneType);
-    return geneValue;
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_VAR : ExprGeneType.SOME_VAR_VAR;
+    return new ExprGeneValue(qtExpr, geneType);
   }
 
   /**

@@ -50,7 +50,7 @@ public class TargetInformation {
   private static List<Expr> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
   private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
-  private static Map<Class<?>, Set<String>> joineableExpressionsByType; // Joineable expressions for each type
+  private static Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
   private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
   public static Sig nullSig; // Null signature
@@ -148,7 +148,7 @@ public class TargetInformation {
 
         if (!joineableExpressionsByType.containsKey(targetVertex))
           joineableExpressionsByType.put(targetVertex, new HashSet<>());
-        joineableExpressionsByType.get(targetVertex).add(adjacentExprStr);
+        joineableExpressionsByType.get(targetVertex).add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
 
         Expr newExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
         buildInitialExpressionsRec(newExpr, targetVertex, k - 1);
@@ -669,7 +669,13 @@ public class TargetInformation {
    * expressions of the form: type -> AnotherType
    */
   public Set<Expr> getJoineableExpressionsOfCurrentType(Class<?> type) {
-    throw new UnsupportedOperationException("Implement this");
+    System.out.println("getJoineableExpressionsOfCurrentType: "+type.getSimpleName());
+    if (joineableExpressionsByType.containsKey(type)) {
+      System.out.println("exprs are: "+joineableExpressionsByType.get(type));
+      return joineableExpressionsByType.get(type);
+    }
+    System.out.println("no exprs");
+    return new HashSet<>();
   }
 
   /**
