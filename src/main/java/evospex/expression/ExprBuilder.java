@@ -45,7 +45,7 @@ public class ExprBuilder {
     setup(str_expr);
     ParseTree tree = parser.parse();
     if (parser.getNumberOfSyntaxErrors() > 0)
-      throw new IllegalArgumentException("The given expression contains syntax errors");
+      throw new IllegalArgumentException("The given expression contains syntax errors: "+str_expr);
     ParseContext ctx = (ParseContext) tree;
     return new Expr(ctx.expr(),c);
   }
