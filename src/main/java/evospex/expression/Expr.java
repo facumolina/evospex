@@ -1,6 +1,8 @@
 package evospex.expression;
 
 import evospex.expression.ExprGrammarParser.ExprContext;
+import evospex.expression.symbol.ExprName;
+import evospex.expression.symbol.ExprOperator;
 
 /**
  * Expr class captures an expression, which is composed of an ExprContext (the actual expression)
@@ -10,8 +12,8 @@ import evospex.expression.ExprGrammarParser.ExprContext;
  */
 public class Expr {
 
-  private ExprContext exprContext; // Actual expression
-  private Class<?> type; // The expression type
+  private final ExprContext exprContext; // Actual expression
+  private final Class<?> type; // The expression type
 
   /**
    * Constructor
@@ -44,7 +46,14 @@ public class Expr {
 
   @Override
   public String toString() {
-    return exprContext.getText();
+    String str =  exprContext.getText();
+    if (str.startsWith(ExprOperator.ALL + ExprName.QT_VAR + ":")) {
+     return str.replace(ExprOperator.ALL + ExprName.QT_VAR + ":",ExprOperator.ALL + " " + ExprName.QT_VAR + ":");
+    }
+    if (str.startsWith(ExprOperator.SOME + ExprName.QT_VAR + ":")) {
+      return str.replace(ExprOperator.SOME + ExprName.QT_VAR + ":",ExprOperator.SOME + " " + ExprName.QT_VAR + ":");
+    }
+    return str;
   }
 
 }
