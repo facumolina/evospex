@@ -160,7 +160,6 @@ public class ExprGeneValue {
    * @return
    */
   private Expr cloneExpression(Expr expr) {
-    System.out.println("Cloning expression: "+expr.toString());
     return ExprBuilder.toExpr(expr.toString(), expr.type());
   }
 
