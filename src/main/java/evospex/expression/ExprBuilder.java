@@ -140,7 +140,7 @@ public class ExprBuilder {
     Closure_fieldContext field_1 = s.closure_field();
     Closure_fieldContext field_2 = field_1.closure_field();
 
-    if (field_2 == null)
+    if (field_2 == null && code != 1)
       throw new IllegalArgumentException("The closured expression is supposed to be double closured");
 
     // Build the quantified expression body depending on the provided code
@@ -174,15 +174,14 @@ public class ExprBuilder {
     Closure_fieldContext field_1 = s.closure_field();
     Closure_fieldContext field_2 = field_1.closure_field();
 
-    if (field_2 == null)
-      throw new IllegalArgumentException("The closured expression is supposed to be double closured");
-
     // Build the quantified expression body depending on the provided code
     String body = "";
     if (code == 1) {
       body = ExprName.QT_VAR + " " + ExprOperator.IN + " " +
               ExprName.QT_VAR + ExprOperator.JOIN + ExprOperator.RT_CLOSURE + ExprDelimiter.LP + field_1.ID() + ExprDelimiter.RP;
     } else if (code == 2) {
+      if (field_2 == null)
+        throw new IllegalArgumentException("The closured expression is supposed to be double closured");
       body = ExprName.QT_VAR + " " + ExprOperator.IN + " " +
               ExprName.QT_VAR + ExprOperator.JOIN + ExprOperator.RT_CLOSURE + ExprDelimiter.LP + field_2.ID() + ExprDelimiter.RP;
     } else {
@@ -190,6 +189,29 @@ public class ExprBuilder {
     }
 
     return toExpr(getDecl(operator, closuredExpr) + " : " + body, Boolean.class);
+  }
+
+  /**
+   * Quantify the given double closured expression with the given operator. The quantified expression body will specify a property
+   * involving two sets as follows:
+   * - op n : e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
+   */
+  public static Expr qtExprSetSet(String operator, Expr closuredExpr) {
+    // Get the set expression
+    Set_exprContext s = ExprUtils.getClosuredExprSet(closuredExpr);
+    Closure_fieldContext field_1 = s.closure_field();
+    Closure_fieldContext field_2 = field_1.closure_field();
+
+    if (field_2 == null)
+      throw new IllegalArgumentException("The closured expression is supposed to be double closured");
+
+    // Build the quantified expression body depending on the provided code
+    String body_left = ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID() + ExprOperator.JOIN + ExprOperator.R_CLOSURE +
+            ExprDelimiter.LP + field_1.ID() + ExprOperator.PLUS + field_2.ID() + ExprDelimiter.RP;
+    String body_right = ExprName.QT_VAR + ExprOperator.JOIN + field_2.ID() + ExprOperator.JOIN + ExprOperator.R_CLOSURE +
+            ExprDelimiter.LP + field_1.ID() + ExprOperator.PLUS + field_2.ID() + ExprDelimiter.RP;
+
+    return toExpr(getDecl(operator, closuredExpr) + " : " + body_left + " " +  ExprOperator.NOT_EQ + " " + body_right, Boolean.class);
   }
 
   /**
