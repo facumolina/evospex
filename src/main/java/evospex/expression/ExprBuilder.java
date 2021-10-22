@@ -167,6 +167,11 @@ public class ExprBuilder {
    * involving one variable and a set and it is determined as follow:
    * - op n : e.*(f+g) : n in n.^f if code=1
    * - op n : e.*(f+g) : n in n.^g if code=2
+   *
+   * @param operator is the quantifier
+   * @param closuredExpr is the closured expression
+   * @param code the code determining the quantified expression body
+   * @return a quantified expression comparing one variable and one set
    */
   public static Expr qtExprVarSet(String operator, Expr closuredExpr, int code) {
     // Get the set expression
@@ -195,6 +200,10 @@ public class ExprBuilder {
    * Quantify the given double closured expression with the given operator. The quantified expression body will specify a property
    * involving two sets as follows:
    * - op n : e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
+   *
+   * @param operator is the quantifier
+   * @param closuredExpr is the closured expression
+   * @return a quantified expression comparing two sets
    */
   public static Expr qtExprSetSet(String operator, Expr closuredExpr) {
     // Get the set expression
@@ -212,6 +221,21 @@ public class ExprBuilder {
             ExprDelimiter.LP + field_1.ID() + ExprOperator.PLUS + field_2.ID() + ExprDelimiter.RP;
 
     return toExpr(getDecl(operator, closuredExpr) + " : " + body_left + " " +  ExprOperator.NOT_EQ + " " + body_right, Boolean.class);
+  }
+
+  /**
+   * Given a closured expression e and an integer expression i creates the cardinality expression #(e) = i
+   * @param closuredExpr is the closured expressiion
+   * @param intExpr is the integer expression
+   * @return the cardinality expression #(closuredExpr) = intExpr
+   */
+  public static Expr cardinalityExpr(Expr closuredExpr, Expr intExpr) {
+    if (intExpr==null || (!Integer.class.equals(intExpr.type()) && !int.class.equals(intExpr.type())))
+      throw new IllegalArgumentException("Invalid integer expression: "+intExpr);
+
+    // Get the set expression
+    Expr card = toExpr(ExprOperator.CARDINALITY + ExprDelimiter.LP + closuredExpr.toString() + ExprDelimiter.RP, Integer.class);
+    return eq(card, intExpr);
   }
 
   /**
