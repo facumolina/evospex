@@ -148,12 +148,10 @@ public class ExprGeneValue {
   @Override
   public ExprGeneValue clone() {
     if (previous == null) {
-      return new ExprGeneValue(cloneExpression(expression), getGeneTypeFromExpression(expression));
+      return new ExprGeneValue(cloneExpression(expression), geneType);
     } else {
-      return new ExprGeneValue(cloneExpression(expression), getGeneTypeFromExpression(expression),
-          previous.clone());
+      return new ExprGeneValue(cloneExpression(expression), geneType, previous.clone());
     }
-
   }
 
   /**
@@ -162,7 +160,8 @@ public class ExprGeneValue {
    * @return
    */
   private Expr cloneExpression(Expr expr) {
-    return ExprBuilder.toExpr(expr.exprCtx().getText(), expr.type());
+    System.out.println("Cloning expression: "+expr.toString());
+    return ExprBuilder.toExpr(expr.toString(), expr.type());
   }
 
   /**
