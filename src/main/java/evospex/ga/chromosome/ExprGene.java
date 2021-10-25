@@ -434,7 +434,20 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       value.setExpression(newExpr, false);
     } else if (GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR.equals(mutationToApply)) {
       // Append a compatible expression in the right side of the body
-      throw new UnsupportedOperationException("implement this");
+      List<ExprContext> expressions = body.expr();
+      Compare_opContext op = body.compare_op();
+      if (expressions.size()!=2)
+        throw new IllegalStateException("Invalid quantified expression body: "+body);
+      ExprContext leftExpr = expressions.get(0);
+      ExprContext rightExpr = expressions.get(1);
+      List<Expr> joineableExprs = contextInfo
+              .getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
+      if (joineableExprs.size() > 0) {
+        Expr joineableExpr = joineableExprs.get(0);
+        String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
+        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        value.setExpression(newExpr, false);
+      }
     } else if (GASpecLearnerMutations.TO_SOME.equals(mutationToApply)) {
       // Create a new expression with the some quantifier
       throw new UnsupportedOperationException("implement this");
