@@ -2,6 +2,7 @@ package report;
 
 import java.util.List;
 
+import evospex.expression.Expr;
 import hamcrest.assertion.HamcrestAssertion;
 import utils.EvoSpexParameters;
 
@@ -42,12 +43,12 @@ public class Report {
     System.out.println("Best individual found: " + Stats.FITEST_CHROMOSOME_FV);
     System.out.println();
     System.out.println("Assertions: ");
-    List<HamcrestAssertion> assertions = Stats.FITEST_CHROMOSOME.toAssertionsList();
+    List<Expr> assertions = Stats.FITEST_CHROMOSOME.toExprList();
     System.out.println("\tassert(");
     for (int i = 0; i < assertions.size() - 1; i++) {
-      System.out.println("\t" + get_assertion_str(assertions.get(i)) + " &&");
+      System.out.println("\t" + assertions.get(i) + " &&");
     }
-    System.out.println("\t" + get_assertion_str(assertions.get(assertions.size() - 1)));
+    System.out.println("\t" + assertions.get(assertions.size() - 1));
     System.out.println("\t);");
     System.out.println("--------------------------------------------");
     System.out.println();
@@ -57,18 +58,6 @@ public class Report {
             + "," + Stats.FITEST_CHROMOSOME.getAmountOfNegativeCounterexamples().intValue() + ","
             + assertions.size());
 
-  }
-
-  /**
-   * Print an assertion
-   */
-  private static String get_assertion_str(HamcrestAssertion assertion) {
-    String str = assertion.toString();
-    if (str.contains("old_this")) {
-      // Remove the dot
-      str = str.replace("old_this.", "old_this");
-    }
-    return str;
   }
 
   /**
