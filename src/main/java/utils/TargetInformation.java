@@ -12,6 +12,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.symbol.ExprName;
+import evospex.expression.symbol.ExprOperator;
 import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
 import org.jgrapht.DirectedGraph;
@@ -146,9 +147,9 @@ public class TargetInformation {
         Class<?> targetVertex = typeGraph.getTargetVertex(edge);
         String adjacentExprStr = edge.getLabel();
 
-        if (!joineableExpressionsByType.containsKey(targetVertex))
-          joineableExpressionsByType.put(targetVertex, new HashSet<>());
-        joineableExpressionsByType.get(targetVertex).add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
+        if (!joineableExpressionsByType.containsKey(vertex))
+          joineableExpressionsByType.put(vertex, new HashSet<>());
+        joineableExpressionsByType.get(vertex).add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
 
         Expr newExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
         buildInitialExpressionsRec(newExpr, targetVertex, k - 1);
@@ -682,8 +683,27 @@ public class TargetInformation {
    * Returns all the expression that can be joined with an expression of the given type, but keeping
    * the return type. That is an expression of the form type -> type + something
    */
-  public List<Expr> getJoineableExpressionsOfCurrentTypeMaintinigReturnType(Expr expr) {
-    throw new UnsupportedOperationException("Implement this");
+  public List<Expr> getJoineableExpressionsOfCurrentTypeMaintainigReturnType(ExprContext expr) {
+    String exprStr = expr.getText();
+    if (exprStr.contains(ExprOperator.JOIN)) {
+      exprStr = exprStr.substring(exprStr.lastIndexOf(ExprOperator.JOIN) + 1);
+    }
+    TypeGraphEdge correspondingEdge = typeGraph.getEdgeFromLabel(exprStr);
+    Class<?> c = typeGraph.getTargetVertex(correspondingEdge);
+    if (joineableExpressionsByType.containsKey(c)) {
+      Set<Expr> joineableToType = joineableExpressionsByType.get(c);
+      List<Expr> sameReturnType = new LinkedList<>();
+      for (Expr joineable : joineableToType) {
+        if (c.isAssignableFrom(joineable.type()) && !exprStr.equals(joineable.toString())) {
+          sameReturnType.add(joineable);
+        }
+      }
+      return sameReturnType;
+    } else {
+      System.out.println("No joineable expressions for type: "+c.getSimpleName());
+      return new LinkedList<>();
+    }
+
   }
 
   /**
