@@ -123,12 +123,11 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
               if (!geneValue.getExpression().equals(ExprConstant.TRUE)) {
                 ExprGene newGene = new ExprGene(copyOfChromosome.getConfiguration(),
                     geneValue.clone(),
-                    ((ExprGene) genes[positionToMutate]).getDataStructureInformation());
+                    ((ExprGene) genes[positionToMutate]).getTargetInformation());
                 Gene[] newGenes = new Gene[genes.length];
                 newGenes[0] = newGene;
                 for (int k = 1; k < newGenes.length; k++) {
-                  newGenes[k] = new ExprGene(copyOfChromosome.getConfiguration(),
-                      new ExprGeneValue(ExprBuilder.TRUE), null);
+                  newGenes[k] = new ExprGene(copyOfChromosome.getConfiguration(), new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), null);
                 }
                 SpecChromosome newUnitaryChromosome = new SpecChromosome(
                     copyOfChromosome.getConfiguration(), newGenes);

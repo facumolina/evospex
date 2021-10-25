@@ -5,7 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.expression.evaluator.ExpressionEvaluator;
+import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.ExprGene;
 import evospex.ga.chromosome.ExprGeneValue;
 import evospex.ga.chromosome.SpecChromosome;
@@ -86,29 +89,29 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
 
     long timeBeforeFitnessComputation = System.currentTimeMillis();
 
-    // Convert the chromosome to the equivalent hamcrest assertions
-    List<HamcrestAssertion> assertions = specChromosome.toAssertionsList();
+    // Get the expressions represented by the current chromosome
+    List<Expr> expressions = specChromosome.toExprList();
 
     // Evaluate the hamcrest assertion
     // If the assertions conjunction has at least one positive counterexample, then the fitness is 0
-    double p = positiveCounterexamples(assertions);
+    double p = positiveCounterexamples(expressions);
 
     // Count the number of negative counterexamples and then compute the fitness value
     // Get the amount of negative counterexamples of the current assertion
     double n = negatives.size();
     if (p == 0) {
-      n = negativeCounterexamples(assertions, specChromosome);
+      n = negativeCounterexamples(expressions, specChromosome);
     }
     specChromosome.setAmountOfPositiveCounterexamples(p);
     specChromosome.setAmountOfNegativeCounterexamples(n);
-    double a = assertions.size();
+    double a = expressions.size();
     double c = specComplexity(specChromosome);
 
     // No counterexamples + Less formulas, the better
     // double res = (MAX - (p + n)) + (1 / (a + c));
 
     // No counterexamples + Less formulas, the better + The more mca's, the better
-    double mca = getMCA(assertions);
+    double mca = getMCA(expressions);
     double ac = a + c;
     double res = (MAX - (p + n));
     if (params.considerSizePenalty())
@@ -143,12 +146,12 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
    * represents properties about the arguments, the results, or comparisons between the initial and
    * final states
    */
-  public double getMCA(List<HamcrestAssertion> assertions) {
+  public double getMCA(List<Expr> expressions) {
     double mca = 0;
-    for (HamcrestAssertion assertion : assertions) {
-      String str = assertion.toString();
-      if (str.contains("arg") || str.contains("result")
-          || (str.contains("old_this") && str.contains(" this")))
+    for (Expr expr : expressions) {
+      String str = expr.toString();
+      if (str.contains("arg") || str.contains(ExprName.RESULT)
+          || (str.contains(ExprName.THIS_PRE) && str.contains(" "+ExprName.THIS)))
         mca++;
     }
     return mca;
@@ -172,12 +175,12 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
    * Returns the amount of positive counterexamples, i.e., the positives instances for which the
    * given assertion returns true
    */
-  private double positiveCounterexamples(List<HamcrestAssertion> assertions) {
+  private double positiveCounterexamples(List<Expr> expressions) {
     double counterexamples = 0;
     for (MethodExecution positive : positives) {
-      for (HamcrestAssertion assertion : assertions) {
+      for (Expr expr : expressions) {
         try {
-          if (!assertion.evaluate(positive)) {
+          if (!evaluate(expr, positive)) {
             counterexamples++;
             break;
           }
@@ -193,20 +196,43 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
   }
 
   /**
+   * Evaluates the given expression on the given method execution
+   */
+  private boolean evaluate(Expr expr, MethodExecution me) {
+    HashMap<String, Object> current_vars = new HashMap<>();
+    current_vars.put(ExprName.THIS_PRE, me.getObjectFrom());
+    current_vars.put(ExprName.THIS, me.getObjectFinalState());
+    current_vars.put(ExprName.RESULT, me.getResult());
+    // TODO method arguments for expression evaluator should be properly set
+    return ExpressionEvaluator.eval(expr.exprCtx(), current_vars);
+  }
+
+  /**
+   * Returns true if the expression can be evaluated in negative objects
+   *
+   * An expression can be evaluated in a negative object only if the expression represents a
+   * property about the final state of the object invoking the method
+   */
+  public boolean evaluableInNegatives(Expr expr) {
+    return !expr.toString().contains(ExprName.THIS_PRE)
+            || (expr.toString().indexOf(ExprName.THIS_PRE) != expr.toString().lastIndexOf(ExprName.THIS)
+            || expr.toString().indexOf(ExprName.THIS) != expr.toString().indexOf(ExprName.THIS_PRE));
+  }
+
+  /**
    * Returns the amount of negative counterexamples, i.e., the negative instances for which the
    * given assertion returns true
    */
-  private double negativeCounterexamples(List<HamcrestAssertion> assertions,
-      SpecChromosome chromosome) {
+  private double negativeCounterexamples(List<Expr> expressions, SpecChromosome chromosome) {
     double counterexamples = 0;
-    Set<MethodExecution> ce = new HashSet<MethodExecution>();
+    Set<MethodExecution> ce = new HashSet<>();
     for (MethodExecution negative : negatives) {
       boolean iscounterexample = true;
-      for (HamcrestAssertion assertion : assertions) {
+      for (Expr expr : expressions) {
         try {
-          if (!assertion.evaluableInNegatives())
+          if (!evaluableInNegatives(expr))
             continue;
-          if (!assertion.evaluate(negative)) {
+          if (!evaluate(expr, negative)) {
             iscounterexample = false; // At least one assertion is violated
             break;
           }

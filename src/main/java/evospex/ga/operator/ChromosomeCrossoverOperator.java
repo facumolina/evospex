@@ -161,7 +161,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
         int genesSize = a_population.getChromosome(0).getGenes().length;
         Gene[] genes = new Gene[genesSize];
         initializeGenes(genes, this.getConfiguration(),
-            ((ExprGene) a_population.getChromosome(i).getGenes()[0]).getDataStructureInformation());
+            ((ExprGene) a_population.getChromosome(i).getGenes()[0]).getTargetInformation());
         int currentAmountOfGenes = 0;
         while (i < size) {
           SpecChromosome chromosome = (SpecChromosome) a_population.getChromosome(i);
@@ -170,7 +170,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
             ExprGene currentGene = (ExprGene) chromosome.getGenes()[0];
             if (currentAmountOfGenes < genesSize) {
               genes[currentAmountOfGenes] = new ExprGene(currentGene.getConfiguration(),
-                  currentGene.getValue().clone(), currentGene.getDataStructureInformation());
+                  currentGene.getValue().clone(), currentGene.getTargetInformation());
               currentAmountOfGenes++;
             }
             if (currentAmountOfGenes == genesSize) {
@@ -185,7 +185,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
               currentAmountOfGenes = 0;
               genes = new Gene[genesSize];
               initializeGenes(genes, this.getConfiguration(),
-                  currentGene.getDataStructureInformation());
+                  currentGene.getTargetInformation());
             }
           }
           i++;
@@ -302,9 +302,9 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
         Gene[] firstLeftSecondRightGenes = new Gene[firstGenes.length];
         Gene[] secondLeftFirstRightGenes = new Gene[firstGenes.length];
         initializeGenes(firstLeftSecondRightGenes, firstMate.getConfiguration(),
-            ((ExprGene) firstGenes[0]).getDataStructureInformation());
+            ((ExprGene) firstGenes[0]).getTargetInformation());
         initializeGenes(secondLeftFirstRightGenes, firstMate.getConfiguration(),
-            ((ExprGene) firstGenes[0]).getDataStructureInformation());
+            ((ExprGene) firstGenes[0]).getTargetInformation());
 
         ExprGene gene1;
         ExprGene gene2;
@@ -342,7 +342,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
    */
   private Gene[] union(Gene[] firstGenes, Gene[] secondGenes, Configuration conf) {
     Gene[] union = new Gene[firstGenes.length];
-    initializeGenes(union, conf, ((ExprGene) firstGenes[0]).getDataStructureInformation());
+    initializeGenes(union, conf, ((ExprGene) firstGenes[0]).getTargetInformation());
     int firstPosition = 0;
     int secondPosition = 0;
     int addedGenes = 0;
@@ -384,7 +384,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
         if ((currentGene != null)
             && !currentGene.getValue().getExpression().equals(ExprConstant.TRUE)) {
           return new ExprGene(currentGene.getConfiguration(), currentGene.getValue().clone(),
-              currentGene.getDataStructureInformation());
+              currentGene.getTargetInformation());
         }
       }
     } catch (InvalidConfigurationException e) {

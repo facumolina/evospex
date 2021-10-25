@@ -1,10 +1,8 @@
 package evospex.ga.chromosome;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
+import evospex.expression.Expr;
 import org.jgap.BaseChromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessEvaluator;
@@ -783,11 +781,19 @@ public class SpecChromosome extends BaseChromosome {
   }
 
   /**
-   * Returns the chromosome genes as an assertions list
+   * Returns the list of expressions that are part of this chromosome
    */
-  public List<HamcrestAssertion> toAssertionsList() {
-    // Convert the chromosome to the equivalent hamcrest assertions
-    return HamcrestAssertionsUtils.generateHamcrestAssertions(this);
+  public List<Expr> toExprList() {
+    List<Expr> expressions = new LinkedList<>();
+    int size = getGenes().length;
+    for (int i = 0; i < size; i++) {
+      if (getGene(i) != null) {
+        ExprGene gene = (ExprGene) getGene(i);
+        if (!gene.getValue().getExpression().equals(ExprConstant.TRUE))
+          expressions.add(gene.getValue().getExpression());
+      }
+    }
+    return expressions;
   }
 
   /**
