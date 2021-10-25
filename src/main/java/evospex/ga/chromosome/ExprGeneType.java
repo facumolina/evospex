@@ -19,7 +19,7 @@ public enum ExprGeneType {
    * Returns the list of applicable mutations to the expr gene type
    */
   public List<String> getApplicableMutations(int amountOfGenes, boolean isPartSolution) {
-    LinkedList<String> applicableMutations = new LinkedList<String>();
+    LinkedList<String> applicableMutations = new LinkedList<>();
 
     if (isPartSolution) {
       // When the gene is part of a solution then just consider the mutation true
