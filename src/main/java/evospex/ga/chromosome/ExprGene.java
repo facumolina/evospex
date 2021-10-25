@@ -419,21 +419,31 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two variables
    */
-  private void applyForAllVarVarMutation() throws Err {
+  private void applyForAllVarVarMutation() {
     String mutationToApply = getSomeApplicableMutation();
-    switch (mutationToApply) {
-    case GASpecLearnerMutations.NEGATE_BODY:
+    Expr expr = value.getExpression();
+    Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
+    if (qt_expr == null)
+      throw new IllegalStateException("The current expression is not a quantified expression");
+    ExprContext body = qt_expr.expr();
+    Set_exprContext set =  qt_expr.set_expr();
+    if (GASpecLearnerMutations.NEGATE_BODY.equals(mutationToApply)) {
       // Create the for all expression with the negated body
-      throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR:
+      String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      value.setExpression(newExpr, false);
+    } else if (GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR.equals(mutationToApply)) {
       // Append a compatible expression in the right side of the body
       throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.TO_SOME:
+    } else if (GASpecLearnerMutations.TO_SOME.equals(mutationToApply)) {
       // Create a new expression with the some quantifier
       throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.TO_TRUE:
+    } else if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      value.setExpression(ExprBuilder.TRUE, false);
+      value.setGeneType(ExprGeneType.CONSTANT);
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
   }
 
