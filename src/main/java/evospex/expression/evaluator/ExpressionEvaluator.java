@@ -25,8 +25,6 @@ import evospex.expression.symbol.ExprName;
  */
 public class ExpressionEvaluator {
 
-  private static ExprGrammarParser parser; // Expressions parser
-
   protected static Map<String, Object> vars; // Map from var name to object
 
   /**
@@ -46,23 +44,21 @@ public class ExpressionEvaluator {
   }
 
   /**
-   * Evaluate the given unary expression with the given object
+   * Evaluate the given expression on the given object
    */
   public static boolean eval(ExprContext expr, Object o) {
     checkEvalArgs(expr, o);
     setup(expr, o);
-    return eval(expr, o);
+    return (Boolean) eval(expr);
   }
 
-
   /**
-   * Set the collection var
+   * Evaluate the given expression using the provided set of vars
    */
-  private static void set_collection_var(Object o) {
-    if (vars.containsKey("Integer_Set_Variable_0"))
-      throw new IllegalStateException("Variable value for collection class already inserted!");
-    vars.put("Integer_Set_Variable_0", o);
-    vars.put("Object_Set_Variable_0", o);
+  public static boolean eval(ExprContext expr, Map<String, Object> variables) {
+    checkEvalArgs(expr, vars.get(ExprName.THIS));
+    vars = variables;
+    return (Boolean) eval(expr);
   }
 
   /**
