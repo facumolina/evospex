@@ -56,4 +56,16 @@ public class Expr {
     return str;
   }
 
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof Expr))
+      return false;
+    return exprContext.getText().equals(((Expr)other).exprContext.getText());
+  }
+
+  @Override
+  public int hashCode() {
+    return exprContext.getText().hashCode();
+  }
+
 }
