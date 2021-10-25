@@ -2,18 +2,6 @@ package evospex.ga.chromosome;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
-import evospex.expression.ExprGrammarParser.ExprContext;
-import rfm.dynalloyCompiler.ast.Decl;
-
-import rfm.dynalloyCompiler.ast.ExprBinary;
-import rfm.dynalloyCompiler.ast.ExprCall;
-import rfm.dynalloyCompiler.ast.ExprConstant;
-import rfm.dynalloyCompiler.ast.ExprList;
-import rfm.dynalloyCompiler.ast.ExprQt;
-import rfm.dynalloyCompiler.ast.ExprUnary;
-import rfm.dynalloyCompiler.ast.ExprVar;
-import rfm.dynalloyCompiler.ast.Sig;
-import utils.DynAlloyExpressionsUtils;
 
 /**
  * This class represents a gene's value.
