@@ -79,6 +79,17 @@ public class TypeGraph {
   }
 
   /**
+   * Get the edge with the given label name
+   */
+  public TypeGraphEdge getEdgeFromLabel(String label) {
+    for (TypeGraphEdge edge : graph.edgeSet()) {
+      if (edge.getLabel().equals(label))
+        return edge;
+    }
+    throw new IllegalArgumentException("Invalid label: "+label);
+  }
+
+  /**
    * Get all fields from the CUT (even the inherited ones)
    */
   private List<Field> getAllFields(List<Field> fields, Class<?> cut) {
