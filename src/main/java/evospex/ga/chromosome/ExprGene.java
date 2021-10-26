@@ -437,7 +437,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       List<ExprContext> expressions = body.expr();
       Compare_opContext op = body.compare_op();
       if (expressions.size()!=2)
-        throw new IllegalStateException("Invalid quantified expression body: "+body);
+        throw new IllegalStateException("Invalid quantified expression body: "+body.getText());
       ExprContext leftExpr = expressions.get(0);
       ExprContext rightExpr = expressions.get(1);
       List<Expr> joineableExprs = contextInfo
@@ -565,6 +565,9 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
       // Create the for all expression with the negated body
       String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      if (newBodyStr.contains(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR)) {
+        newBodyStr = newBodyStr.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR,ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
+      }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       System.out.println("Mutated expression: "+newExpr);
       value.setExpression(newExpr, false);
