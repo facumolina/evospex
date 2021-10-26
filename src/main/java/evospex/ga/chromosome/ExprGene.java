@@ -572,10 +572,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * is a predicate about a variable and a set
    */
   private void applyForAllVarSetMutation() throws Err {
-    System.out.println("--------------------------");
-    System.out.println("applyForAllVarSetMutation");
     Expr expr = value.getExpression();
-    System.out.println("Original expression: "+expr);
     String mutationToApply = getSomeApplicableMutation();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
     if (qt_expr == null)
@@ -593,7 +590,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         newBodyStr = newBodyStr.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR,ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-      System.out.println("Mutated expression: "+newExpr);
       value.setExpression(newExpr, false);
     } else if (mutationToApply.equals(GASpecLearnerMutations.TO_SOME)) {
       // Create a new expression with the some quantifier
@@ -602,7 +598,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       // Set the expression to true
       value.setExpression(ExprBuilder.TRUE, false);
       value.setGeneType(ExprGeneType.CONSTANT);
-      System.out.println("Mutated expression: "+ExprBuilder.TRUE);
     } else {
       throw new UnsupportedOperationException("implement this");
     }
