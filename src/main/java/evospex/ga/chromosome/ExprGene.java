@@ -431,6 +431,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     if (GASpecLearnerMutations.NEGATE_BODY.equals(mutationToApply)) {
       // Create the for all expression with the negated body
       String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      if (ExprOperator.NOT_1.equals(body.unary_op())) {
+        // The body is already negated, so just remove the negation operation
+        newBodyStr = body.expr().get(0).getText();
+      }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       value.setExpression(newExpr, false);
     } else if (GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR.equals(mutationToApply)) {
@@ -581,6 +585,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
       // Create the for all expression with the negated body
       String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      if (ExprOperator.NOT_1.equals(body.unary_op())) {
+        // The body is already negated, so just remove the negation operation
+        newBodyStr = body.expr().get(0).getText();
+      }
       if (newBodyStr.contains(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR)) {
         newBodyStr = newBodyStr.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR,ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
       }
