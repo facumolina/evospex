@@ -32,7 +32,7 @@ public class SetExpressionEvaluator {
 
     // Start exploring applying the fields as indicated by the closure operation
     Object base_object = NameExpressionEvaluator.eval(left_part, null);
-    Set<Object> set = new HashSet<Object>();
+    Set<Object> set = new HashSet<>();
 
     if (base_object!=null) {
       if (closure_op.getText().equals("*"))
