@@ -6,6 +6,7 @@ import java.util.Random;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.expression.ExprGrammarParser.Unary_opContext;
 import evospex.expression.ExprGrammarParser.Qt_exprContext;
 import evospex.expression.ExprGrammarParser.Compare_opContext;
 import evospex.expression.ExprGrammarParser.ExprContext;
@@ -436,17 +437,32 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       // Append a compatible expression in the right side of the body
       List<ExprContext> expressions = body.expr();
       Compare_opContext op = body.compare_op();
-      if (expressions.size()!=2)
-        throw new IllegalStateException("Invalid quantified expression body: "+body.getText());
-      ExprContext leftExpr = expressions.get(0);
-      ExprContext rightExpr = expressions.get(1);
-      List<Expr> joineableExprs = contextInfo
-              .getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
-      if (joineableExprs.size() > 0) {
-        Expr joineableExpr = joineableExprs.get(0);
-        String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
-        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-        value.setExpression(newExpr, false);
+      if (expressions.size()!=2) {
+        Unary_opContext unary = body.unary_op();
+        if (unary == null || expressions.size()!=1)
+          throw new IllegalStateException("Invalid quantified expression body: "+body.getText());
+        ExprContext e = body.expr(0);
+        ExprContext leftExpr = e.expr(0);
+        ExprContext rightExpr = e.expr(1);
+        List<Expr> joineableExprs = contextInfo.getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
+        if (joineableExprs.size() > 0) {
+          Expr joineableExpr = joineableExprs.get(0);
+          String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
+          newBodyStr = unary.getText() + ExprDelimiter.LP + newBodyStr +  ExprDelimiter.RP;
+          Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+          value.setExpression(newExpr, false);
+        }
+      } else {
+        ExprContext leftExpr = expressions.get(0);
+        ExprContext rightExpr = expressions.get(1);
+        List<Expr> joineableExprs = contextInfo
+                .getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
+        if (joineableExprs.size() > 0) {
+          Expr joineableExpr = joineableExprs.get(0);
+          String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
+          Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+          value.setExpression(newExpr, false);
+        }
       }
     } else if (GASpecLearnerMutations.TO_SOME.equals(mutationToApply)) {
       // Create a new expression with the some quantifier
