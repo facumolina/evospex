@@ -54,7 +54,7 @@ public class NameExpressionEvaluator {
     if (ExpressionEvaluator.vars.containsKey(access_field))
       return ExpressionEvaluator.vars.get(access_field);
     if (access_field.equals(QuantifiedExpressionEvaluator.EMPTY_SET))
-      return new HashSet<Object>();
+      return new HashSet<>();
     if (access_field.equals(QuantifiedExpressionEvaluator.QT_VAR_NAME))
       return ExpressionEvaluator.vars.get(QuantifiedExpressionEvaluator.QT_VAR_NAME);
     if (access_field.equals(ExprGrammarConstantSymbols.NULL))
