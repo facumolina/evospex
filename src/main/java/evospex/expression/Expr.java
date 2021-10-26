@@ -47,12 +47,14 @@ public class Expr {
   @Override
   public String toString() {
     String str =  exprContext.getText();
+
     if (str.startsWith(ExprOperator.ALL + ExprName.QT_VAR + ":")) {
-     return str.replace(ExprOperator.ALL + ExprName.QT_VAR + ":",ExprOperator.ALL + " " + ExprName.QT_VAR + ":");
+      str = str.replace(ExprOperator.ALL + ExprName.QT_VAR + ":",ExprOperator.ALL + " " + ExprName.QT_VAR + ":");
+    } else if (str.startsWith(ExprOperator.SOME + ExprName.QT_VAR + ":")) {
+      str = str.replace(ExprOperator.SOME + ExprName.QT_VAR + ":",ExprOperator.SOME + " " + ExprName.QT_VAR + ":");
     }
-    if (str.startsWith(ExprOperator.SOME + ExprName.QT_VAR + ":")) {
-      return str.replace(ExprOperator.SOME + ExprName.QT_VAR + ":",ExprOperator.SOME + " " + ExprName.QT_VAR + ":");
-    }
+    if (str.contains(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR))
+      str = str.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR, ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
     return str;
   }
 
