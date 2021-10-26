@@ -26,14 +26,16 @@ public class UnaryExpressionEvaluator {
 
   private static Object eval(String op, Object o) {
     switch (op) {
-    case CARDINALITY:
-      if (o == null)
-        return 0;
-      assert (o instanceof Collection);
-      Collection<Object> set = (Collection<Object>) o;
-      return set.size();
+      case CARDINALITY:
+        if (o == null)
+          return 0;
+        assert (o instanceof Collection);
+        Collection<Object> set = (Collection<Object>) o;
+        return set.size();
+      case NOT:
+        assert (o instanceof Boolean);
+        return !((Boolean)o);
     }
-    throw new IllegalArgumentException(
-        "Operator " + op + " is not supported for unary expressions");
+    throw new IllegalArgumentException("Operator " + op + " is not supported for unary expressions");
   }
 }
