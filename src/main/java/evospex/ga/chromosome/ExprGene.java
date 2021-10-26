@@ -23,7 +23,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
 import rfm.dynalloy.Err;
-import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.TargetInformation;
 
 /**
@@ -825,7 +824,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Returns true if this gene has the default value true.
    */
   public boolean isDefault() {
-    return value.getExpression().equals(ExprConstant.TRUE);
+    return value.getExpression().equals(ExprBuilder.TRUE);
   }
 
   /**
