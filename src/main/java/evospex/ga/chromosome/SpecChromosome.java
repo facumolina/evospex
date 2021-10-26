@@ -3,6 +3,7 @@ package evospex.ga.chromosome;
 import java.util.*;
 
 import evospex.expression.Expr;
+import evospex.expression.ExprBuilder;
 import org.jgap.BaseChromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessEvaluator;
@@ -17,11 +18,6 @@ import org.jgap.IJGAPFactory;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.impl.IntegerGene;
-
-import hamcrest.assertion.HamcrestAssertion;
-import hamcrest.utils.HamcrestAssertionsUtils;
-import rfm.dynalloyCompiler.ast.ExprConstant;
-import utils.DynAlloyExpressionsUtils;
 
 /**
  * This class represents the chromosomes. Each chromosome defines a representation invariant.
@@ -514,7 +510,7 @@ public class SpecChromosome extends BaseChromosome {
         Gene gene = getGene(i);
         if (gene instanceof ExprGene) {
           ExprGene exprGene = (ExprGene) getGene(i);
-          if (!exprGene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+          if (!exprGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
             if (i > 0) {
               representation.append(", ");
             }
@@ -746,7 +742,7 @@ public class SpecChromosome extends BaseChromosome {
           System.out.println("\t\t" + getGene(i).toString());
         } else {
           ExprGene exprGene = (ExprGene) getGene(i);
-          if (!exprGene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+          if (!exprGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
             System.out.println("\t\t" + getGene(i).toString());
           }
         }
@@ -772,7 +768,7 @@ public class SpecChromosome extends BaseChromosome {
     for (int i = 0; i < size; i++) {
       if (getGene(i) != null) {
         ExprGene gene = (ExprGene) getGene(i);
-        if (!gene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+        if (!gene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
           activeGenes++;
         }
       }
@@ -789,7 +785,7 @@ public class SpecChromosome extends BaseChromosome {
     for (int i = 0; i < size; i++) {
       if (getGene(i) != null) {
         ExprGene gene = (ExprGene) getGene(i);
-        if (!gene.getValue().getExpression().equals(ExprConstant.TRUE))
+        if (!gene.getValue().getExpression().equals(ExprBuilder.TRUE))
           expressions.add(gene.getValue().getExpression());
       }
     }
