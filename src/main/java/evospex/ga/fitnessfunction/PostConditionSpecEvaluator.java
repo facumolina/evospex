@@ -8,6 +8,7 @@ import java.util.Set;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.evaluator.ExpressionEvaluator;
+import evospex.expression.evaluator.NonEvaluableExpressionException;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.ExprGene;
 import evospex.ga.chromosome.ExprGeneValue;
@@ -18,11 +19,9 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 
 import hamcrest.assertion.HamcrestAssertion;
-import hamcrest.expression.NonEvaluableExpressionException;
 import evospex.target.MethodExecution;
 import report.Stats;
-import rfm.dynalloyCompiler.ast.ExprBinary;
-import rfm.dynalloyCompiler.ast.ExprConstant;
+
 import utils.EvoSpexParameters;
 import utils.FitnessValue;
 
@@ -94,7 +93,16 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
 
     // Evaluate the hamcrest assertion
     // If the assertions conjunction has at least one positive counterexample, then the fitness is 0
+    System.out.println("------------------");
+    System.out.println("Evaluating fitness function");
+    //specChromosome.printGenes();
+    System.out.println("Chromosome:");
+    expressions.forEach(e -> {
+      if (!e.equals(ExprBuilder.TRUE))
+        System.out.println(e.exprCtx().getText());
+    });
     double p = positiveCounterexamples(expressions);
+    System.out.println("Positive counterexamples: "+p);
 
     // Count the number of negative counterexamples and then compute the fitness value
     // Get the amount of negative counterexamples of the current assertion
@@ -185,8 +193,7 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
             break;
           }
         } catch (NonEvaluableExpressionException e) {
-          // When the expression can't be evaluated, consider the method execution as a
-          // counterexample
+          // When the expression can't be evaluated, consider the method execution as a counterexample
           counterexamples++;
           break;
         }
@@ -268,7 +275,7 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     for (int i = 0; i < genes.length; i++) {
       ExprGene gene = (ExprGene) genes[i];
       ExprGeneValue geneValue = (ExprGeneValue) gene.getInternalValue();
-      if (geneValue.getExpression() != ExprBuilder.TRUE) {
+      if (!geneValue.getExpression().equals(ExprBuilder.TRUE)) {
         // The gene is not "empty"
         complexity += geneValue.getComplexity();
       }
