@@ -130,7 +130,7 @@ public class ExprGeneValue {
 
   @Override
   public String toString() {
-    return "don't know how to print this new genes";
+    return expression.toString();
   }
 
   @Override
