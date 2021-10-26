@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import evospex.expression.ExprGrammarParser;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.ExprGrammarParser.Qt_exprContext;
 import evospex.expression.ExprGrammarParser.Num_binary_opContext;
@@ -19,7 +18,7 @@ import evospex.expression.symbol.ExprName;
 
 /**
  * This class represents an Expression Evaluator. Provides a method that given a Java object and an
- * expression (satisfiying the expressions grammar ExprGrammar) evaluates the expression on the object.
+ * expression (satisfying the expressions grammar ExprGrammar) evaluates the expression on the object.
  * 
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
@@ -56,7 +55,7 @@ public class ExpressionEvaluator {
    * Evaluate the given expression using the provided set of vars
    */
   public static boolean eval(ExprContext expr, Map<String, Object> variables) {
-    checkEvalArgs(expr, vars.get(ExprName.THIS));
+    checkEvalArgs(expr, variables.get(ExprName.THIS));
     vars = variables;
     return (Boolean) eval(expr);
   }
