@@ -49,7 +49,7 @@ public class TypeGraph {
           if (!Modifier.isStatic(fld.getModifiers())) {
             // For each non static field
             String fld_decl_name = fld.getName();
-            Class<?> fld_type = fld.getType();
+            Class<?> fld_type = formatClass(fld.getType());
             graph.addVertex(fld_type);
             graph.addEdge(cut, fld_type, new TypeGraphEdge(fld_decl_name));
             to_visit.add(fld_type);
@@ -62,6 +62,26 @@ public class TypeGraph {
         }
       }
     }
+  }
+
+  /**
+   * Format the given class, i.e., if it represents a basic type (such as int) return the corresponding non-basic type.
+   * @param c is the class to format
+   * @return the corresponding non basic type
+   */
+  private Class<?> formatClass(Class<?> c) {
+    if (c.isPrimitive()) {
+      if (c.equals(int.class))
+        return Integer.class;
+      if (c.equals(float.class))
+        return Float.class;
+      if (c.equals(double.class))
+        return Double.class;
+      if (c.equals(boolean.class))
+        return Boolean.class;
+      throw new IllegalArgumentException("Don't know how to format class "+c.getSimpleName());
+    }
+    return c;
   }
 
   /**
