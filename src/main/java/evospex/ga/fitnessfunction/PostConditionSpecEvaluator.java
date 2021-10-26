@@ -18,7 +18,6 @@ import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 
-import hamcrest.assertion.HamcrestAssertion;
 import evospex.target.MethodExecution;
 import report.Stats;
 
@@ -64,7 +63,7 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     MAX = positives.size() + negatives.size();
     Stats.POSITIVE_CE = positives.size();
     Stats.NEGATIVE_CE = negatives.size();
-    calculatedFitness = new HashMap<String, FitnessValue>();
+    calculatedFitness = new HashMap<>();
   }
 
   @Override
@@ -91,18 +90,9 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     // Get the expressions represented by the current chromosome
     List<Expr> expressions = specChromosome.toExprList();
 
-    // Evaluate the hamcrest assertion
+    // Evaluate the assertion
     // If the assertions conjunction has at least one positive counterexample, then the fitness is 0
-    System.out.println("------------------");
-    System.out.println("Evaluating fitness function");
-    //specChromosome.printGenes();
-    System.out.println("Chromosome:");
-    expressions.forEach(e -> {
-      if (!e.equals(ExprBuilder.TRUE))
-        System.out.println(e.exprCtx().getText());
-    });
     double p = positiveCounterexamples(expressions);
-    System.out.println("Positive counterexamples: "+p);
 
     // Count the number of negative counterexamples and then compute the fitness value
     // Get the amount of negative counterexamples of the current assertion
@@ -169,10 +159,10 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
    * Returns true if the conjunction of the given assertions has at least one positive
    * counterexample. That is, the conjunction returns false for at least one positive instance.
    */
-  private boolean hasPositiveCounterexample(List<HamcrestAssertion> assertions) {
+  private boolean hasPositiveCounterexample(List<Expr> assertions) {
     for (MethodExecution positive : positives) {
-      for (HamcrestAssertion assertion : assertions) {
-        if (!assertion.evaluate(positive))
+      for (Expr expr : assertions) {
+        if (!evaluate(expr, positive))
           return true;
       }
     }
