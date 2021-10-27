@@ -66,8 +66,6 @@ public class TargetInformation {
   private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
   private Map<String, String> methodVarsType; // Variables names and their types
 
-
-
   /**
    * Constructor from a given target class
    * @param targetClass is the current class under analysis
@@ -178,125 +176,6 @@ public class TargetInformation {
   }
 
   /**
-   * Constructor from Alloy
-   * @param decls is the parameter declarations of the data structure
-   * @param commands are the commands to be executed
-   * @throws Err
-   */
-  public TargetInformation(ConstList<Decl> decls, ConstList<Command> commands) throws Err {
-    structureRelations = new HashMap<>();
-    expressionsByEvaluationValue = new HashMap<>();
-    relationsForEvaluation = new HashMap<>();
-    methodVarsByType = new HashMap<>();
-    methodVarsType = new HashMap<>();
-    allIntExpressions = new LinkedList<>();
-
-    for (Decl decl : decls) {
-      // Get each attribute with the respective type from the specification (RepOK parameters)
-      Type declType = decl.expr.type();
-      for (int i = 0; i < decl.names.size(); i++) {
-        //relationsForEvaluation.add(decl.names.get(i));
-        String name = decl.names.get(i).label;
-        //structureRelations.put(name, declType);
-      }
-    }
-    if (commands.size() > 0)
-      scope = commands.get(0).overall;
-    else
-      scope = 3;
-    buildGraph();
-    buildExpressions();
-    buildExpressionsForCommands(commands);
-    buildCollections();
-  }
-
-  /**
-   * Create all the collections
-   */
-  private void buildCollections() {
-    if (doubleClosuredExpressions.isEmpty()) {
-      // Create collections for simple closured expressions only when there are no double cloured
-      // expressions
-      //for (Expr e : simpleClosuredExpressions) {
-        // if (e.toString().contains("thizPre"))
-        // continue;
-      //  createCollections(e);
-      //}
-    } else {
-      // Create collections for double closured expressions
-      //for (Expr e : doubleClosuredExpressions) {
-        // if (e.toString().contains("thizPre"))
-        // continue;
-      //  createCollections(e);
-      //}
-    }
-  }
-
-  /**
-   * Save signatures information
-   */
-  public void saveSignaturesInformation(A4Solution example) {
-    SafeList<Sig> signatureList = example.getAllReachableSigs();
-
-    Sig nullSignature = signatureList.get(5);
-    TargetInformation.nullSig = nullSignature;
-    structureSignatures = new LinkedList<Sig>();
-    unarySignatures = new LinkedList<Sig>();
-    signaturesUsedInRecursiveRelations = new LinkedList<Sig>();
-    signatureEvaluations = new HashMap<Type, List<Expr>>();
-    // Iterate over all the signatures, and save those that are used in recursive relations.
-    for (Sig signature : signatureList) {
-      structureSignatures.add(signature);
-      boolean found = false;
-      for (ExprVar skolem : example.getAllSkolems()) {
-        List<List<PrimSig>> foldedType = skolem.type().fold();
-        for (List<PrimSig> fold : foldedType) {
-          if (fold.size() == 2) {
-            if (fold.get(0).equals(signature) && fold.get(0).equals(fold.get(1))) {
-              signaturesUsedInRecursiveRelations.add(signature);
-              found = true;
-            }
-          }
-          if (found)
-            break;
-        }
-        if (found)
-          break;
-      }
-      if (signature.decl.expr.toString().contains("one ") && !signature.toString().contains("univ")
-          && !signature.toString().contains("Int") && !signature.toString().contains("String")
-          && !signature.toString().contains("none") && signature.isTopLevel()
-          && signature.isAbstract == null) {
-        unarySignatures.add(signature);
-      }
-    }
-
-  }
-
-  /**
-   * Build a graph where the vertex set is the set of declaration names of the data structure and
-   * there is an edge between a vertex v1 and a vertex v2 iff the type of the declaration v1 can be
-   * joined with the type of the declaration v2.
-   */
-  private void buildGraph() {
-    // Generate each node from the keys
-    structureGraph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
-    for (String node : structureRelations.keySet()) {
-      structureGraph.addVertex(node);
-    }
-    // Generate each edge from the key types
-    for (String sourceKey : structureRelations.keySet()) {
-      for (String targetKey : structureRelations.keySet()) {
-        //Type sourceType = structureRelations.get(sourceKey);
-        //Type targetType = structureRelations.get(targetKey);
-        //if (DynAlloyRunner.joinableTypes(sourceType, targetType)) {
-          structureGraph.addEdge(sourceKey, targetKey);
-        //}
-      }
-    }
-  }
-
-  /**
    * Get evaluable expressions
    */
   public List<Expr> getEvaluableExpressions() {
@@ -340,25 +219,6 @@ public class TargetInformation {
   }
 
   /**
-   * Add the possible evaluation to the given type
-   */
-  public void addEvaluationToSignature(Type type, Expr evaluation) {
-    if (!signatureEvaluations.containsKey(type))
-      signatureEvaluations.put(type, new LinkedList<Expr>());
-    // Add the evaluation if it not exists
-    boolean found = false;
-    for (Expr expr : signatureEvaluations.get(type)) {
-      if (expr.toString().equals(evaluation.toString())) {
-        found = true;
-        break;
-      }
-    }
-    if (!found && !evaluation.toString().equalsIgnoreCase("none")) {
-      signatureEvaluations.get(type).add(evaluation);
-    }
-  }
-
-  /**
    * Get all the joined expressions
    */
   public List<Expr> getJoinedExpressions() {
@@ -387,62 +247,6 @@ public class TargetInformation {
   }
 
   /**
-   * Translate all the joined expressions
-   */
-  public List<Expr> getCommandJoinedExpressions(Iterable<ExprVar> skolems) {
-    //return translateExpressions(joinedExpressions, skolems);
-    return new LinkedList<>();
-  }
-
-  /**
-   * Translate all the joined expressions of type int
-   */
-  public List<Expr> getCommandJoinedExpressionsInt(Iterable<ExprVar> skolems) {
-    //return translateExpressions(joinedExpressionsOfTypeInt, skolems);
-    return new LinkedList<>();
-  }
-
-  /**
-   * Translate all the simple closured expressions
-   */
-  public List<Expr> getCommandSimpleClosuredExpressions(Iterable<ExprVar> skolems) {
-    //return translateExpressions(simpleClosuredExpressions, skolems);
-    return new LinkedList<>();
-  }
-
-  /**
-   * Translate all the double closured expressions
-   */
-  public List<Expr> getCommandDoubleClosuredExpressions(Iterable<ExprVar> skolems) {
-    //return translateExpressions(doubleClosuredExpressions, skolems);
-    return new LinkedList<>();
-  }
-
-  /**
-   * Build expressions from graph
-   * 
-   * @throws Err
-   */
-  private void buildExpressions() throws Err {
-    //joinedExpressions = new LinkedList<Expr>();
-    //joinedExpressionsOfTypeInt = new LinkedList<Expr>();
-    //simpleClosuredExpressions = new LinkedList<Expr>();
-    //doubleClosuredExpressions = new LinkedList<Expr>();
-    //joineableExpressionsByType = new HashMap<Type, Set<Expr>>();
-    collectionsByType = new HashMap<String, Set<Expr>>();
-
-    if (structureRelations.keySet().contains("thizPre")) {
-      // Shoudl be present when learning post conditions
-      //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
-      //buildAllExpressions(thizPreExpr, "thizPre", scope);
-    }
-
-    //ExprVar thizExpr = ExprVar.make(null, "thiz", structureRelations.get("thiz"));
-    //buildAllExpressions(thizExpr, "thiz", scope);
-
-  }
-
-  /**
    * Create collections from the given closured expression
    */
   private void createCollections(Expr closured) {
@@ -458,18 +262,6 @@ public class TargetInformation {
         collectionsByType.put(collectionType.toString(), new HashSet<>());
       collectionsByType.get(collectionType.toString()).add(collection);
     }
-  }
-
-  /**
-   * Get corresponding evaluable expression according to name
-   */
-  private Expr getCorrespondingEvaluableExpression(String exprName) {
-    //for (Expr expr : relationsForEvaluation) {
-    //  if (exprName.equals(((ExprHasName) expr).label)) {
-    //    return expr;
-    //  }
-    //}
-    return null;
   }
 
   /**
@@ -531,23 +323,6 @@ public class TargetInformation {
       }
     }
     return false;
-  }
-
-  /**
-   * Build the expressions that can be evaluated for a list of commands
-   * 
-   * @param commands
-   */
-  private void buildExpressionsForCommands(ConstList<Command> commands) {
-    commandExpressions = new HashMap<String, LinkedList<Expr>>();
-    for (Command cmd : commands) {
-      commandExpressions.put(cmd.label, new LinkedList<Expr>());
-      //commandExpressions.get(cmd.label).addAll(buildExpressionsForCommand(cmd, joinedExpressions));
-      //commandExpressions.get(cmd.label)
-      //    .addAll(buildExpressionsForCommand(cmd, simpleClosuredExpressions));
-      //commandExpressions.get(cmd.label)
-      //    .addAll(buildExpressionsForCommand(cmd, doubleClosuredExpressions));
-    }
   }
 
   /**
@@ -653,19 +428,6 @@ public class TargetInformation {
   }
 
   /**
-   * Returns true if exists some binary relation r : type -> type + something
-   */
-  public boolean typeUsedInRecursiveRelation(Type type) {
-    for (List<PrimSig> primSigList : type.fold()) {
-      for (PrimSig primSig : primSigList) {
-        if (signaturesUsedInRecursiveRelations.contains(primSig))
-          return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Returns all the expression that can be joined with an expression of the given type. That is
    * expressions of the form: type -> AnotherType
    */
@@ -745,31 +507,6 @@ public class TargetInformation {
    */
   public Type getReturnType(ExprContext expr) {
     throw new UnsupportedOperationException("implement this");
-  }
-
-  /**
-   * Returns true if the type1 contains the type2
-   */
-  public boolean typeContains(Type type1, Type type2) {
-    List<PrimSig> sigsType2 = type2.fold().get(0);
-    for (List<PrimSig> primSigList : type1.fold()) {
-      if (sigsType2.equals(primSigList))
-        return true;
-    }
-    return false;
-  }
-
-  /**
-   * Given an expr var, returns the corresponding signature. If is not found, then return the null
-   * signature
-   */
-  public static Sig getCorrespondingSignature(ExprVar var) {
-    String sigName = "this/" + var.label.substring(0, var.label.length() - 2);
-    for (Sig signature : structureSignatures) {
-      if (signature.label.equals(sigName))
-        return signature;
-    }
-    return nullSig;
   }
 
   /**
