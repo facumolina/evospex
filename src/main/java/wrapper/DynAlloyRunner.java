@@ -705,7 +705,8 @@ public class DynAlloyRunner extends Runner {
    * @throws Err
    */
   public TargetInformation getStructureInformation() throws Err {
-    return new TargetInformation(decls, commands);
+    return null;
+    //return new TargetInformation(decls, commands);
   }
 
   /**
