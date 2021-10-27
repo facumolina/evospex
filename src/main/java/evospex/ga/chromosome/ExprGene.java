@@ -430,7 +430,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     if (GASpecLearnerMutations.NEGATE_BODY.equals(mutationToApply)) {
       // Create the for all expression with the negated body
       String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
-      if (ExprOperator.NOT_1.equals(body.unary_op())) {
+      if (body.unary_op()!=null && ExprOperator.NOT_1.equals(body.unary_op().getText())) {
         // The body is already negated, so just remove the negation operation
         newBodyStr = body.expr().get(0).getText();
       }
@@ -442,9 +442,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       Compare_opContext op = body.compare_op();
       if (expressions.size()!=2) {
         Unary_opContext unary = body.unary_op();
-        if (unary == null || expressions.size()!=1)
+        if (unary == null || expressions.size()!=1 || expressions.get(0).expr().size()!=2)
           throw new IllegalStateException("Invalid quantified expression body: "+body.getText());
-        ExprContext e = body.expr(0);
+        ExprContext e = expressions.get(0);
+        op = e.compare_op(); // The op now is the op that is in the
         ExprContext leftExpr = e.expr(0);
         ExprContext rightExpr = e.expr(1);
         List<Expr> joineableExprs = contextInfo.getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
