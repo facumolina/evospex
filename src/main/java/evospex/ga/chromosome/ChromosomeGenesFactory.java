@@ -495,27 +495,20 @@ public class ChromosomeGenesFactory {
   /**
    * Creates genes from joined expressions and its evaluation result. Given an expression e, the
    * gene expression built from e can be:
-   *
-   * - e = null when the evaluation result is null
-   *
-   * - e != null when the evaluation result is not null
-   *
-   * - no e when the evaluation result is empty
+   * - e = null, e != null or no e when the evaluation result is a reference
+   * - e = result, e != result when the evaluation result is a primitive value
    */
   public List<Gene> createsGenesFromEvaluableJoinedExpressions(
           List<Expr> evaluableJoinedExpressions, Object o, boolean isPositive) throws Exception {
     List<Gene> genes = new LinkedList<>();
     for (Expr expr : evaluableJoinedExpressions) {
-      // TODO reimplement the below if
-      //if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
-      //  continue;
       try {
-        Object result = ExpressionEvaluator.evalAnyExpr(expr.exprCtx(), o);
+        String name = expr.toString().startsWith(ExprName.THIS_PRE)? ExprName.THIS_PRE : ExprName.THIS;
+        Object result = ExpressionEvaluator.evalAnyExpr(expr.exprCtx(), name, o);
         genes.add(buildExprGeneFromEval(expr, result, isPositive));
       } catch (NonEvaluableExpressionException e) {
         // The evaluation result is empty
       }
-
     }
     return genes;
   }
@@ -598,7 +591,7 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Creates genes comparing evalable expressions over thiz and thizPre
+   * Creates genes comparing evaluable expressions over this and this_pre
    * 
    * @throws InvalidConfigurationException
    */
