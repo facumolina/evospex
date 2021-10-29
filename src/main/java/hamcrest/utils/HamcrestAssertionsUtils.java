@@ -57,7 +57,7 @@ public class HamcrestAssertionsUtils {
    */
   private static String alloy2HamcrestExprString(Expr alloyExpr) {
     assert !(alloyExpr instanceof ExprQt);
-    if (alloyExpr == TargetInformation.nullSig) {
+    if (alloyExpr == null) {
       // Null constant
       return "null";
     }
@@ -130,7 +130,7 @@ public class HamcrestAssertionsUtils {
    * Alloy Expr to Hamcrest Expr
    */
   private static HamcrestExpr alloyExpr2HamcrestExpr(Expr expr) {
-    if (expr == TargetInformation.nullSig) {
+    if (expr == null) {
       return new SimpleHamcrestExpr("null");
     }
     if (expr instanceof PrimSig) {

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import evospex.expression.Expr;
@@ -16,19 +15,7 @@ import evospex.expression.symbol.ExprOperator;
 import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-
-import rfm.dynalloy.ConstList;
-import rfm.dynalloy.Err;
-import rfm.dynalloy.SafeList;
-import rfm.dynalloyCompiler.ast.Command;
-import rfm.dynalloyCompiler.ast.Decl;
-import rfm.dynalloyCompiler.ast.ExprVar;
-import rfm.dynalloyCompiler.ast.Sig;
-import rfm.dynalloyCompiler.ast.Sig.PrimSig;
-import rfm.dynalloyCompiler.ast.Type;
-import rfm.dynalloyCompiler.translator.A4Solution;
 
 /**
  * This class keeps some useful information regarding the target class and method.
@@ -41,7 +28,6 @@ public class TargetInformation {
   private TypeGraph typeGraph; // Current cut type graph
   private DirectedGraph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
 
-  private Map<String, LinkedList<Expr>> commandExpressions; // Commands.
   private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains expressions grouped by its evaluation results.
   private final int scope; // Scope (defined in the alloy file)
 
@@ -54,14 +40,8 @@ public class TargetInformation {
   private static Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
   private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
 
-  public static Sig nullSig; // Null signature
-
   private Map<String, Expr> relationsForEvaluation; // Target relations with expressions
   private Map<String, Class<?>> structureRelations; // Target relations with types
-  private static List<Sig> structureSignatures; // All signatures
-  private List<Sig> signaturesUsedInRecursiveRelations; // Signatures used in recursive relations
-  private static List<Sig> unarySignatures; // Unary signatures
-  private static Map<Type, List<Expr>> signatureEvaluations; // Map types to values seen during expresion evaluations.\
 
   private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
   private Map<String, String> methodVarsType; // Variables names and their types
@@ -250,18 +230,7 @@ public class TargetInformation {
    * Create collections from the given closured expression
    */
   private void createCollections(Expr closured) {
-    Set<Expr> joinableExpressions = getJoineableExpressionsOfCurrentType(
-        null);
-    for (Expr e : joinableExpressions) {
-      // For every expression that can be joined to the closured expression, create
-      // the corresponding collection
-      Expr collection = ExprBuilder.join(closured, e);
-      Type collectionType = getReturnType(null);
-      // collectionType.
-      if (!collectionsByType.containsKey(collectionType.toString()))
-        collectionsByType.put(collectionType.toString(), new HashSet<>());
-      collectionsByType.get(collectionType.toString()).add(collection);
-    }
+    throw new UnsupportedOperationException("Implement this");
   }
 
   /**
@@ -471,27 +440,7 @@ public class TargetInformation {
   /**
    * Returns some possible value for the given type
    */
-  public Expr getSomeValueForType(Type type) {
-    return signatureEvaluations.get(type).iterator().next();
-  }
-
-  /**
-   * Returns some possible value for the given type
-   */
-  public static Expr getRandomValueForType(Type type) {
-    Random random = new Random();
-    List<Expr> evaluationsForType = signatureEvaluations.get(type);
-    if (evaluationsForType != null && evaluationsForType.size() > 0) {
-      int randomNumber = random.nextInt(evaluationsForType.size());
-      return signatureEvaluations.get(type).get(randomNumber);
-    }
-    return null;
-  }
-
-  /**
-   * Returns some possible value for the given type
-   */
-  public static Expr getUnarySigForType(Type type) {
+  public static Expr getUnarySigForType(Class<?> cl) {
     throw new UnsupportedOperationException("Implement this");
   }
 
@@ -505,7 +454,7 @@ public class TargetInformation {
   /**
    * Returns a non-null return type for the given type.
    */
-  public Type getReturnType(ExprContext expr) {
+  public Class<?> getReturnType(ExprContext expr) {
     throw new UnsupportedOperationException("implement this");
   }
 

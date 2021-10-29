@@ -503,12 +503,10 @@ public class DynAlloyExpressionsUtils {
     ExprBinary plusexpr = (ExprBinary) getExpressionAfterClosure(closuredExpression);
     Expr leftQtDomain = ExprBinary.Op.MINUS.make(null,
         null, ExprBinary.Op.JOIN.make(null, null, n, ExprBinary.Op.JOIN.make(null, null,
-            plusexpr.left, ExprUnary.Op.RCLOSURE.make(null, plusexpr))),
-        TargetInformation.nullSig);
+            plusexpr.left, ExprUnary.Op.RCLOSURE.make(null, plusexpr))), null);
     Expr rightQtDomain = ExprBinary.Op.MINUS.make(null,
         null, ExprBinary.Op.JOIN.make(null, null, n, ExprBinary.Op.JOIN.make(null, null,
-            plusexpr.right, ExprUnary.Op.RCLOSURE.make(null, plusexpr))),
-        TargetInformation.nullSig);
+            plusexpr.right, ExprUnary.Op.RCLOSURE.make(null, plusexpr))), null);
 
     // Creates the body
     // n.joinableExpr
@@ -645,7 +643,7 @@ public class DynAlloyExpressionsUtils {
   public static Expr createsCardinalitySetEqualsToIntExpr(Expr closuredExpr, Expr intExpr)
       throws Err {
     Expr cardinality = ExprUnary.Op.CAST2SIGINT.make(null, ExprUnary.Op.CARDINALITY.make(null,
-        ExprBinary.Op.MINUS.make(null, null, closuredExpr, TargetInformation.nullSig)));
+        ExprBinary.Op.MINUS.make(null, null, closuredExpr, null)));
 
     // Creates args
     List<Expr> args = createsArgsForBinaryIntegerExprCall(intExpr, cardinality);
