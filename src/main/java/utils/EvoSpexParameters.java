@@ -88,7 +88,7 @@ public class EvoSpexParameters {
     considerDoubleClosuredExpressions = true;
 
     // Default values for fields related to post conditions learning
-    learnPre = false;
+    learnPre = true;
   }
 
   /**
