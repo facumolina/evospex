@@ -29,9 +29,9 @@ public class ExpressionEvaluator {
   /**
    * Setup the parser
    */
-  private static void setup(ExprContext expr,Object o) {
+  private static void setup(String name,Object o) {
     vars = new HashMap<>();
-    vars.put(ExprName.THIS, o);
+    vars.put(name, o);
   }
 
   /**
@@ -45,11 +45,11 @@ public class ExpressionEvaluator {
   /**
    * Evaluate the given expression on the given object
    */
-  public static boolean eval(ExprContext expr, Object o) {
-    checkEvalArgs(expr, o);
-    setup(expr, o);
-    return (Boolean) eval(expr);
-  }
+  //public static boolean eval(ExprContext expr, Object o) {
+  //  checkEvalArgs(expr, o);
+  //  setup(expr, o);
+  //  return (Boolean) eval(expr);
+ // }
 
   /**
    * Evaluate the given expression using the provided set of vars
@@ -63,9 +63,9 @@ public class ExpressionEvaluator {
   /**
    * Evaluate the given any expr (not necessarily boolean) on the given object
    */
-  public static Object evalAnyExpr(ExprContext expr, Object o) throws NonEvaluableExpressionException {
+  public static Object evalAnyExpr(ExprContext expr, String name, Object o) throws NonEvaluableExpressionException {
     checkEvalArgs(expr, o);
-    setup(expr, o);
+    setup(name, o);
     return eval(expr);
   }
 
