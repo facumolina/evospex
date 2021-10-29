@@ -2,6 +2,7 @@ package evospex.target;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedPseudograph;
+import utils.JavaClassesUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -57,7 +58,7 @@ public class TypeGraph {
         }
         for (Class<?> cls : to_visit) {
           // Visit fields only for non-primitive types for now
-          if (!cls.isPrimitive())
+          if (!cls.isPrimitive() && !JavaClassesUtils.isNumber(cls))
             buildGraph(cls, visited);
         }
       }

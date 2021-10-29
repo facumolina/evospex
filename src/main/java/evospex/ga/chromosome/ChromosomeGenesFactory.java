@@ -20,6 +20,7 @@ import rfm.dynalloy.Err;
 import rfm.dynalloyCompiler.ast.ExprQt;
 
 import rfm.dynalloyCompiler.ast.Type;
+import utils.JavaClassesUtils;
 import utils.TargetInformation;
 import utils.EvoSpexParameters;
 import wrapper.DynAlloyRunner;
@@ -580,7 +581,7 @@ public class ChromosomeGenesFactory {
         if (rightExpr.toString().contains("thizPre"))
           continue;
         if (leftExpr.type().equals(rightExpr)) {
-          if (Number.class.isAssignableFrom(leftExpr.type())) {
+          if (JavaClassesUtils.isNumber(leftExpr.type())) {
             // We are comparing numeric expressions
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.INT_COMPARISON);
@@ -1017,7 +1018,7 @@ public class ChromosomeGenesFactory {
   public Gene buildExprGeneFromEval(Expr expr, Object result, boolean isPositive) throws InvalidConfigurationException {
     String opStr = isPositive ? ExprOperator.EQ : ExprOperator.NOT_EQ;
 
-    if (result != null && Number.class.isAssignableFrom(expr.type())) {
+    if (result != null && JavaClassesUtils.isNumber(expr.type())) {
       Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.toExpr(result.toString(), result.getClass()), Boolean.class);
       ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
       return new ExprGene(conf, newValue, contextInfo);
