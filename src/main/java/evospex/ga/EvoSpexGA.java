@@ -121,7 +121,7 @@ public class EvoSpexGA {
    * Extract the data structure information for the current target class
    */
   private void extractDataStructureInformation(Class<?> targetClass) {
-    targetInformation = new TargetInformation(targetClass);
+    targetInformation = new TargetInformation(targetClass, parameters.learnPre());
   }
 
   /**

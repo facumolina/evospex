@@ -49,8 +49,9 @@ public class TargetInformation {
   /**
    * Constructor from a given target class
    * @param targetClass is the current class under analysis
+   * @param considerPreState determines if the pre states of the target must be considered
    */
-  public TargetInformation(Class<?> targetClass) {
+  public TargetInformation(Class<?> targetClass, boolean considerPreState) {
     // Build the type graph
     cut = targetClass;
     typeGraph = new TypeGraph(targetClass);
@@ -59,11 +60,14 @@ public class TargetInformation {
     structureRelations = new HashMap<>();
     relationsForEvaluation = new HashMap<>();
     structureRelations.put(ExprName.THIS, targetClass);
+    structureRelations.put(ExprName.THIS_PRE, targetClass);
     relationsForEvaluation.put(ExprName.THIS, ExprBuilder.toExpr(ExprName.THIS, targetClass));
+    relationsForEvaluation.put(ExprName.THIS_PRE, ExprBuilder.toExpr(ExprName.THIS_PRE, targetClass));
     allIntExpressions = new LinkedList<>();
-    buildBaseExpressions(cut, new HashSet<>());
     scope = 3;
-    buildInitialExpressions();
+
+    buildBaseExpressions(cut, new HashSet<>());
+    buildInitialExpressions(considerPreState);
 
     expressionsByEvaluationValue = new HashMap<>();
     methodVarsByType = new HashMap<>();
@@ -88,9 +92,10 @@ public class TargetInformation {
 
   /**
    * Build the initial expressions by traversing the type graph
+   * @param considerPreState determines if the pre states must be considered when building expressions
    * Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
    */
-  private void buildInitialExpressions() {
+  private void buildInitialExpressions(boolean considerPreState) {
     joinedExpressions = new LinkedList<>();
     joinedExpressionsOfTypeInt = new LinkedList<>();
     simpleClosuredExpressions = new LinkedList<>();
@@ -98,11 +103,11 @@ public class TargetInformation {
     joineableExpressionsByType = new HashMap<>();
     collectionsByType = new HashMap<>();
 
-    //if (structureRelations.keySet().contains("thizPre")) {
-      // Shoudl be present when learning post conditions
-      //ExprVar thizPreExpr = ExprVar.make(null, "thizPre", structureRelations.get("thizPre"));
-      //buildAllExpressions(thizPreExpr, "thizPre", scope);
-    //}
+    if (considerPreState) {
+      // Pre state expression are also considered
+      buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS_PRE), cut, scope);
+    }
+
     buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS), cut, scope);
   }
 
