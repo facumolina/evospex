@@ -43,15 +43,6 @@ public class ExpressionEvaluator {
   }
 
   /**
-   * Evaluate the given expression on the given object
-   */
-  //public static boolean eval(ExprContext expr, Object o) {
-  //  checkEvalArgs(expr, o);
-  //  setup(expr, o);
-  //  return (Boolean) eval(expr);
- // }
-
-  /**
    * Evaluate the given expression using the provided set of vars
    */
   public static boolean eval(ExprContext expr, Map<String, Object> variables) {
