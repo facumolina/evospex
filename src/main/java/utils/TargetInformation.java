@@ -125,7 +125,7 @@ public class TargetInformation {
     }
     if (k > 0) {
       Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(vertex);
-      List<String> adjacentClosuredExpressionsStr = new LinkedList<>();
+      List<Expr> adjacentClosuredExpressions = new LinkedList<>();
       for (TypeGraphEdge edge : outgoingEdges) {
         Class<?> targetVertex = typeGraph.getTargetVertex(edge);
         String adjacentExprStr = edge.getLabel();
@@ -140,20 +140,22 @@ public class TargetInformation {
         if (vertex.equals(targetVertex) && !currExpr.toString().contains(adjacentExprStr)) {
           // The current adjacent expression is closable
           // And the adjacent expression is not contained in the current expression
-          adjacentClosuredExpressionsStr.add(adjacentExprStr);
+          adjacentClosuredExpressions.add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
           Expr closured = ExprBuilder.joinWithRClosure(currExpr, adjacentExprStr);
           System.out.println("Expr "+ closured + " is set of "+targetVertex.getSimpleName());
+          closured.setClassOfElemsInSet(targetVertex);
           simpleClosuredExpressions.add(closured);
         }
 
       }
 
-      for (int i = 0; i < adjacentClosuredExpressionsStr.size() - 1; i++) {
-        for (int j = i + 1; j < adjacentClosuredExpressionsStr.size(); j++) {
-          String fst = adjacentClosuredExpressionsStr.get(i);
-          String snd = adjacentClosuredExpressionsStr.get(j);
-          Expr closured = ExprBuilder.joinWithRClosure(currExpr, fst, snd);
-          System.out.println("Expr "+ closured);
+      for (int i = 0; i < adjacentClosuredExpressions.size() - 1; i++) {
+        for (int j = i + 1; j < adjacentClosuredExpressions.size(); j++) {
+          Expr fst = adjacentClosuredExpressions.get(i);
+          Expr snd = adjacentClosuredExpressions.get(j);
+          Expr closured = ExprBuilder.joinWithRClosure(currExpr, fst.toString(), snd.toString());
+          System.out.println("Double closured expr "+ closured);
+          closured.setClassOfElemsInSet(fst.type());
           doubleClosuredExpressions.add(closured);
         }
       }
@@ -473,10 +475,11 @@ public class TargetInformation {
   /**
    * Add var to type
    */
-  public void addVariableForType(String typeName, String varName) {
+  public void addVariableForType(Class<?> type, String varName) {
+    String typeName = type.getSimpleName();
     methodVarsType.put(varName, typeName);
     if (!methodVarsByType.containsKey(typeName))
-      methodVarsByType.put(typeName, new HashSet<String>());
+      methodVarsByType.put(typeName, new HashSet<>());
     if (methodVarsByType.get(typeName).add(varName)) {
       //if (typeName.contains("Integer"))
         //allIntExpressions.add(ExprVar.make(null, varName));
