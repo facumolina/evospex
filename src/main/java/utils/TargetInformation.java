@@ -38,7 +38,7 @@ public class TargetInformation {
   private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
   private static Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
-  private static Map<String, Set<Expr>> collectionsByType; // Data structure collections by type
+  private static Map<Class<?>, Set<Expr>> collectionsByType; // Data structure collections by type
 
   private Map<String, Expr> relationsForEvaluation; // Target relations with expressions
   private Map<String, Class<?>> structureRelations; // Target relations with types
@@ -352,7 +352,8 @@ public class TargetInformation {
    * Returns true iff there is some collection attribute containing objects of the given type
    */
   public static boolean hasCollectionsOfType(Class<?> type) {
-    throw new UnsupportedOperationException("Implement this");
+    Set<Class<?>> types = collectionsByType.keySet();
+    return types.contains(type);
   }
 
   /**
