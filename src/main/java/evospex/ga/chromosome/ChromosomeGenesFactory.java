@@ -208,7 +208,7 @@ public class ChromosomeGenesFactory {
         if (argsExamples != null) {
           int argPos = 0;
           for (Object arg : argsExamples) {
-            String argLabel = "arg" + argPos;
+            String argLabel = ExprName.getArgLabel(argPos);
             genes.addAll(createGenesFromArgValue(arg, argLabel, evaluableSimpleClosuredExpressions,
                     evaluableDoubleClosuredExpressions));
             argPos++;
