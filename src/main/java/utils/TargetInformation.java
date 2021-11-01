@@ -163,19 +163,27 @@ public class TargetInformation {
   }
 
   /**
-   * Get evaluable expressions
+   * Get all the evaluable expressions
    */
-  public List<Expr> getEvaluableExpressions() {
-    List<Expr> expressionsList = new LinkedList<>();
-    expressionsList.addAll(allIntExpressions);
-    return expressionsList;
-  }
+  public List<Expr> getEvaluableExpressions() { return joinedExpressions; }
 
   /**
    * Get int evaluable expressions
    */
   public List<Expr> getIntEvaluableExpressions() {
     return allIntExpressions;
+  }
+
+  /**
+   * Get the evaluable expressions of the given type
+   */
+  public List<Expr> getEvaluableExpressionsOfType(Class<?> type) {
+    List<Expr> exprsOfType = new LinkedList<>();
+    joinedExpressions.forEach(e -> {
+      if (e.type().equals(type))
+        exprsOfType.add(e);
+    });
+    return exprsOfType;
   }
 
   /**
@@ -343,13 +351,8 @@ public class TargetInformation {
   /**
    * Returns true iff there is some collection attribute containing objects of the given type
    */
-  public static boolean hasCollectionsOfType(String typeStr) {
-    Set<String> types = collectionsByType.keySet();
-    for (String t : types) {
-      if (t.contains("Collection_" + typeStr))
-        return true;
-    }
-    return false;
+  public static boolean hasCollectionsOfType(Class<?> type) {
+    throw new UnsupportedOperationException("Implement this");
   }
 
   /**
@@ -362,7 +365,7 @@ public class TargetInformation {
   /**
    * Returns the collection attributes which type is the given type
    */
-  public static List<Expr> getCollectionsOfType(String typeStr) {
+  public static List<Expr> getCollectionsOfType(Class<?> type) {
     throw new UnsupportedOperationException("Implement this");
   }
 
@@ -408,12 +411,9 @@ public class TargetInformation {
    * expressions of the form: type -> AnotherType
    */
   public Set<Expr> getJoineableExpressionsOfCurrentType(Class<?> type) {
-    System.out.println("getJoineableExpressionsOfCurrentType: "+type.getSimpleName());
     if (joineableExpressionsByType.containsKey(type)) {
-      System.out.println("exprs are: "+joineableExpressionsByType.get(type));
       return joineableExpressionsByType.get(type);
     }
-    System.out.println("no exprs");
     return new HashSet<>();
   }
 
