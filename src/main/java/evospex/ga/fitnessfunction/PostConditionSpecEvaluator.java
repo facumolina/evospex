@@ -200,7 +200,11 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     current_vars.put(ExprName.THIS_PRE, me.getObjectFrom());
     current_vars.put(ExprName.THIS, me.getObjectFinalState());
     current_vars.put(ExprName.RESULT, me.getResult());
-    // TODO method arguments for expression evaluator should be properly set
+    // Set the method arguments
+    List<Object> currArgsValues = me.getMethodArguments();
+    for (int i = 0 ; i < currArgsValues.size(); i++) {
+      current_vars.put(ExprName.getArgLabel(i),currArgsValues.get(i));
+    }
     return ExpressionEvaluator.eval(expr.exprCtx(), current_vars);
   }
 
