@@ -17,4 +17,12 @@ public class ExprName {
   public static final String ZERO = "0"; // Name for the result expression 0
   public static final String ONE = "1"; // Name for the result expression 1
 
+  /**
+   * Get the label for the i-th argument of a method
+   */
+  public static String getArgLabel(int pos) {
+    if (pos < 0) throw new IllegalArgumentException("The position must be greater or equal than zero");
+    return "arg" + pos;
+  }
+
 }
