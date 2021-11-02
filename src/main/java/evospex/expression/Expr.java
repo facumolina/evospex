@@ -16,7 +16,7 @@ public class Expr {
 
   private final ExprContext exprContext; // Actual expression
   private final Class<?> type; // The expression type
-  private Class<?> quantificationOverType; // Class of elements in a quantified set
+  private Class<?> classOfElemsInSet ; // Class of elements in set
 
   /**
    * Constructor
@@ -26,7 +26,7 @@ public class Expr {
       throw new IllegalArgumentException("Neither the expression nor the class can be null");
     exprContext = exprCtx;
     type = c;
-    quantificationOverType = null;
+    classOfElemsInSet = null;
   }
 
   /**
@@ -51,7 +51,7 @@ public class Expr {
   /**
    * Returns the class of the elements of the set being quantified
    */
-  public Class<?> classOfElemsInSet() { return quantificationOverType; };
+  public Class<?> classOfElemsInSet() { return classOfElemsInSet; };
 
   /**
    * Set the class of the elements of the set being quantified
@@ -59,7 +59,7 @@ public class Expr {
    */
   public void setClassOfElemsInSet(Class<?> cl) {
     if (cl == null) throw new IllegalArgumentException();
-    quantificationOverType = cl;
+    classOfElemsInSet = cl;
   }
 
   /**
@@ -85,7 +85,11 @@ public class Expr {
       List<ExprContext> exprs = exprContext.expr();
       str = exprs.get(0).getText() + " " + ExprOperator.IN + " " + exprs.get(1).getText();
     }
-
+    if (cmp_op != null && ExprOperator.NOT_IN.equals(cmp_op.getText())) {
+      // The operator is not in, so make this string more clear
+      List<ExprContext> exprs = exprContext.expr();
+      str = exprs.get(0).getText() + " " + ExprOperator.NOT_IN + " " + exprs.get(1).getText();
+    }
     return str;
   }
 
@@ -99,6 +103,13 @@ public class Expr {
   @Override
   public int hashCode() {
     return exprContext.getText().hashCode();
+  }
+
+  @Override
+  public Expr clone() {
+    Expr e = ExprBuilder.toExpr(toString(), type());
+    e.classOfElemsInSet = this.classOfElemsInSet;
+    return e;
   }
 
 }
