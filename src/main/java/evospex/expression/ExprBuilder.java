@@ -97,7 +97,10 @@ public class ExprBuilder {
    * @return the expression expr1 in expr2
    */
   public static Expr in(Expr expr1, Expr expr2) {
-    return toExpr(expr1.toString() + " " + ExprOperator.IN + " " + expr2.toString(), Boolean.class);
+    Expr e = toExpr(expr1.toString() + " " + ExprOperator.IN + " " + expr2.toString(), Boolean.class);
+    if (expr1.type()==null || expr2.type()==null) throw new IllegalArgumentException("The expressions type can't be null");
+    e.setClassOfElemsInSet(expr1.type());
+    return e;
   }
 
   /**
