@@ -305,7 +305,7 @@ public class ChromosomeGenesFactory {
       throws InvalidConfigurationException {
     Class<?> collection_type = guessElementType(c);
     if (collection_type != null) {
-      Set<Expr> collections = TargetInformation.getCollectionsOfType(collection_type);
+      List<Expr> collections = TargetInformation.getSetsOfType(collection_type);
       for (Expr collection : collections) {
         Expr geneExpr = ExprBuilder.eq(collection_expr, collection);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
@@ -407,8 +407,8 @@ public class ChromosomeGenesFactory {
    */
   private List<Gene> addAssertionsConsideringCollections(String argLabel, Expr argExpr) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
-    if (TargetInformation.hasCollectionsOfType(argExpr.type())) {
-      Set<Expr> collections = TargetInformation.getCollectionsOfType(argExpr.type());
+    if (TargetInformation.existsSetOfType(argExpr.type())) {
+      List<Expr> collections = TargetInformation.getSetsOfType(argExpr.type());
       for (Expr expr : collections) {
         // Create a gene with the expression argLabel in collection
         Expr geneExpr = ExprBuilder.in(ExprBuilder.toExpr(argLabel, expr.type()), expr);

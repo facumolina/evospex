@@ -33,13 +33,13 @@ public class TargetInformation {
   private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
   private static Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
-  private static Map<Class<?>, Set<Expr>> collectionsByType; // Data structure collections by type
+  private static Map<Class<?>, List<Expr>> setsByType; // Expressions denoting sets grouped by type
 
   private Map<String, Expr> relationsForEvaluation; // Target relations with expressions
   private Map<String, Class<?>> structureRelations; // Target relations with types
 
-  private Map<String, Set<String>> methodVarsByType; // Variables names grouped by type
-  private Map<String, String> methodVarsType; // Variables names and their types
+  private Map<Class<?>, Set<String>> methodVarsByType; // Variables names grouped by type
+  private Map<String, Class<?>> methodVarsType; // Variables names and their types
 
   /**
    * Constructor from a given target class
@@ -96,7 +96,7 @@ public class TargetInformation {
     simpleClosuredExpressions = new LinkedList<>();
     doubleClosuredExpressions = new LinkedList<>();
     joineableExpressionsByType = new HashMap<>();
-    collectionsByType = new HashMap<>();
+    setsByType = new HashMap<>();
 
     if (considerPreState) {
       // Pre state expression are also considered
@@ -129,6 +129,9 @@ public class TargetInformation {
           joineableExpressionsByType.put(vertex, new HashSet<>());
         joineableExpressionsByType.get(vertex).add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
 
+        if (Collection.class.isAssignableFrom(targetVertex))
+          throw new UnsupportedOperationException("Handle collections properly");
+
         Expr newExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
         buildInitialExpressionsRec(newExpr, targetVertex, k - 1);
 
@@ -140,6 +143,7 @@ public class TargetInformation {
           System.out.println("Expr "+ closured + " is set of "+targetVertex.getSimpleName());
           closured.setClassOfElemsInSet(targetVertex);
           simpleClosuredExpressions.add(closured);
+          createSets(closured, targetVertex);
         }
 
       }
@@ -152,7 +156,29 @@ public class TargetInformation {
           System.out.println("Double closured expr "+ closured);
           closured.setClassOfElemsInSet(fst.type());
           doubleClosuredExpressions.add(closured);
+          createSets(closured, fst.type());
         }
+      }
+    }
+  }
+
+  /**
+   * Create sets a given closured expression
+   */
+  private void createSets(Expr closured, Class<?> elemsType) {
+    // Add the given set expression to its type
+    if (!setsByType.containsKey(elemsType))
+      setsByType.put(elemsType, new LinkedList<>());
+    setsByType.get(elemsType).add(closured);
+    // If the class is not a primitive type, create the sets which closured expression is the base
+    if (!elemsType.isPrimitive()) {
+      Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(elemsType);
+      for (TypeGraphEdge edge : outgoingEdges) {
+        Class<?> v = typeGraph.getTargetVertex(edge);
+        String adjacentExprStr = edge.getLabel();
+        if (!setsByType.containsKey(v))
+          setsByType.put(v, new LinkedList<>());
+        setsByType.get(v).add(ExprBuilder.join(closured, ExprBuilder.toExpr(adjacentExprStr, v)));
       }
     }
   }
@@ -244,49 +270,6 @@ public class TargetInformation {
   }
 
   /**
-   * Builds all the expressions of a given length
-   *
-   * @param vertex
-   *          is the current vertex being
-   * @param scope
-   *          is the length of expressions to be builded
-   * @return a list of expressions
-   */
-  private List<Expr> buildExpressionsOfLength(String vertex, int scope) {
-    //ExprVar currentExpr = ExprVar.make(null, vertex, structureRelations.get(vertex));
-    if (scope == 0) {
-      LinkedList<Expr> exprList = new LinkedList<Expr>();
-      //exprList.add(currentExpr);
-      if (isClosure(vertex)) {
-        //exprList.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr));
-      }
-      return exprList;
-    } else {
-      Set<DefaultEdge> outgoingEdges = structureGraph.outgoingEdgesOf(vertex);
-      List<Expr> adjacentExpressions = new LinkedList<Expr>();
-      for (DefaultEdge edge : outgoingEdges) {
-        // For each adjacent vertex creates all the expressions starting from that vertex and of
-        // length
-        // scope-1
-        String targetVertex = structureGraph.getEdgeTarget(edge);
-        adjacentExpressions.addAll(buildExpressionsOfLength(targetVertex, scope - 1));
-      }
-
-      List<Expr> resultingExpressions = new LinkedList<Expr>();
-      for (Expr expr : adjacentExpressions) {
-        // For each adjacent expression, join it with the current expression. If the current
-        // expression
-        // can be closured, also join the closured current expression with the adjacent.
-        //resultingExpressions.add(currentExpr.join(expr));
-        if (isClosure(vertex)) {
-          //resultingExpressions.add(ExprUnary.Op.RCLOSURE.make(null, currentExpr).join(expr));
-        }
-      }
-      return resultingExpressions;
-    }
-  }
-
-  /**
    * Returns true if the current vertex generates an expression than can be closure
    * @param vertex
    * @return
@@ -340,14 +323,14 @@ public class TargetInformation {
    * Returns true iff there is some collection attribute in the current context
    */
   public static boolean hasCollections() {
-    return collectionsByType.keySet().size() > 0;
+    return setsByType.keySet().size() > 0;
   }
 
   /**
-   * Returns true iff there is some collection attribute containing objects of the given type
+   * Returns true iff there is some set expression containing objects of the given type
    */
-  public static boolean hasCollectionsOfType(Class<?> type) {
-    Set<Class<?>> types = collectionsByType.keySet();
+  public static boolean existsSetOfType(Class<?> type) {
+    Set<Class<?>> types = setsByType.keySet();
     return types.contains(type);
   }
 
@@ -359,11 +342,10 @@ public class TargetInformation {
   }
 
   /**
-   * Returns the collection attributes which type is the given type
+   * Returns the expressions denoting sets of the given type
    */
-  public static Set<Expr> getCollectionsOfType(Class<?> type) {
-    // TODO possible collections should never be null
-    return collectionsByType.get(type);
+  public static List<Expr> getSetsOfType(Class<?> type) {
+    return setsByType.get(type);
   }
 
   /**
@@ -469,19 +451,18 @@ public class TargetInformation {
   /**
    * Return vars of a given type name
    */
-  public Set<String> getVariablesOfType(String typeName) {
-    return methodVarsByType.get(typeName);
+  public Set<String> getVariablesOfType(Class<?> cl) {
+    return methodVarsByType.get(cl);
   }
 
   /**
    * Add var to type
    */
   public void addVariableForType(Class<?> type, String varName) {
-    String typeName = type.getSimpleName();
-    methodVarsType.put(varName, typeName);
-    if (!methodVarsByType.containsKey(typeName))
-      methodVarsByType.put(typeName, new HashSet<>());
-    if (methodVarsByType.get(typeName).add(varName)) {
+    methodVarsType.put(varName, type);
+    if (!methodVarsByType.containsKey(type))
+      methodVarsByType.put(type, new HashSet<>());
+    if (methodVarsByType.get(type).add(varName)) {
       //if (typeName.contains("Integer"))
         //allIntExpressions.add(ExprVar.make(null, varName));
     }
@@ -490,7 +471,7 @@ public class TargetInformation {
   /**
    * Get var type
    */
-  public String getVarType(String varName) {
+  public Class<?> getVarType(String varName) {
     return methodVarsType.get(varName);
   }
 
