@@ -136,19 +136,10 @@ public class ExprGeneValue {
   @Override
   public ExprGeneValue clone() {
     if (previous == null) {
-      return new ExprGeneValue(cloneExpression(expression), geneType);
+      return new ExprGeneValue(expression.clone(), geneType);
     } else {
-      return new ExprGeneValue(cloneExpression(expression), geneType, previous.clone());
+      return new ExprGeneValue(expression.clone(), geneType, previous.clone());
     }
-  }
-
-  /**
-   * Clone the given expression
-   * @param expr is the expression to clone
-   * @return
-   */
-  private Expr cloneExpression(Expr expr) {
-    return ExprBuilder.toExpr(expr.toString(), expr.type());
   }
 
   /**
