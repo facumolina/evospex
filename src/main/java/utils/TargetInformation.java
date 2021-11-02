@@ -1,11 +1,6 @@
 package utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
@@ -366,8 +361,9 @@ public class TargetInformation {
   /**
    * Returns the collection attributes which type is the given type
    */
-  public static List<Expr> getCollectionsOfType(Class<?> type) {
-    throw new UnsupportedOperationException("Implement this");
+  public static Set<Expr> getCollectionsOfType(Class<?> type) {
+    // TODO possible collections should never be null
+    return collectionsByType.get(type);
   }
 
   /**
@@ -455,8 +451,12 @@ public class TargetInformation {
   /**
    * Returns some possible expression of the given type
    */
-  public ExprContext getRandomIntExpr() {
-    throw new UnsupportedOperationException("Implement this");
+  public Expr getRandomIntExpr() {
+    Random random = new Random();
+    if (allIntExpressions.isEmpty())
+      return ExprBuilder.ZERO;
+    int randomNumber = random.nextInt(allIntExpressions.size());
+    return (Expr) allIntExpressions.toArray()[randomNumber];
   }
 
   /**
