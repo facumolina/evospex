@@ -7,7 +7,7 @@ import rfm.dynalloyCompiler.ast.ExprBinary.Op;
 /**
  * This class contains all the possible mutations identifiers
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class GASpecLearnerMutations {
 
