@@ -3,6 +3,7 @@ package evospex.ga.chromosome;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
@@ -22,6 +23,7 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
+import org.jgap.gp.function.Exp;
 import rfm.dynalloy.Err;
 import utils.TargetInformation;
 
@@ -634,16 +636,39 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyInclusionMutation() {
     String mutationToApply = getSomeApplicableMutation();
-    switch (mutationToApply) {
-    case GASpecLearnerMutations.NEGATE:
-      throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.REPLACE_INCLUDED:
-      throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.REPLACE_SET:
-      throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.TO_TRUE:
-      throw new UnsupportedOperationException("implement this");
-    default:
+    Expr expr  = value.getExpression();
+    List<ExprContext> expressions = expr.exprCtx().expr();
+    if (expressions.size() != 2)
+      throw new IllegalStateException("The expression "+expr+" should only have two expressions");
+    ExprContext left = expressions.get(0);
+    ExprContext right = expressions.get(1);
+    if (GASpecLearnerMutations.NEGATE.equals(mutationToApply)) {
+      System.out.println("--------------");
+      System.out.println("Negating inclusion");
+      System.out.println("Original: " + expr);
+      Compare_opContext op = expr.exprCtx().compare_op();
+      if (!op.getText().equals(ExprOperator.IN) && !op.getText().equals(ExprOperator.NOT_IN))
+        throw new IllegalStateException("Can't negate inclusion with operator " + op.getText());
+      String newOp = op.getText().equals(ExprOperator.IN) ? ExprOperator.NOT_IN : ExprOperator.IN;
+      Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
+      System.out.println("Mutated: " + newExpr);
+      value.setExpression(newExpr, false);
+    } else if (GASpecLearnerMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
+        throw new UnsupportedOperationException("implement this");
+    } else if (GASpecLearnerMutations.REPLACE_SET.equals(mutationToApply)) {
+      System.out.println("--------------");
+      System.out.println("Replacing set");
+      System.out.println("Original: " + expr);
+      System.out.println("Elems in set: " + expr.classOfElemsInSet());
+      Set<Expr> possibleCollections = TargetInformation.getCollectionsOfType(expr.classOfElemsInSet());
+      if (possibleCollections!=null && possibleCollections.size() > 0) {
+        throw new UnsupportedOperationException("implement this");
+      }
+    } else if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
+      value.setExpression(ExprBuilder.TRUE, false);
+      value.setGeneType(ExprGeneType.CONSTANT);
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
     }
   }
 
@@ -683,26 +708,90 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   private void applyIntComparisonMutation() throws Err {
     String mutationToApply = getSomeApplicableMutation();
+    Expr expr = value.getExpression();
+    Expr newExpr;
+    List<ExprContext> exprs = expr.exprCtx().expr();
+    if (exprs.size() != 2)
+      throw new IllegalStateException("The expression is not a numeric comparison: "+expr);
+    String op = expr.exprCtx().compare_op().getText();
+    ExprContext left = exprs.get(0);
+    ExprContext right = exprs.get(1);
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE:
-      throw new UnsupportedOperationException("implement this");
+      System.out.println("-------------");
+      System.out.println("Negating op");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + expr.exprCtx().getText() + ExprDelimiter.RP, Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.ADD_ONE:
       // Add one at the right expression
-      throw new UnsupportedOperationException("implement this");
+      System.out.println("-------------");
+      System.out.println("Add one");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
+              + ExprOperator.PLUS + " " + ExprBuilder.ONE, Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.SUB_ONE:
       // Subtract one at the right expression
-      throw new UnsupportedOperationException("implement this");
+      System.out.println("-------------");
+      System.out.println("Sub one");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
+              + ExprOperator.MINUS + " " + ExprBuilder.ONE, Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
     case GASpecLearnerMutations.ADD_EXPR:
       // Add a random integer expression to the right expression
-      throw new UnsupportedOperationException("implement this");
+      Expr exprToAdd = contextInfo.getRandomIntExpr();
+      System.out.println("-------------");
+      System.out.println("Add expr");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
+              + ExprOperator.PLUS + " " + exprToAdd.exprCtx().getText(), Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.SUB_EXPR:
       // Subtract a random integer expression to the right expression
-      throw new UnsupportedOperationException("implement this");
+      Expr exprToSub = contextInfo.getRandomIntExpr();
+      System.out.println("-------------");
+      System.out.println("Sub expr");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
+              + ExprOperator.MINUS + " " + exprToSub.exprCtx().getText(), Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.REPLACE_RIGHT:
       // Replace the right expression
-      throw new UnsupportedOperationException("implement this");
+      Expr replacementExpr = contextInfo.getRandomIntExpr();
+      System.out.println("-------------");
+      System.out.println("Replace right");
+      System.out.println("Original: "+expr);
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + replacementExpr.exprCtx().getText(), Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.REPLACE_OP:
-      throw new UnsupportedOperationException("implement this");
+      System.out.println("-------------");
+      System.out.println("Replacing op");
+      System.out.println("Original: "+expr);
+      String newOp = ExprOperator.getRandomNumericCmpOp();
+      newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      break;
     case GASpecLearnerMutations.EQ_SUB_ONE:
       // Create eq expression and subtract one at the right expression
       throw new UnsupportedOperationException("implement this");
@@ -810,7 +899,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   @Override
   public Object getInternalValue() {
-    return (ExprGeneValue) value;
+    return value;
   }
 
   public int compareTo(ExprGene other) {
