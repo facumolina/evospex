@@ -1,5 +1,7 @@
 package evospex.expression.symbol;
 
+import java.util.Random;
+
 /**
  * This class maintains all the expressions operators
  *
@@ -51,5 +53,14 @@ public class ExprOperator {
   public static final String LONE = "lone";
   public static final String ONE = "one";
   public static final String NO = "no";
+
+  private static final String[] NUMERIC_CMP_OPERATORS = { EQ, NOT_EQ, LT, LTE, GT, GTE };
+  /**
+   * Get a random operator for a numeric comparison
+   */
+  public static String getRandomNumericCmpOp() {
+    Random r = new Random();
+    return NUMERIC_CMP_OPERATORS[r.nextInt(NUMERIC_CMP_OPERATORS.length)];
+  }
 
 }
