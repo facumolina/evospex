@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser.Unary_opContext;
@@ -24,7 +23,6 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
-import org.jgap.gp.function.Exp;
 import rfm.dynalloy.Err;
 import utils.TargetInformation;
 
@@ -649,27 +647,25 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         throw new IllegalStateException("Can't negate inclusion with operator " + op.getText());
       String newOp = op.getText().equals(ExprOperator.IN) ? ExprOperator.NOT_IN : ExprOperator.IN;
       Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
+      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
     } else if (GASpecLearnerMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
       Set<String> sameTypeVars = contextInfo.getVariablesOfType(expr.classOfElemsInSet());
       Random random = new Random();
       int randomNumber = random.nextInt(sameTypeVars.size());
       String newVarName = (String) sameTypeVars.toArray()[randomNumber];
-      Expr e = ExprBuilder.toExpr(newVarName + " " + expr.exprCtx().compare_op().getText() + " " + right.getText(), Boolean.class);
-      value.setExpression(e, false);
+      Expr newExpr = ExprBuilder.toExpr(newVarName + " " + expr.exprCtx().compare_op().getText() + " " + right.getText(), Boolean.class);
+      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+      value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.INCLUSION);
     } else if (GASpecLearnerMutations.REPLACE_SET.equals(mutationToApply)) {
-      System.out.println("--------------");
-      System.out.println("Replacing set");
-      System.out.println("Original: " + expr);
-      System.out.println("Elems in set: " + expr.classOfElemsInSet());
       List<Expr> possibleCollections = TargetInformation.getSetsOfType(expr.classOfElemsInSet());
       if (possibleCollections.size() > 0) {
         Random r = new Random();
         int rN = r.nextInt(possibleCollections.size());
         Expr newRight = possibleCollections.get(rN);
         Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + op.getText() + " " + newRight.exprCtx().getText(), Boolean.class);
-        System.out.println("Mutated: "+newExpr);
+        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         value.setExpression(newExpr, false);
         value.setGeneType(ExprGeneType.INCLUSION);
       }
@@ -793,7 +789,9 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     case GASpecLearnerMutations.TO_TRUE:
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      value.setExpression(ExprBuilder.TRUE, false);
+      value.setGeneType(ExprGeneType.CONSTANT);
+      break;
     default:
       throw new IllegalStateException("Mutation " + mutationToApply + " not implemented!");
     }
