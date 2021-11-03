@@ -178,7 +178,9 @@ public class TargetInformation {
         String adjacentExprStr = edge.getLabel();
         if (!setsByType.containsKey(v))
           setsByType.put(v, new LinkedList<>());
-        setsByType.get(v).add(ExprBuilder.join(closured, ExprBuilder.toExpr(adjacentExprStr, v)));
+        Expr newSetExpr = ExprBuilder.join(closured, ExprBuilder.toExpr(adjacentExprStr, v));
+        newSetExpr.setClassOfElemsInSet(v);
+        setsByType.get(v).add(newSetExpr);
       }
     }
   }
