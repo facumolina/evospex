@@ -74,7 +74,7 @@ public class EvoSpexParameters {
     mcaReward = true;
 
     // Chromosomes related parameters
-    amountOfGenes = 100;
+    amountOfGenes = 20;
     examplesConsideredForInitialChromosomesGeneration = 4;
     initialChromosomesUnary = true;
     buildBigAndChromosome = false;
