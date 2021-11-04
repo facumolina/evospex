@@ -209,8 +209,7 @@ public class ChromosomeGenesFactory {
           int argPos = 0;
           for (Object arg : argsExamples) {
             String argLabel = ExprName.getArgLabel(argPos);
-            genes.addAll(createGenesFromArgValue(arg, argLabel, evaluableSimpleClosuredExpressions,
-                    evaluableDoubleClosuredExpressions));
+            genes.addAll(createGenesFromArgValue(arg, argLabel));
             argPos++;
           }
         }
@@ -363,33 +362,23 @@ public class ChromosomeGenesFactory {
    * Create a set of genes using from a method's argument value
    * @param argValue is a possible value for the argument
    * @param argLabel is a label identifying the argument
-   * @param simpleClosuredExprs are the current simple closured expressions
-   * @param doubleClosuredExprs are the current double closured expressions
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesFromArgValue(Object argValue, String argLabel, List<Expr> simpleClosuredExprs,
-                                            List<Expr> doubleClosuredExprs) throws InvalidConfigurationException {
+  public List<Gene> createGenesFromArgValue(Object argValue, String argLabel) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
-    if (argValue instanceof Integer) {
-      // The value is an instance of an integer, thus for the argument argLabel we can create genes with expressions such as:
-      // argLabel = e where e is an integer expression.
+    if (argValue != null) {
       // argLabel = #(e) where e is a closured expression
-      targetInfo.addVariableForType(Integer.class, argLabel);
-      Expr argExpr = ExprBuilder.toExpr(argLabel, Integer.class);
-      for (Expr expr : targetInfo.getIntEvaluableExpressions()) {
-        ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.INT_COMPARISON);
-        genes.add(new ExprGene(conf, newValue, targetInfo));
-      }
-
-      // Create more genes using the argument expression and the closured expressions
-      genes.addAll(createGenesFromIntArgumentAndClosuredExpressions(argExpr, simpleClosuredExprs));
-      genes.addAll(createGenesFromIntArgumentAndClosuredExpressions(argExpr, doubleClosuredExprs));
-
-      // Create more genes using the argument expression and collections
-      genes.addAll(addAssertionsConsideringCollections(argLabel, argExpr));
-    } else {
-      // Get the evaluable expressions of the current class
-      if (argValue != null) {
+      Expr argExpr = ExprBuilder.toExpr(argLabel, argValue.getClass());
+      targetInfo.addVariableForType(argValue.getClass(), argLabel);
+      if (argValue instanceof Integer) {
+        // The value is an instance of an integer, thus for the argument argLabel we can create genes with expressions such as:
+        // argLabel = e where e is an integer expression.
+        for (Expr expr : targetInfo.getIntEvaluableExpressions()) {
+          ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.INT_COMPARISON);
+          genes.add(new ExprGene(conf, newValue, targetInfo));
+        }
+      } else {
+        // The value is a reference
         List<Expr> evaluable = targetInfo.getEvaluableExpressionsOfType(argValue.getClass());
         for (Expr expr : evaluable) {
           Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(argLabel,argValue.getClass()), expr);
@@ -398,6 +387,14 @@ public class ChromosomeGenesFactory {
           genes.add(new ExprGene(conf, newValue, targetInfo));
         }
       }
+
+      // Create more genes using the argument expression and the closured expressions
+      genes.addAll(createGenesFromArgumentAndSets(argExpr));
+
+      // Create more genes using the argument expression and collections
+      genes.addAll(addAssertionsConsideringCollections(argLabel, argExpr));
+    } else {
+      throw new UnsupportedOperationException("Decide what to do when arg is null");
     }
     return genes;
   }
@@ -420,34 +417,25 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Create genes for an int argument and the given list of closured expressions.
-   * For each closured expression cl, a gene with the following expression will be created
-   * for each expression e that can be joined to the closured one:
-   * - argExpr in cl.e
+   * Create genes from arguments and sets.
+   * For each set expression s containing elems of the same type as the argument, a gene with
+   * the following expression will be created:
+   * - argExpr in s
    * @param argExpr is the argument expression
-   * @param closuredExpressions is the list of closured expressions
+   * @return a list of genes combining the given argument with sets of the same type
    */
-  private List<Gene> createGenesFromIntArgumentAndClosuredExpressions(Expr argExpr, List<Expr> closuredExpressions) {
+  private List<Gene> createGenesFromArgumentAndSets(Expr argExpr) {
     List<Gene> genes = new LinkedList<>();
-    closuredExpressions.forEach(closuredExpr -> {
-      if (!closuredExpr.isPreState() || parameters.learnPre()) {
-        Set<Expr> joineableExpressions = targetInfo.getJoineableExpressionsOfCurrentType(closuredExpr.classOfElemsInSet());
-        // For each joineable expr generate the quantified expressions
-        for (Expr joineableExpr : joineableExpressions) {
-          if (joineableExpr.type().equals(Integer.class)) {
-            if (parameters.getConsiderIntEvaluations()) {
-              // Join the expression with the set
-              // argExpr in set.joinExpr
-              try {
-                Expr setJoinExpr = ExprBuilder.join(closuredExpr, joineableExpr);
-                Expr inExpr = ExprBuilder.in(argExpr, setJoinExpr);
-                ExprGeneValue geneValue = new ExprGeneValue(inExpr, ExprGeneType.INCLUSION);
-                genes.add(new ExprGene(conf, geneValue, targetInfo));
-              } catch (InvalidConfigurationException e) {
-                throw new IllegalStateException("Invalid config exception when adding considering expr: " + joineableExpr);
-              }
-            }
-          }
+    List<Expr> setsOfType = TargetInformation.getSetsOfType(argExpr.type());
+    setsOfType.forEach(set -> {
+      if (!set.isPreState() || parameters.learnPre()) {
+        try {
+          Expr inExpr = ExprBuilder.in(argExpr, set);
+          inExpr.setClassOfElemsInSet(set.classOfElemsInSet());
+          ExprGeneValue geneValue = new ExprGeneValue(inExpr, ExprGeneType.INCLUSION);
+          genes.add(new ExprGene(conf, geneValue, targetInfo));
+        } catch (InvalidConfigurationException e) {
+          throw new IllegalStateException("Invalid config exception when adding considering expr: " + set);
         }
       }
     });
