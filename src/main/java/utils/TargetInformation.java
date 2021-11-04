@@ -347,7 +347,11 @@ public class TargetInformation {
    * Returns the expressions denoting sets of the given type
    */
   public static List<Expr> getSetsOfType(Class<?> type) {
-    return setsByType.get(type);
+    List<Expr> sets = new LinkedList<>(setsByType.get(type));
+    // Additionally, sets of objects should be returned, since they are possible sets for any given type
+    if (setsByType.containsKey(Object.class))
+      sets.addAll(setsByType.get(Object.class));
+    return sets;
   }
 
   /**
@@ -454,6 +458,14 @@ public class TargetInformation {
    * Return vars of a given type name
    */
   public Set<String> getVariablesOfType(Class<?> cl) {
+    if (Object.class.equals(cl)) {
+      // The given class is object, so return all variables
+      Set<String> vars = new HashSet<>();
+      for (Class<?> t : methodVarsByType.keySet()) {
+        vars.addAll(methodVarsByType.get(t));
+      }
+      return vars;
+    }
     return methodVarsByType.get(cl);
   }
 
