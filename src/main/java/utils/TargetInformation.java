@@ -272,24 +272,6 @@ public class TargetInformation {
   }
 
   /**
-   * Returns true if the current vertex generates an expression than can be closure
-   * @param vertex
-   * @return
-   */
-  private boolean isClosure(String vertex) {
-    Set<DefaultEdge> outgoingEdges = structureGraph.outgoingEdgesOf(vertex);
-    for (DefaultEdge edge : outgoingEdges) {
-      // For each adjacent vertex create an expression, join it with the current expression
-      // and try to add it to the expression list
-      String targetVertex = structureGraph.getEdgeTarget(edge);
-      if (vertex.equals(targetVertex)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Calculates all the possible comparisons between expressions (only those expressions which types
    * are not disjoint)
    */
@@ -309,16 +291,6 @@ public class TargetInformation {
   public int calculateAmountCardinalityExpressions() {
     return joinedExpressionsOfTypeInt.size()
         * (simpleClosuredExpressions.size() + doubleClosuredExpressions.size());
-  }
-
-  /**
-   * Returns true if the given expression has a closured subexpression
-   * 
-   * @param evaluableExpr
-   * @return
-   */
-  public boolean hasClosuredExpr(Expr evaluableExpr) {
-    throw new UnsupportedOperationException("Implement this");
   }
 
   /**
@@ -385,13 +357,6 @@ public class TargetInformation {
   }
 
   /**
-   * Counts the amount of times that the expression appears in the currentExpr
-   */
-  public int getTotalOcurrences(String expression, Expr expr) {
-    throw new UnsupportedOperationException("implement this");
-  }
-
-  /**
    * Returns all the expression that can be joined with an expression of the given type. That is
    * expressions of the form: type -> AnotherType
    */
@@ -427,13 +392,6 @@ public class TargetInformation {
       return new LinkedList<>();
     }
 
-  }
-
-  /**
-   * Returns some possible value for the given type
-   */
-  public static Expr getUnarySigForType(Class<?> cl) {
-    throw new UnsupportedOperationException("Implement this");
   }
 
   /**
@@ -483,10 +441,11 @@ public class TargetInformation {
   }
 
   /**
-   * Get var type
+   * Returns a random value for the given class
    */
-  public Class<?> getVarType(String varName) {
-    return methodVarsType.get(varName);
+  public static Object randomValueForType(Class<?> cl) {
+    if (cl == null) throw new IllegalArgumentException();
+    throw new UnsupportedOperationException("Don't know how to do this");
   }
 
 }
