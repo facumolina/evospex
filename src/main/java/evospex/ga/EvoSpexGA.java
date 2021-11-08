@@ -17,7 +17,7 @@ import org.jgap.Genotype;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 
-import evospex.ga.chromosome.ChromosomeGenesFactory;
+import evospex.ga.chromosome.factory.GenesFactory;
 import evospex.ga.chromosome.ExprGene;
 import evospex.ga.chromosome.ExprGeneValueCloneHandler;
 import evospex.ga.chromosome.SpecChromosome;
@@ -49,7 +49,7 @@ public class EvoSpexGA {
   private TargetInformation targetInformation; // Contains information regarding the target and method
   private Class<?> targetClass; // Target class under analysis
   private EvoSpexParameters parameters; // Evolutionary process arguments
-  private ChromosomeGenesFactory cgfactory;
+  private GenesFactory cgfactory;
 
   /**
    * Constructor
@@ -185,7 +185,7 @@ public class EvoSpexGA {
     conf.setSampleChromosome(sampleChromosome);
     conf.setKeepPopulationSizeConstant(false);
     conf.setPreservFittestIndividual(true);
-    cgfactory = new ChromosomeGenesFactory(conf, runner, genes_num, targetInformation,
+    cgfactory = new GenesFactory(conf, runner, genes_num, targetInformation,
         parameters);
   }
 

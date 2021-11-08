@@ -1,5 +1,6 @@
 package evospex.ga.chromosome;
 
+import java.lang.annotation.Target;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -23,7 +24,7 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
-import rfm.dynalloy.Err;
+import utils.JavaClassesUtils;
 import utils.TargetInformation;
 
 /**
@@ -217,11 +218,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         applyForAllVarVarMutation();
         break;
       case FORALL_VAR_VALUE_VAR_VALUE:
-        try {
-          applyForAllVarValueVarValueMutation();
-        } catch (NullPointerException e) {
-          e.printStackTrace();
-        }
+        applyForAllVarValueVarValueMutation();
         break;
       case FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON:
         applyForAllVarValueVarValueIntComparisonMutation();
@@ -267,7 +264,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply some quantifier mutation
    */
-  private void applySomeQuantifierMutation() throws Err {
+  private void applySomeQuantifierMutation() {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -289,7 +286,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  private void applySomeVarVarMutation() throws Err {
+  private void applySomeVarVarMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
@@ -309,7 +306,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  private void applySomeVarSetMutation() throws Err {
+  private void applySomeVarSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
       throw new UnsupportedOperationException("implement this");
@@ -328,7 +325,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two sets
    */
-  private void applySomeSetSetMutation() throws Err {
+  private void applySomeSetSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.NEGATE_BODY:
@@ -400,19 +397,32 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  private void applyForAllMutation() throws Err {
+  private void applyForAllMutation() {
     String mutationToApply = getSomeApplicableMutation();
-    if (mutationToApply.equals(GASpecLearnerMutations.NEGATE_BODY)) {
+    Expr expr = value.getExpression();
+    Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
+    if (qt_expr == null)
+      throw new IllegalStateException("The current expression is not a quantified expression");
+    ExprContext body = qt_expr.expr();
+    Set_exprContext set =  qt_expr.set_expr();
+    if (GASpecLearnerMutations.NEGATE_BODY.equals(mutationToApply)) {
       // Create the for all expression with the negated body
-      throw new UnsupportedOperationException("implement this");
-    } else {
-      if (mutationToApply.equals(GASpecLearnerMutations.TO_SOME)) {
-        // Create a new expression with the some quantifier
-        throw new UnsupportedOperationException("implement this");
-      } else {
-        // Set the expression to true
-        throw new UnsupportedOperationException("implement this");
+      String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      if (body.unary_op()!=null && ExprOperator.NOT_1.equals(body.unary_op().getText())) {
+        // The body is already negated, so just remove the negation operation
+        newBodyStr = body.expr().get(0).getText();
       }
+      Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      value.setExpression(newExpr, false);
+    } else if (GASpecLearnerMutations.TO_SOME.equals(mutationToApply)) {
+      // Create a new expression with the some quantifier
+      // throw new UnsupportedOperationException("implement this");
+    } else if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
+      // Set the expression to true
+      value.setExpression(ExprBuilder.TRUE, false);
+      value.setGeneType(ExprGeneType.CONSTANT);
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
   }
 
@@ -485,18 +495,48 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation of two variables n.value=v0 OP n.g.value=v0
    */
-  private void applyForAllVarValueVarValueMutation() throws Err {
+  private void applyForAllVarValueVarValueMutation() {
     String mutationToApply = getSomeApplicableMutation();
-    switch (mutationToApply) {
-    case GASpecLearnerMutations.NEGATE_BODY:
+    Expr expr = value.getExpression();
+    Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
+    if (qt_expr == null)
+      throw new IllegalStateException("The current expression is not a quantified expression");
+    ExprContext body = qt_expr.expr();
+    Set_exprContext set =  qt_expr.set_expr();
+    if (GASpecLearnerMutations.NEGATE_BODY.equals(mutationToApply)) {
+      System.out.println("-------------");
+      System.out.println("Negating body");
+      System.out.println("Expr: "+expr);
+      // Create the for all expression with the negated body
+      String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
+      if (body.unary_op()!=null && ExprOperator.NOT_1.equals(body.unary_op().getText())) {
+        // The body is already negated, so just remove the negation operation
+        newBodyStr = body.expr().get(0).getText();
+      }
+      Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      System.out.println("Mutated: "+newExpr);
+      value.setExpression(newExpr, false);
+    } else if (GASpecLearnerMutations.REPLACE_VALUE.equals(mutationToApply)){
+      System.out.println("-------------");
+      System.out.println("Replace value");
+      System.out.println("Expr: "+expr);
+      if (body.binary_op()!=null) {
+        System.out.println("Body is binary");
+        ExprContext left = body.expr().get(0);
+        ExprContext left2 = left.expr().get(0);
+        System.out.println("Value type is unknown");
+        System.out.println("Elems in set: "+expr.classOfElemsInSet());
+        TargetInformation.randomValueForType(null);
+      } else {
+        System.out.println("Body is not binary");
+      }
       throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.REPLACE_VALUE:
+    } else if (GASpecLearnerMutations.NEGATE_RIGHT_EQUALITY.equals(mutationToApply)) {
       throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.NEGATE_RIGHT_EQUALITY:
+    } else if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
       throw new UnsupportedOperationException("implement this");
-    case GASpecLearnerMutations.TO_TRUE:
-      // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
 
   }
@@ -505,7 +545,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation of two variables values of int type op [n.value,n.g.value]
    */
-  private void applyForAllVarValueVarValueIntComparisonMutation() throws Err {
+  private void applyForAllVarValueVarValueIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.OP_NOT_EQ:
@@ -534,7 +574,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation like op[n.value,n.f.value] AND op[n.value,n.g.value]
    */
-  private void applyForAllVarValuesDoubleIntComparisonMutation() throws Err {
+  private void applyForAllVarValuesDoubleIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case GASpecLearnerMutations.OP_NOT_EQ:
@@ -561,7 +601,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  private void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() throws Err {
+  private void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (GASpecLearnerMutations.TO_TRUE.equals(mutationToApply)) {
       throw new UnsupportedOperationException("implement this");
@@ -572,7 +612,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about a variable and a set
    */
-  private void applyForAllVarSetMutation() throws Err {
+  private void applyForAllVarSetMutation() {
     Expr expr = value.getExpression();
     String mutationToApply = getSomeApplicableMutation();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -609,7 +649,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two sets
    */
-  private void applyForAllSetSetMutation() throws Err {
+  private void applyForAllSetSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -708,10 +748,9 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   /**
    * Apply mutation when the gene expression is an int comparison ( int [=,<>,<,>,<=,>=] int)
-   * 
-   * @throws Err
+   *
    */
-  private void applyIntComparisonMutation() throws Err {
+  private void applyIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Expr newExpr;
@@ -841,7 +880,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is cardinality
    */
-  private void applyCardinalityMutation() throws Err {
+  private void applyCardinalityMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     // Check the expression is adequate
