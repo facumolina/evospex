@@ -13,7 +13,6 @@ import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.ExprGene;
 import evospex.ga.chromosome.ExprGeneValue;
 import evospex.ga.chromosome.SpecChromosome;
-import org.apache.commons.jexl3.JexlEngine;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -45,8 +44,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
 
   EvoSpexParameters params;
 
-  // Create or retrieve an engine
-  JexlEngine jexl;
   private HashMap<String, FitnessValue> calculatedFitness;
 
   /**
