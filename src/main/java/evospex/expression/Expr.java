@@ -71,24 +71,39 @@ public class Expr {
   public String toString() {
     String str =  exprContext.getText();
 
-    if (str.startsWith(ExprOperator.ALL + ExprName.QT_VAR + ":")) {
-      str = str.replace(ExprOperator.ALL + ExprName.QT_VAR + ":",ExprOperator.ALL + " " + ExprName.QT_VAR + ":");
-    } else if (str.startsWith(ExprOperator.SOME + ExprName.QT_VAR + ":")) {
-      str = str.replace(ExprOperator.SOME + ExprName.QT_VAR + ":",ExprOperator.SOME + " " + ExprName.QT_VAR + ":");
+    ExprGrammarParser.Qt_exprContext qt_expr_ctx = exprContext.qt_expr();
+    if (qt_expr_ctx != null) {
+      if (str.startsWith(ExprOperator.ALL + ExprName.QT_VAR + ":")) {
+        str = str.replace(ExprOperator.ALL + ExprName.QT_VAR + ":", ExprOperator.ALL + " " + ExprName.QT_VAR + ":");
+      } else if (str.startsWith(ExprOperator.SOME + ExprName.QT_VAR + ":")) {
+        str = str.replace(ExprOperator.SOME + ExprName.QT_VAR + ":", ExprOperator.SOME + " " + ExprName.QT_VAR + ":");
+      }
+      ExprContext body = qt_expr_ctx.expr();
+      if (body.getText().contains(ExprOperator.IMPLIES_1)) {
+        str = str.replace(ExprOperator.IMPLIES_1, " " + ExprOperator.IMPLIES_1 + " ");
+      }
     }
+
     if (str.contains(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR))
       str = str.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR, ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
 
     ExprGrammarParser.Compare_opContext cmp_op = exprContext.compare_op();
     if (cmp_op != null && ExprOperator.IN.equals(cmp_op.getText())) {
-      // The operator is in, so make this string more clear
+      // The operator is in
       List<ExprContext> exprs = exprContext.expr();
       str = exprs.get(0).getText() + " " + ExprOperator.IN + " " + exprs.get(1).getText();
     }
     if (cmp_op != null && ExprOperator.NOT_IN.equals(cmp_op.getText())) {
-      // The operator is not in, so make this string more clear
+      // The operator is not in
       List<ExprContext> exprs = exprContext.expr();
       str = exprs.get(0).getText() + " " + ExprOperator.NOT_IN + " " + exprs.get(1).getText();
+    }
+
+    ExprGrammarParser.Binary_opContext bin_op = exprContext.binary_op();
+    if (bin_op != null && ExprOperator.IMPLIES_1.equals(bin_op.getText())) {
+      // The operator is implies
+      List<ExprContext> exprs = exprContext.expr();
+      str = exprs.get(0).getText() + " " + ExprOperator.IMPLIES_1 + " " + exprs.get(1).getText();
     }
     return str;
   }

@@ -104,8 +104,7 @@ public class ChromosomeGenesFactory {
    * @return a list of individuals computed from the given arguments
    */
   public List<SpecChromosome> generateChromosomesFromObject(Object o, boolean isPositive,
-      Object resultExample, List<Object> argsExamples, boolean addComplex)
-      throws InvalidConfigurationException, Err {
+      Object resultExample, List<Object> argsExamples, boolean addComplex) throws InvalidConfigurationException {
     List<SpecChromosome> chromosomes = new LinkedList<>();
     List<Gene> genes = createGenesFromObject(o, isPositive, resultExample, argsExamples,
         addComplex);
@@ -183,10 +182,9 @@ public class ChromosomeGenesFactory {
       }
 
       if (parameters.getConsiderJoinedExpressionsComparisons()) {
-        // Create the genes comparing joined expressions of the thiz object
+        // Create the genes comparing joined expressions of the this object
         genes.addAll(createsGenesComparingEvaluableExpressions());
-        // Create the genes comparing joined expressions of the thiz object with the thizPre object
-        // (if possible)
+        // Create the genes comparing joined expressions of the this object with the this_pre object (if possible)
         genes.addAll(createGenesComparingJoinedExpressionsDifferentObjects(evaluableJoinedExpressions));
       }
 
@@ -532,7 +530,7 @@ public class ChromosomeGenesFactory {
   }
 
   /**
-   * Creates genes comparing evalable expressions over thiz and thizPre
+   * Creates genes comparing evaluable expressions over thiz and thizPre
    *
    * @throws InvalidConfigurationException
    */
@@ -542,7 +540,7 @@ public class ChromosomeGenesFactory {
       Expr leftExpr = evaluableJoinedExpressions.get(j);
       for (int k = j + 1; k < evaluableJoinedExpressions.size(); k++) {
         Expr rightExpr = evaluableJoinedExpressions.get(k);
-        if (rightExpr.toString().contains("thizPre"))
+        if (rightExpr.toString().contains(ExprName.THIS_PRE))
           continue;
         if (leftExpr.type().equals(rightExpr)) {
           if (JavaClassesUtils.isNumber(leftExpr.type())) {
@@ -704,7 +702,7 @@ public class ChromosomeGenesFactory {
     List<Gene> genes = new LinkedList<>();
     for (int j = 0; j < doubleClosuredExpressions.size(); j++) {
       Expr evaluableExpr = doubleClosuredExpressions.get(j);
-      if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
+      if (evaluableExpr.toString().contains(ExprName.THIS_PRE) && !parameters.learnPre())
         continue;
 
       // Create genes with expressions which body is a predicate about shapes
@@ -727,44 +725,28 @@ public class ChromosomeGenesFactory {
 
   /**
    * Creates genes from double closured expressions for shape
-   * 
    * - all n: e.*(f+g) : n != null
-   * 
-   * - all n:e.*(f+g) : n.f != null
-   * 
+   * - all n: e.*(f+g) : n.f != null
    * - all n: e.*(f+g) : n.g != null
-   * 
    * - all n: e.*(f+g) : n != n.f
-   * 
    * - all n:e.*(f+g) : n != n.g
-   * 
    * - all n: e.*(f+g) : n.f != n.g
-   * 
    * - all n: e.*(f+g) : n in n.^f
-   * 
    * - all n: e.*(f+g) : n in n.^g
-   * 
    * - all n: e.*(f+g) : n in n.^(f+g)
-   * 
    * - all n: e.*(f+g) : n.f.*(f+g) in n.g.*(f+g)
    */
   public List<Gene> createsGenesFromDoubleClosuredExpressionsForShape(Expr doubleClosuredExpr)
-      throws InvalidConfigurationException, Err {
-    List<Gene> genes = new LinkedList<Gene>();
+      throws InvalidConfigurationException {
+    List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
 
-    // (all + some) n: e.*(f+g) : n != null
-    // geneValue = createsQtExpressionVarPredicate(correctedEvaluableExpr, "all");
-    // (all + some) n: e.*(f+g) : n.f != null
-    // (all + some) n: e.*(f+g) : n.g != null
-
     // (all + some) n: e.*(f+g) : n != n.f
-    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL,
-        1);
+    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
+
     // (all + some) n: e.*(f+g) : n != n.g
-    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL,
-        2);
+    geneValue = ChromosomeGenesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     /*
