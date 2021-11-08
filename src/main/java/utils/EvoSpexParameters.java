@@ -8,9 +8,9 @@ import com.thoughtworks.xstream.XStream;
 import evospex.target.MethodExecution;
 
 /**
- * This class contains parameters for the learning process
+ * This class contains parameters for the inference process.
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class EvoSpexParameters {
 

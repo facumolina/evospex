@@ -25,7 +25,7 @@ import utils.EvoSpexParameters;
 /**
  * Mutation operator
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class ExprGeneMutationOperator extends BaseGeneticOperator implements Configurable {
 
