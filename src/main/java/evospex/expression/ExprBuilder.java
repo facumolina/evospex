@@ -81,6 +81,16 @@ public class ExprBuilder {
   }
 
   /**
+   * Compare the two given expressions with the implies operator
+   * @param expr1 is the first expression
+   * @param expr2 is the second expression
+   * @return the expression expr1 != expr2
+   */
+  public static Expr implies(Expr expr1, Expr expr2) {
+    return toExpr(expr1.exprCtx().getText() + " " + ExprOperator.IMPLIES_1 + " " + expr2.exprCtx().getText(), Boolean.class);
+  }
+
+  /**
    * Apply the two given expressions with the given operator
    * @param expr1 is the first expression
    * @param expr2 is the second expression
@@ -147,7 +157,7 @@ public class ExprBuilder {
       throw new IllegalArgumentException("The closured expression is supposed to be double closured");
 
     // Build the quantified expression body depending on the provided code
-    String body = "";
+    String body;
     switch (code) {
       case 1:
         body = ExprName.QT_VAR + " " + ExprOperator.NOT_EQ + " " + ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID();
@@ -224,6 +234,47 @@ public class ExprBuilder {
             ExprDelimiter.LP + field_1.ID() + ExprOperator.PLUS + field_2.ID() + ExprDelimiter.RP;
 
     return toExpr(getDecl(operator, closuredExpr) + " : " + body_left + " " +  ExprOperator.NOT_EQ + " " + body_right, Boolean.class);
+  }
+
+  /**
+   * Given a closured expression e.*(f+g), an expression r, an expression e1 of the same type as r,
+   * and a quantification operator, creates a gene value with expression:
+   *
+   * - op n : e.*(f+g) | n.r = e1
+   */
+  public static Expr qtExprOneVarValueComparison(Expr closured, Expr joineable, Expr toCmp, String op) {
+    Expr joinField = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + joineable, joineable.type());
+    Expr cmp = eq(joinField, toCmp);
+    return toExpr(getDecl(op, closured) + " : " + cmp, Boolean.class);
+  }
+
+  /**
+   * Given a double closured expression e.*(f+g), an expression r and a quantification operator
+   * creates a gene value with expression:
+   *
+   * - op n : e.*(f+g) | (n.f!=null)=> n.r = n.f.r if code==1
+   * - op n : e.*(f+g) | (n.g!=null)=> n.r = n.g.r if code==2
+   */
+  public static Expr qtExprTwoVarValuesComparison(Expr closured, Expr joineable, String op, int code) {
+    // Get the set expression
+    Set_exprContext s = ExprUtils.getClosuredExprSet(closured);
+    Closure_fieldContext field_1 = s.closure_field();
+    Closure_fieldContext field_2 = field_1.closure_field();
+    if (field_2 == null)
+      throw new IllegalArgumentException("The closured expression is supposed to be double closured");
+
+    if (code == 1) {
+      // Prepare the body parts
+      Expr joinField = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + joineable, joineable.type());
+      Expr joinFieldAndExpr = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID() + ExprOperator.JOIN + joineable,  joineable.type());
+      Expr cmp = eq(joinField, joinFieldAndExpr);
+      // Create the quantified expression
+      String bodyStr = neq(joinField, ExprBuilder.NULL) + " " + ExprOperator.IMPLIES_1 + " " + cmp;
+      return toExpr(getDecl(op, closured) + " : " + bodyStr, Boolean.class);
+    } else if (code == 2) {
+      throw new UnsupportedOperationException("code not supported");
+    }
+    throw new UnsupportedOperationException("code not supported");
   }
 
   /**
