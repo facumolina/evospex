@@ -9,7 +9,7 @@ import rfm.dynalloyCompiler.ast.ExprBinary.Op;
  * 
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class GASpecLearnerMutations {
+public class ExprGeneMutations {
 
   // Common mutations
   public static final String TO_TRUE = "ToTrue";

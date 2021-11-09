@@ -3,7 +3,7 @@ package evospex.ga.chromosome;
 import java.util.LinkedList;
 import java.util.List;
 
-import evospex.ga.operator.GASpecLearnerMutations;
+import evospex.ga.operator.ExprGeneMutations;
 
 /**
  * This class represents the types of the gene's value depending which type of expression contains
@@ -23,89 +23,89 @@ public enum ExprGeneType {
 
     if (isPartSolution) {
       // When the gene is part of a solution then just consider the mutation true
-      applicableMutations.add(GASpecLearnerMutations.TO_TRUE);
+      applicableMutations.add(ExprGeneMutations.TO_TRUE);
       return applicableMutations;
     }
 
     boolean addTrueMutation = false;
     switch (this) {
     case CARDINALITY:
-      applicableMutations.add(GASpecLearnerMutations.ADD_ONE);
-      applicableMutations.add(GASpecLearnerMutations.SUB_ONE);
+      applicableMutations.add(ExprGeneMutations.ADD_ONE);
+      applicableMutations.add(ExprGeneMutations.SUB_ONE);
       addTrueMutation = true;
       break;
     case CONSTANT:
-      applicableMutations.add(GASpecLearnerMutations.PREVIOUS);
+      applicableMutations.add(ExprGeneMutations.PREVIOUS);
       addTrueMutation = true;
       break;
     case EMPTYNESS:
-      applicableMutations.add(GASpecLearnerMutations.SOME);
+      applicableMutations.add(ExprGeneMutations.SOME);
       addTrueMutation = true;
       break;
     case EQUALITY:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE);
+      applicableMutations.add(ExprGeneMutations.NEGATE);
       addTrueMutation = true;
       break;
     case INT_COMPARISON:
       // applicableMutations.add(GASpecLearnerMutations.NEGATE);
-      applicableMutations.add(GASpecLearnerMutations.ADD_ONE);
-      applicableMutations.add(GASpecLearnerMutations.SUB_ONE);
-      applicableMutations.add(GASpecLearnerMutations.ADD_EXPR);
-      applicableMutations.add(GASpecLearnerMutations.SUB_EXPR);
-      applicableMutations.add(GASpecLearnerMutations.REPLACE_RIGHT);
+      applicableMutations.add(ExprGeneMutations.ADD_ONE);
+      applicableMutations.add(ExprGeneMutations.SUB_ONE);
+      applicableMutations.add(ExprGeneMutations.ADD_EXPR);
+      applicableMutations.add(ExprGeneMutations.SUB_EXPR);
+      applicableMutations.add(ExprGeneMutations.REPLACE_RIGHT);
       // applicableMutations.add(GASpecLearnerMutations.EQ_SUB_ONE);
       // applicableMutations.add(GASpecLearnerMutations.OP_EQ);
       // applicableMutations.add(GASpecLearnerMutations.OP_LT);
       // applicableMutations.add(GASpecLearnerMutations.OP_LTE);
       // applicableMutations.add(GASpecLearnerMutations.OP_GT);
       // applicableMutations.add(GASpecLearnerMutations.OP_GTE);
-      applicableMutations.add(GASpecLearnerMutations.REPLACE_OP);
+      applicableMutations.add(ExprGeneMutations.REPLACE_OP);
       addTrueMutation = true;
       break;
     case INCLUSION:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE);
-      applicableMutations.add(GASpecLearnerMutations.REPLACE_INCLUDED);
+      applicableMutations.add(ExprGeneMutations.NEGATE);
+      applicableMutations.add(ExprGeneMutations.REPLACE_INCLUDED);
       // if (ContextInformation.hasCollections()) {
-      applicableMutations.add(GASpecLearnerMutations.REPLACE_SET);
+      applicableMutations.add(ExprGeneMutations.REPLACE_SET);
       // }
       addTrueMutation = true;
       break;
     case FORALL:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.TO_SOME);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.TO_SOME);
       addTrueMutation = true;
       break;
     case FORALL_VAR_VALUE:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
       // applicableMutations.add(DynAlloySpecLearnerMutations.TO_SOME);
       addTrueMutation = true;
       break;
     case FORALL_VAR_VAR:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.JOIN_COMPATIBLE_EXPR);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.JOIN_COMPATIBLE_EXPR);
       addTrueMutation = true;
       break;
     case FORALL_VAR_VALUE_VAR_VALUE:
       // applicableMutations.add(DynAlloySpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.REPLACE_VALUE);
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_RIGHT_EQUALITY);
+      applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
+      applicableMutations.add(ExprGeneMutations.NEGATE_RIGHT_EQUALITY);
       addTrueMutation = true;
       break;
     case FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON:
-      applicableMutations.add(GASpecLearnerMutations.OP_NOT_EQ);
-      applicableMutations.add(GASpecLearnerMutations.OP_LTE);
-      applicableMutations.add(GASpecLearnerMutations.OP_LT);
-      applicableMutations.add(GASpecLearnerMutations.OP_GTE);
-      applicableMutations.add(GASpecLearnerMutations.OP_GT);
+      applicableMutations.add(ExprGeneMutations.OP_NOT_EQ);
+      applicableMutations.add(ExprGeneMutations.OP_LTE);
+      applicableMutations.add(ExprGeneMutations.OP_LT);
+      applicableMutations.add(ExprGeneMutations.OP_GTE);
+      applicableMutations.add(ExprGeneMutations.OP_GT);
       // applicableMutations.add(GASpecLearnerMutations.CHANGE_IMPLIES);
       addTrueMutation = true;
       break;
     case FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON:
-      applicableMutations.add(GASpecLearnerMutations.OP_NOT_EQ);
-      applicableMutations.add(GASpecLearnerMutations.OP_LTE);
-      applicableMutations.add(GASpecLearnerMutations.OP_LT);
-      applicableMutations.add(GASpecLearnerMutations.OP_GTE);
-      applicableMutations.add(GASpecLearnerMutations.OP_GT);
+      applicableMutations.add(ExprGeneMutations.OP_NOT_EQ);
+      applicableMutations.add(ExprGeneMutations.OP_LTE);
+      applicableMutations.add(ExprGeneMutations.OP_LT);
+      applicableMutations.add(ExprGeneMutations.OP_GTE);
+      applicableMutations.add(ExprGeneMutations.OP_GT);
       // applicableMutations.add(GASpecLearnerMutations.CHANGE_IMPLIES);
       addTrueMutation = true;
       break;
@@ -113,52 +113,52 @@ public enum ExprGeneType {
       addTrueMutation = true;
       break;
     case FORALL_VAR_SET:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
       addTrueMutation = true;
       break;
     case FORALL_SET_SET:
-      applicableMutations.add(GASpecLearnerMutations.INTERSECTION_NULL);
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.INTERSECTION_NULL);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
       addTrueMutation = true;
       break;
     case NEGATION:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE);
+      applicableMutations.add(ExprGeneMutations.NEGATE);
       addTrueMutation = true;
       break;
     case NO:
-      applicableMutations.add(GASpecLearnerMutations.TO_SOME);
+      applicableMutations.add(ExprGeneMutations.TO_SOME);
       addTrueMutation = true;
       break;
     case SOME:
-      applicableMutations.add(GASpecLearnerMutations.EMPTYNESS);
+      applicableMutations.add(ExprGeneMutations.EMPTYNESS);
       addTrueMutation = true;
       break;
     case SOMEQT:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.TO_ALL);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.TO_ALL);
       addTrueMutation = true;
       break;
     case SOME_VAR_VAR:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.TO_ALL);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.TO_ALL);
       addTrueMutation = true;
       break;
     case SOME_VAR_SET:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.TO_ALL);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.TO_ALL);
       addTrueMutation = true;
       break;
     case SOME_SET_SET:
-      applicableMutations.add(GASpecLearnerMutations.NEGATE_BODY);
-      applicableMutations.add(GASpecLearnerMutations.INTERSECTION_NULL);
-      applicableMutations.add(GASpecLearnerMutations.TO_ALL);
+      applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+      applicableMutations.add(ExprGeneMutations.INTERSECTION_NULL);
+      applicableMutations.add(ExprGeneMutations.TO_ALL);
       addTrueMutation = true;
       break;
     default:
       return applicableMutations;
     }
     if (addTrueMutation && amountOfGenes > 1)
-      applicableMutations.add(GASpecLearnerMutations.TO_TRUE);
+      applicableMutations.add(ExprGeneMutations.TO_TRUE);
 
     return applicableMutations;
   }
