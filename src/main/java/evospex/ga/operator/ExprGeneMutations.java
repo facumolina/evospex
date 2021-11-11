@@ -1,8 +1,8 @@
 package evospex.ga.operator;
 
-import java.util.Random;
+import evospex.expression.symbol.ExprOperator;
 
-import rfm.dynalloyCompiler.ast.ExprBinary.Op;
+import java.util.Random;
 
 /**
  * This class contains all the possible mutations identifiers
@@ -25,7 +25,7 @@ public class ExprGeneMutations {
   public static final String REPLACE_RIGHT = "ReplaceRight";
   public static final String EQ_SUB_ONE = "EqSubOne";
   public static final String REPLACE_OP = "ReplaceOp";
-  public static final Op[] BIN_OPERATORS = { Op.EQUALS, Op.GT, Op.GTE, Op.LT, Op.LTE };
+  public static final String[] BIN_OPERATORS = {ExprOperator.EQ, ExprOperator.GT, ExprOperator.GTE, ExprOperator.LT, ExprOperator.LTE };
 
   // Inclusion expression mutations
   public static final String REPLACE_INCLUDED = "ReplaceIncluded";
@@ -61,7 +61,7 @@ public class ExprGeneMutations {
 
   public static final String CHANGE_IMPLIES = "ChangeImpliesValue";
 
-  public static Op getRandomBinaryOperator() {
+  public static String getRandomBinaryOperator() {
     Random r = new Random();
     return BIN_OPERATORS[r.nextInt(BIN_OPERATORS.length)];
   }

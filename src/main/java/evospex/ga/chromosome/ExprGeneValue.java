@@ -152,7 +152,7 @@ public class ExprGeneValue {
     switch (geneType) {
     case EQUALITY:
       return 1;
-    case INT_COMPARISON:
+    case NUMERIC_COMPARISON:
       // TODO re implement this as originally
       return 1;
     case EMPTYNESS:
@@ -177,8 +177,6 @@ public class ExprGeneValue {
       return 3;
     case FORALL_VAR_VALUE_VAR_VALUE:
       return 3.2;
-    case FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON:
-      return 3.4;
     case FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON:
       return 3.6;
     case FORALL_VAR_VALUES_DOUBLE_QT_INT_COMPARISON:

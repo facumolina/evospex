@@ -16,6 +16,7 @@ import evospex.expression.ExprGrammarParser.Set_exprContext;
 import evospex.expression.symbol.ExprDelimiter;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
+import evospex.ga.operator.ExprGeneMutationHelper;
 import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.BaseGene;
 import org.jgap.Configuration;
@@ -34,7 +35,7 @@ import utils.TargetInformation;
 public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   private ExprGeneValue value;
-  private TargetInformation contextInfo;
+  private TargetInformation targetInfo;
   private int amountOfGenesInChromosome = 0;
   private boolean isPartOfSolution;
 
@@ -47,7 +48,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   public ExprGene(Configuration a_conf, TargetInformation info) throws InvalidConfigurationException {
     super(a_conf);
     this.value = new ExprGeneValue();
-    this.contextInfo = info;
+    this.targetInfo = info;
     isPartOfSolution = false;
   }
 
@@ -62,7 +63,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throws InvalidConfigurationException {
     super(a_conf);
     this.value = value;
-    this.contextInfo = info;
+    this.targetInfo = info;
     isPartOfSolution = false;
   }
 
@@ -70,7 +71,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Get the target information
    */
   public TargetInformation getTargetInformation() {
-    return contextInfo;
+    return targetInfo;
   }
 
   /**
@@ -104,7 +105,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   @Override
   protected Gene newGeneInternal() {
     try {
-      return new ExprGene(getConfiguration(), this.value.clone(), this.contextInfo);
+      return new ExprGene(getConfiguration(), this.value.clone(), this.targetInfo);
     } catch (InvalidConfigurationException ex) {
       throw new IllegalStateException(ex.getMessage());
     }
@@ -197,7 +198,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       case EQUALITY:
         applyEqualityMutation();
         break;
-      case INT_COMPARISON:
+      case NUMERIC_COMPARISON:
         applyIntComparisonMutation();
         break;
       case NEGATION:
@@ -217,9 +218,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         break;
       case FORALL_VAR_VALUE_VAR_VALUE:
         applyForAllVarValueVarValueMutation();
-        break;
-      case FORALL_VAR_VALUE_VAR_VALUE_INT_COMPARISON:
-        applyForAllVarValueVarValueIntComparisonMutation();
         break;
       case FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON:
         applyForAllVarValuesDoubleIntComparisonMutation();
@@ -338,8 +336,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      ExprGeneMutationHelper.toTrue(value);
+      break;
     default:
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -417,8 +417,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       // throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
       // Set the expression to true
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -457,7 +456,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         op = e.compare_op(); // The op now is the op that is in the
         ExprContext leftExpr = e.expr(0);
         ExprContext rightExpr = e.expr(1);
-        List<Expr> joineableExprs = contextInfo.getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
+        List<Expr> joineableExprs = targetInfo.getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
         if (joineableExprs.size() > 0) {
           Expr joineableExpr = joineableExprs.get(0);
           String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
@@ -468,7 +467,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       } else {
         ExprContext leftExpr = expressions.get(0);
         ExprContext rightExpr = expressions.get(1);
-        List<Expr> joineableExprs = contextInfo
+        List<Expr> joineableExprs = targetInfo
                 .getJoineableExpressionsOfCurrentTypeMaintainigReturnType(rightExpr);
         if (joineableExprs.size() > 0) {
           Expr joineableExpr = joineableExprs.get(0);
@@ -482,8 +481,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
       // Set the expression to true
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -519,51 +517,74 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       System.out.println("Replace value");
       System.out.println("Expr: "+expr);
       if (body.binary_op()!=null) {
-        System.out.println("Body is binary");
         ExprContext left = body.expr().get(0);
-        ExprContext left2 = left.expr().get(0);
-        System.out.println("Value type is unknown");
-        System.out.println("Elems in set: "+expr.classOfElemsInSet());
-        TargetInformation.randomValueForType(null);
+        ExprContext right = body.expr().get(1);
+
+        System.out.println("Class of values: "+expr.classOfValues());
+        Object randomValue = targetInfo.randomValueForType(expr.classOfValues());
+        String newBodyStr;
+        if ((new Random()).nextBoolean()) {
+          // Use the value on the left of the body
+          if (left.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
+          ExprContext left2 = left.expr().get(0);
+          Expr newLeft = ExprBuilder.toExpr(left2.getText() + " " + left.compare_op().getText() + " " + randomValue, Boolean.class);
+           newBodyStr = newLeft + " " + body.binary_op().getText() + " " + right.getText();
+        } else {
+          // Use the value on the right of the body
+          if (right.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
+          ExprContext left2 = right.expr().get(0);
+          Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + right.compare_op().getText() + " " + randomValue, Boolean.class);
+          newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+        }
+        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        System.out.println("Mutated: "+newExpr);
+        value.setExpression(newExpr, false);
       } else {
-        System.out.println("Body is not binary");
+        throw new IllegalStateException("Can't perform REPLACE_VALUE mutation on expression: "+expr);
       }
-      throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.NEGATE_RIGHT_EQUALITY.equals(mutationToApply)) {
-      throw new UnsupportedOperationException("implement this");
+      System.out.println("-------------");
+      System.out.println("NEGATE_RIGHT_EQUALITY");
+      System.out.println("Expr: "+expr);
+      if (body.binary_op()!=null) {
+        ExprContext left = body.expr().get(0);
+        ExprContext right = body.expr().get(1);
+        // Create the for all expression with the negated body
+        String newRightStr = ExprOperator.NOT_1 + ExprDelimiter.LP + right.getText() + ExprDelimiter.RP;
+        if (right.unary_op()!=null && ExprOperator.NOT_1.equals(right.unary_op().getText())) {
+          // The body is already negated, so just remove the negation operation
+          newRightStr = right.expr().get(0).getText();
+        }
+        String newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRightStr;
+        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        System.out.println("Mutated: "+newExpr);
+        value.setExpression(newExpr, false);
+      } else {
+        throw new IllegalStateException("Can't perform NEGATE_RIGHT_EQUALITY mutation on expression: "+expr);
+      }
+    } else if (ExprGeneMutations.REPLACE_OP.equals(mutationToApply)) {
+      System.out.println("-------------");
+      System.out.println("REPLACE_OP");
+      System.out.println("Expr: "+expr);
+      if (body.binary_op()!=null) {
+        ExprContext left = body.expr().get(0);
+        ExprContext right = body.expr().get(1);
+        if (right.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_OP mutation on expression "+expr);
+        ExprContext left2 = right.expr().get(0);
+        ExprContext right2 = right.expr().get(1);
+        String newOp = ExprGeneMutations.getRandomBinaryOperator();
+        Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + newOp + " " + right2.getText(), Boolean.class);
+        String newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        System.out.println("Mutated: "+newExpr);
+        value.setExpression(newExpr, false);
+      } else {
+        throw new IllegalStateException("Can't perform REPLACE_OP mutation on expression: "+expr);
+      }
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      throw new UnsupportedOperationException("implement this");
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
-    }
-
-  }
-
-  /**
-   * Apply mutation when the gene expression is a quantification with the operator all and the body
-   * is a predicate about some relation of two variables values of int type op [n.value,n.g.value]
-   */
-  private void applyForAllVarValueVarValueIntComparisonMutation() {
-    String mutationToApply = getSomeApplicableMutation();
-    switch (mutationToApply) {
-    case ExprGeneMutations.OP_NOT_EQ:
-      // Change the operator to !=
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_LT:
-      // Change the operator to <
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_LTE:
-      // Change the operator to <=
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_GT:
-      // Change the operator to >
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_GTE:
-      // Change the operator to >=
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.CHANGE_IMPLIES:
-      // Change implies equality
-      throw new UnsupportedOperationException("implement this");
     }
 
   }
@@ -602,7 +623,9 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   private void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      throw new UnsupportedOperationException("implement this");
+      ExprGeneMutationHelper.toTrue(value);
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
   }
 
@@ -635,8 +658,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)) {
       // Set the expression to true
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("implement this");
     }
@@ -663,8 +685,10 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      ExprGeneMutationHelper.toTrue(value);
+      break;
     default:
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -688,7 +712,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
     } else if (ExprGeneMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
-      Set<String> sameTypeVars = contextInfo.getVariablesOfType(expr.classOfElemsInSet());
+      Set<String> sameTypeVars = targetInfo.getVariablesOfType(expr.classOfElemsInSet());
       Random random = new Random();
       int randomNumber = random.nextInt(sameTypeVars.size());
       String newVarName = (String) sameTypeVars.toArray()[randomNumber];
@@ -697,7 +721,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.INCLUSION);
     } else if (ExprGeneMutations.REPLACE_SET.equals(mutationToApply)) {
-      List<Expr> possibleCollections = TargetInformation.getSetsOfType(expr.classOfElemsInSet());
+      List<Expr> possibleCollections = targetInfo.getSetsOfType(expr.classOfElemsInSet());
       if (possibleCollections.size() > 0) {
         Random r = new Random();
         int rN = r.nextInt(possibleCollections.size());
@@ -708,8 +732,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         value.setGeneType(ExprGeneType.INCLUSION);
       }
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
     }
@@ -737,8 +760,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       Expr mutatedExpr = ExprBuilder.toExpr(left.getText() + " " + new_op + " " + right.getText(), Boolean.class);
       value.setExpression(mutatedExpr, false);
     } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)){
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
     }
@@ -762,49 +784,49 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     case ExprGeneMutations.NEGATE:
       newExpr = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + expr.exprCtx().getText() + ExprDelimiter.RP, Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.ADD_ONE:
       // Add one at the right expression
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.PLUS + " " + ExprBuilder.ONE, Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.SUB_ONE:
       // Subtract one at the right expression
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.MINUS + " " + ExprBuilder.ONE, Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
     case ExprGeneMutations.ADD_EXPR:
       // Add a random integer expression to the right expression
-      Expr exprToAdd = contextInfo.getRandomIntExpr();
+      Expr exprToAdd = targetInfo.getRandomIntExpr();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.PLUS + " " + exprToAdd.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.SUB_EXPR:
       // Subtract a random integer expression to the right expression
-      Expr exprToSub = contextInfo.getRandomIntExpr();
+      Expr exprToSub = targetInfo.getRandomIntExpr();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.MINUS + " " + exprToSub.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.REPLACE_RIGHT:
       // Replace the right expression
-      Expr replacementExpr = contextInfo.getRandomIntExpr();
+      Expr replacementExpr = targetInfo.getRandomIntExpr();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + replacementExpr.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.REPLACE_OP:
       String newOp = ExprOperator.getRandomNumericCmpOp();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
       value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INT_COMPARISON);
+      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
       break;
     case ExprGeneMutations.EQ_SUB_ONE:
       // Create eq expression and subtract one at the right expression
@@ -826,8 +848,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
       break;
     default:
       throw new IllegalStateException("Mutation " + mutationToApply + " not implemented!");
@@ -838,14 +859,13 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Gets randomly an applicable mutation for the current gene type
    */
   private String getSomeApplicableMutation() {
-    List<String> mutations = value.getGeneType().getApplicableMutations(amountOfGenesInChromosome,
-        isPartOfSolution);
+    List<String> mutations = ExprGeneMutationHelper.getApplicableMutations(this);
     if (mutations.size() > 0) {
       Random random = new Random();
       int randomNumber = random.nextInt(mutations.size());
       return mutations.get(randomNumber);
     }
-    return "";
+    throw new IllegalStateException("Can't find mutations for gene: "+this);
   }
 
   /**
@@ -906,8 +926,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       value.setExpression(newExpr, false);
     } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)){
       // Set the expression to true
-      value.setExpression(ExprBuilder.TRUE, false);
-      value.setGeneType(ExprGeneType.CONSTANT);
+      ExprGeneMutationHelper.toTrue(value);
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -949,7 +968,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   public ExprGene clone() {
     try {
-      return new ExprGene(getConfiguration(), this.value.clone(), this.contextInfo);
+      return new ExprGene(getConfiguration(), this.value.clone(), this.targetInfo);
     } catch (InvalidConfigurationException ex) {
       throw new IllegalStateException(ex.getMessage());
     }

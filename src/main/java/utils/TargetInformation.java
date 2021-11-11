@@ -23,21 +23,25 @@ public class TargetInformation {
   private TypeGraph typeGraph; // Current cut type graph
   private DirectedGraph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
 
-  private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains expressions grouped by its evaluation results.
+
   private final int scope; // Scope (defined in the alloy file)
 
   // Structures handling expressions extracted by traversing the type graph
   private List<Expr> joinedExpressions; // Contains expressions of the form e.f
   private List<Expr> joinedExpressionsOfTypeInt;// Contains int/Integer expressions build from target
-  private static List<Expr> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
-  private static List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
-  private static List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
-  private static Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
-  private static Map<Class<?>, List<Expr>> setsByType; // Expressions denoting sets grouped by type
+  private List<Expr> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
+  private List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
+  private List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
+  private Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
+  private Map<Class<?>, List<Expr>> setsByType; // Expressions denoting sets grouped by type
 
+  // Evaluation related structures
+  private Map<Class<?>, List<Object>> typeEvaluations; // Types and evaluation values
+  private Map<String, LinkedList<Expr>> expressionsByEvaluationValue; // Contains expressions grouped by its evaluation results.
   private Map<String, Expr> relationsForEvaluation; // Target relations with expressions
   private Map<String, Class<?>> structureRelations; // Target relations with types
 
+  // Method variables
   private Map<Class<?>, Set<String>> methodVarsByType; // Variables names grouped by type
   private Map<String, Class<?>> methodVarsType; // Variables names and their types
 
@@ -64,10 +68,10 @@ public class TargetInformation {
     buildBaseExpressions(cut, new HashSet<>());
     buildInitialExpressions(considerPreState);
 
+    typeEvaluations = new HashMap<>();
     expressionsByEvaluationValue = new HashMap<>();
     methodVarsByType = new HashMap<>();
     methodVarsType = new HashMap<>();
-
   }
 
   /**
@@ -224,45 +228,47 @@ public class TargetInformation {
   }
 
   /**
-   * Adds evaluation to value
-   * 
-   * @param expr is the evaluation expression
-   * @param value is the evaluation value
+   * Updates the information related to a value obtained by evaluating an expression
+   * The update performs two tasks:
+   * 1. It adds the given expression to the list of expressions that have evaluated to value.
+   * 2. It adds the value as a possible one for the expression type.
+   * @param expr is the expression that evaluated to the given value.
+   * @param value is the evaluation value.
    */
-  public void addEvaluationToValue(Expr expr, String value) {
-    if (!expressionsByEvaluationValue.containsKey(value)) {
-      expressionsByEvaluationValue.put(value, new LinkedList<>());
+  public void updateEvaluationValueInfo(Object value, Expr expr) {
+    // 1. Add the expression to list of expressions that evaluates to the given value
+    String valueStr = value==null?ExprName.NULL:value.toString();
+    if (!expressionsByEvaluationValue.containsKey(valueStr)) {
+      expressionsByEvaluationValue.put(valueStr, new LinkedList<>());
     }
-    expressionsByEvaluationValue.get(value).add(expr);
+    expressionsByEvaluationValue.get(valueStr).add(expr);
+    // 2. Add the value as an option for the expression type
+    Class<?> type = expr.type();
+    if (!typeEvaluations.containsKey(type))
+      typeEvaluations.put(type, new LinkedList<>());
+
+    if (!typeEvaluations.get(type).contains(valueStr)) typeEvaluations.get(type).add(valueStr);
   }
 
   /**
    * Get all the joined expressions
    */
-  public List<Expr> getJoinedExpressions() {
-    return joinedExpressions;
-  }
+  public List<Expr> getJoinedExpressions() { return joinedExpressions; }
 
   /**
    * Get all the joined expressions of type int
    */
-  public List<Expr> getJoinedExpressionsOfTypeInt() {
-    return joinedExpressionsOfTypeInt;
-  }
+  public List<Expr> getJoinedExpressionsOfTypeInt() { return joinedExpressionsOfTypeInt; }
 
   /**
    * Get all the simple closured expressions
    */
-  public List<Expr> getSimpleClosuredExpressions() {
-    return simpleClosuredExpressions;
-  }
+  public List<Expr> getSimpleClosuredExpressions() { return simpleClosuredExpressions; }
 
   /**
    * Get all the double closured expressions
    */
-  public List<Expr> getDoubleClosuredExpressions() {
-    return doubleClosuredExpressions;
-  }
+  public List<Expr> getDoubleClosuredExpressions() { return doubleClosuredExpressions; }
 
   /**
    * Create collections from the given closured expression
@@ -296,14 +302,14 @@ public class TargetInformation {
   /**
    * Returns true iff there is some collection attribute in the current context
    */
-  public static boolean hasCollections() {
+  public boolean hasCollections() {
     return setsByType.keySet().size() > 0;
   }
 
   /**
    * Returns true iff there is some set expression containing objects of the given type
    */
-  public static boolean existsSetOfType(Class<?> type) {
+  public boolean existsSetOfType(Class<?> type) {
     Set<Class<?>> types = setsByType.keySet();
     return types.contains(type);
   }
@@ -318,7 +324,7 @@ public class TargetInformation {
   /**
    * Returns the expressions denoting sets of the given type
    */
-  public static List<Expr> getSetsOfType(Class<?> type) {
+  public List<Expr> getSetsOfType(Class<?> type) {
     List<Expr> sets = new LinkedList<>(setsByType.get(type));
     // Additionally, sets of objects should be returned, since they are possible sets for any given type
     if (setsByType.containsKey(Object.class))
@@ -443,9 +449,17 @@ public class TargetInformation {
   /**
    * Returns a random value for the given class
    */
-  public static Object randomValueForType(Class<?> cl) {
+  public Object randomValueForType(Class<?> cl) {
     if (cl == null) throw new IllegalArgumentException();
-    throw new UnsupportedOperationException("Don't know how to do this");
+    Random random = new Random();
+    if (!typeEvaluations.containsKey(cl))
+      throw new IllegalArgumentException("Don't know how to get a random value for class: "+cl.getSimpleName());
+    List<Object> evaluationsForType = typeEvaluations.get(cl);
+    int randomNumber = random.nextInt(evaluationsForType.size());
+    Object value = evaluationsForType.get(randomNumber);
+    System.out.println("Random value for type: "+cl.getSimpleName());
+    System.out.println(value);
+    return value;
   }
 
 }
