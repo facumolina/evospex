@@ -16,7 +16,8 @@ public class Expr {
 
   private final ExprContext exprContext; // Actual expression
   private final Class<?> type; // The expression type
-  private Class<?> classOfElemsInSet ; // Class of elements in set
+  private Class<?> classOfElemsInSet ; // Class of elements in set (only for quantified expressions)
+  private Class<?> classOfValues; // Class of values being compared (only for quantified expressions)
 
   /**
    * Constructor
@@ -51,7 +52,7 @@ public class Expr {
   /**
    * Returns the class of the elements of the set being quantified
    */
-  public Class<?> classOfElemsInSet() { return classOfElemsInSet; };
+  public Class<?> classOfElemsInSet() { return classOfElemsInSet; }
 
   /**
    * Set the class of the elements of the set being quantified
@@ -60,6 +61,20 @@ public class Expr {
   public void setClassOfElemsInSet(Class<?> cl) {
     if (cl == null) throw new IllegalArgumentException();
     classOfElemsInSet = cl;
+  }
+
+  /**
+   * Return the class of the values being compared in a quantified expression
+   */
+  public Class<?> classOfValues() { return classOfValues; }
+
+  /**
+   * Set the class of the values being compared
+   * @param cl is the class of the values
+   */
+  public void setClassOfValues(Class<?> cl) {
+    if (cl == null) throw new IllegalArgumentException();
+    classOfValues = cl;
   }
 
   /**
@@ -124,6 +139,7 @@ public class Expr {
   public Expr clone() {
     Expr e = ExprBuilder.toExpr(toString(), type());
     e.classOfElemsInSet = this.classOfElemsInSet;
+    e.classOfValues = this.classOfValues;
     return e;
   }
 
