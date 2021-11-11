@@ -8,7 +8,7 @@ package utils;
 public class JavaClassesUtils {
 
   /**
-   * Check if the given class is a numberic class
+   * Check if the given class is a numeric class
    * @param cl is the given class
    * @return true iff cl is a numeric class
    */
