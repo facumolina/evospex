@@ -457,8 +457,6 @@ public class TargetInformation {
     List<Object> evaluationsForType = typeEvaluations.get(cl);
     int randomNumber = random.nextInt(evaluationsForType.size());
     Object value = evaluationsForType.get(randomNumber);
-    System.out.println("Random value for type: "+cl.getSimpleName());
-    System.out.println(value);
     return value;
   }
 
