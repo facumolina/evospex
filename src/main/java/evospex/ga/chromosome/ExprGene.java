@@ -503,9 +503,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     ExprContext body = qt_expr.expr();
     Set_exprContext set =  qt_expr.set_expr();
     if (ExprGeneMutations.NEGATE_BODY.equals(mutationToApply)) {
-      System.out.println("-------------");
-      System.out.println("Negating body");
-      System.out.println("Expr: "+expr);
       // Create the for all expression with the negated body
       String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
       if (body.unary_op()!=null && ExprOperator.NOT_1.equals(body.unary_op().getText())) {
@@ -515,17 +512,12 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       newExpr.setClassOfValues(expr.classOfValues());
-      System.out.println("Mutated: "+newExpr);
       value.setExpression(newExpr, false);
     } else if (ExprGeneMutations.REPLACE_VALUE.equals(mutationToApply)){
-      System.out.println("-------------");
-      System.out.println("Replace value");
-      System.out.println("Expr: "+expr);
       if (body.binary_op()!=null) {
         ExprContext left = body.expr().get(0);
         ExprContext right = body.expr().get(1);
 
-        System.out.println("Class of values: "+expr.classOfValues());
         Object randomValue = targetInfo.randomValueForType(expr.classOfValues());
         String newBodyStr;
         if ((new Random()).nextBoolean()) {
@@ -536,23 +528,30 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
            newBodyStr = newLeft + " " + body.binary_op().getText() + " " + right.getText();
         } else {
           // Use the value on the right of the body
-          if (right.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
-          ExprContext left2 = right.expr().get(0);
-          Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + right.compare_op().getText() + " " + randomValue, Boolean.class);
-          newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+          if (right.compare_op()==null) {
+            if (right.unary_op()!=null && ExprOperator.NOT_1.equals(right.unary_op().getText())) {
+              ExprContext negatedExpr = right.expr().get(0);
+              if (negatedExpr.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
+              ExprContext left2 = negatedExpr.expr().get(0);
+              Expr newRight = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + left2.getText() + " " + negatedExpr.compare_op().getText() + " " + randomValue + ExprDelimiter.RP, Boolean.class);
+              newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+            } else {
+              throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
+            }
+          } else {
+            ExprContext left2 = right.expr().get(0);
+            Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + right.compare_op().getText() + " " + randomValue, Boolean.class);
+            newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+          }
         }
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
-        System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
         throw new IllegalStateException("Can't perform REPLACE_VALUE mutation on expression: "+expr);
       }
     } else if (ExprGeneMutations.NEGATE_RIGHT_EQUALITY.equals(mutationToApply)) {
-      System.out.println("-------------");
-      System.out.println("NEGATE_RIGHT_EQUALITY");
-      System.out.println("Expr: "+expr);
       if (body.binary_op()!=null) {
         ExprContext left = body.expr().get(0);
         ExprContext right = body.expr().get(1);
@@ -566,28 +565,35 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
-        System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
         throw new IllegalStateException("Can't perform NEGATE_RIGHT_EQUALITY mutation on expression: "+expr);
       }
     } else if (ExprGeneMutations.REPLACE_OP.equals(mutationToApply)) {
-      System.out.println("-------------");
-      System.out.println("REPLACE_OP");
-      System.out.println("Expr: "+expr);
       if (body.binary_op()!=null) {
         ExprContext left = body.expr().get(0);
         ExprContext right = body.expr().get(1);
-        if (right.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_OP mutation on expression "+expr);
-        ExprContext left2 = right.expr().get(0);
-        ExprContext right2 = right.expr().get(1);
-        String newOp = ExprGeneMutations.getRandomBinaryOperator();
-        Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + newOp + " " + right2.getText(), Boolean.class);
+        Expr newRight;
+        if (right.compare_op()==null) {
+          if (right.unary_op()!=null && ExprOperator.NOT_1.equals(right.unary_op().getText())) {
+            ExprContext negatedExpr = right.expr().get(0);
+            ExprContext left2 = negatedExpr.expr().get(0);
+            ExprContext right2 = negatedExpr.expr().get(1);
+            String newOp = ExprGeneMutations.getRandomBinaryOperator();
+            newRight = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + left2.getText() + " " + newOp + " " + right2.getText() + ExprDelimiter.RP, Boolean.class);
+          } else {
+            throw new IllegalStateException("Compare op can't be null on REPLACE_OP mutation on expression " + expr);
+          }
+        } else {
+          ExprContext left2 = right.expr().get(0);
+          ExprContext right2 = right.expr().get(1);
+          String newOp = ExprGeneMutations.getRandomBinaryOperator();
+          newRight = ExprBuilder.toExpr(left2.getText() + " " + newOp + " " + right2.getText(), Boolean.class);
+        }
         String newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
-        System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
         throw new IllegalStateException("Can't perform REPLACE_OP mutation on expression: "+expr);
@@ -597,7 +603,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
-
   }
 
   /**
