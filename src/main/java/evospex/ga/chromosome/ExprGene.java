@@ -443,6 +443,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         newBodyStr = body.expr().get(0).getText();
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
     } else if (ExprGeneMutations.JOIN_COMPATIBLE_EXPR.equals(mutationToApply)) {
       // Append a compatible expression in the right side of the body
@@ -462,6 +463,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
           String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
           newBodyStr = unary.getText() + ExprDelimiter.LP + newBodyStr +  ExprDelimiter.RP;
           Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+          newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
           value.setExpression(newExpr, false);
         }
       } else {
@@ -473,6 +475,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
           Expr joineableExpr = joineableExprs.get(0);
           String newBodyStr = leftExpr.getText() + " " + op.getText() + " " + rightExpr.getText() + ExprOperator.JOIN + joineableExpr.toString();
           Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+          newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
           value.setExpression(newExpr, false);
         }
       }
@@ -510,6 +513,8 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         newBodyStr = body.expr().get(0).getText();
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+      newExpr.setClassOfValues(expr.classOfValues());
       System.out.println("Mutated: "+newExpr);
       value.setExpression(newExpr, false);
     } else if (ExprGeneMutations.REPLACE_VALUE.equals(mutationToApply)){
@@ -537,6 +542,8 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
           newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
         }
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+        newExpr.setClassOfValues(expr.classOfValues());
         System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
@@ -557,6 +564,8 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         }
         String newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRightStr;
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+        newExpr.setClassOfValues(expr.classOfValues());
         System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
@@ -576,6 +585,8 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
         Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + newOp + " " + right2.getText(), Boolean.class);
         String newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+        newExpr.setClassOfValues(expr.classOfValues());
         System.out.println("Mutated: "+newExpr);
         value.setExpression(newExpr, false);
       } else {
