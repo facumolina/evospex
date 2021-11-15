@@ -273,16 +273,22 @@ public class ExprBuilder {
       throw new IllegalArgumentException("The closured expression is supposed to be double closured");
 
     Expr e;
+    Expr joinValue = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + joineable, joineable.type());
     if (code == 1) {
       // Prepare the body parts
-      Expr joinField = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + joineable, joineable.type());
+      Expr joinField = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID(), joineable.type());
       Expr joinFieldAndExpr = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID() + ExprOperator.JOIN + joineable,  joineable.type());
-      Expr cmp = eq(joinField, joinFieldAndExpr);
+      Expr cmp = eq(joinValue, joinFieldAndExpr);
       // Create the quantified expression
       String bodyStr = neq(joinField, ExprBuilder.NULL) + " " + ExprOperator.IMPLIES_1 + " " + cmp;
       e = toExpr(getDecl(op, closured) + " : " + bodyStr, Boolean.class);
     } else if (code == 2) {
-      throw new UnsupportedOperationException("code not supported");
+      Expr joinField = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + field_2.ID(), joineable.type());
+      Expr joinFieldAndExpr = toExpr(ExprName.QT_VAR + ExprOperator.JOIN + field_2.ID() + ExprOperator.JOIN + joineable,  joineable.type());
+      Expr cmp = eq(joinValue, joinFieldAndExpr);
+      // Create the quantified expression
+      String bodyStr = neq(joinField, ExprBuilder.NULL) + " " + ExprOperator.IMPLIES_1 + " " + cmp;
+      e = toExpr(getDecl(op, closured) + " : " + bodyStr, Boolean.class);
     } else {
       throw new UnsupportedOperationException("code not supported");
     }
