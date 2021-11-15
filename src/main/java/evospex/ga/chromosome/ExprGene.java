@@ -520,30 +520,24 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
         Object randomValue = targetInfo.randomValueForType(expr.classOfValues());
         String newBodyStr;
-        if ((new Random()).nextBoolean()) {
-          // Use the value on the left of the body
-          if (left.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
-          ExprContext left2 = left.expr().get(0);
-          Expr newLeft = ExprBuilder.toExpr(left2.getText() + " " + left.compare_op().getText() + " " + randomValue, Boolean.class);
-           newBodyStr = newLeft + " " + body.binary_op().getText() + " " + right.getText();
-        } else {
-          // Use the value on the right of the body
-          if (right.compare_op()==null) {
-            if (right.unary_op()!=null && ExprOperator.NOT_1.equals(right.unary_op().getText())) {
-              ExprContext negatedExpr = right.expr().get(0);
-              if (negatedExpr.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
-              ExprContext left2 = negatedExpr.expr().get(0);
-              Expr newRight = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + left2.getText() + " " + negatedExpr.compare_op().getText() + " " + randomValue + ExprDelimiter.RP, Boolean.class);
-              newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
-            } else {
-              throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
-            }
-          } else {
-            ExprContext left2 = right.expr().get(0);
-            Expr newRight = ExprBuilder.toExpr(left2.getText() + " " + right.compare_op().getText() + " " + randomValue, Boolean.class);
+
+        // Use the value on the right of the body
+        if (right.compare_op()==null) {
+          if (right.unary_op()!=null && ExprOperator.NOT_1.equals(right.unary_op().getText())) {
+            ExprContext negatedExpr = right.expr().get(0);
+            if (negatedExpr.compare_op()==null) throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
+            ExprContext right2 = negatedExpr.expr().get(1);
+            Expr newRight = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + randomValue + " " + negatedExpr.compare_op().getText() + " " + right2.getText() + ExprDelimiter.RP, Boolean.class);
             newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
+          } else {
+            throw new IllegalStateException("Compare op can't be null on REPLACE_VALUE mutation on expression "+expr);
           }
+        } else {
+          ExprContext right2 = right.expr().get(1);
+          Expr newRight = ExprBuilder.toExpr(randomValue + " " + right.compare_op().getText() + " " + right2.getText(), Boolean.class);
+          newBodyStr = left.getText() + " " + body.binary_op().getText() + " " + newRight;
         }
+
         Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
