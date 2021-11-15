@@ -231,36 +231,35 @@ public class GenesFactory {
    * 
    * @throws InvalidConfigurationException
    */
-  public List<Gene> createGenesUsingTheResultObject(Object resultExample)
-      throws InvalidConfigurationException {
+  public List<Gene> createGenesUsingTheResultObject(Object resultExample) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
+    Expr resultExpr = ExprBuilder.getResult(resultExample.getClass());
     if (resultExample instanceof Boolean) {
       // The result is boolean, add it directly
       targetInfo.addVariableForType(Boolean.class, ExprName.RESULT);
-      Expr geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
+      Expr geneExpr = ExprBuilder.eq(resultExpr, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
       genes.add(new ExprGene(conf, newValue, targetInfo));
-    } else if (resultExample instanceof Integer || resultExample instanceof Double) {
-      // The result is int or double, compare it with int expressions
+    } else if (Number.class.isAssignableFrom(resultExample.getClass())) {
+      // The result is a numeric type, thus compare it with expressions of the same type
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      List<Expr> intExprs = targetInfo.getIntEvaluableExpressions();
-      for (Expr intExpr : intExprs) {
-        Expr geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, intExpr);
+      List<Expr> exprsOfType = targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
+      for (Expr expr : exprsOfType) {
+        Expr geneExpr = ExprBuilder.eq(resultExpr, expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);
         genes.add(new ExprGene(conf, newValue, targetInfo));
       }
-      if (targetInfo.hasCollections()) {
-        List<Expr> collections = TargetInformation.getCollections();
-        for (Expr collectionExpr : collections) {
-          Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(collectionExpr+".size", Number.class),ExprBuilder.RESULT);
-          ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);
+      if (targetInfo.hasSets()) {
+        List<Expr> sets = targetInfo.getSets();
+        for (Expr setExpr : sets) {
+          ExprGeneValue newValue = createsCardinalityExpression(setExpr, resultExpr);
           genes.add(new ExprGene(conf, newValue, targetInfo));
         }
       }
     } else if (resultExample instanceof String) {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      genes.add(create_gene_expr_equal_null(ExprBuilder.RESULT));
+      genes.add(create_gene_expr_equal_null(resultExpr));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains(resultExample.getClass().getSimpleName())
@@ -272,11 +271,11 @@ public class GenesFactory {
       }*/
     } else {
       if (resultExample instanceof Collection) {
-        collections_equalities((Collection) resultExample, ExprBuilder.RESULT, genes);
+        collections_equalities((Collection) resultExample, resultExpr, genes);
       }
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      genes.add(create_gene_expr_equal_null(ExprBuilder.RESULT));
+      genes.add(create_gene_expr_equal_null(resultExpr));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains("this/" + resultExample.getClass().getSimpleName())) {

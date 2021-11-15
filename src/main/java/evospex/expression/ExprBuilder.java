@@ -24,10 +24,10 @@ public class ExprBuilder {
 
   public static final Expr TRUE = toExpr(ExprName.TRUE, Boolean.class);
   public static final Expr FALSE = toExpr(ExprName.FALSE, Boolean.class);
-  public static final Expr RESULT = toExpr(ExprName.RESULT, Object.class);
   public static final Expr NULL = toExpr(ExprName.NULL, Object.class);
   public static final Expr ZERO = toExpr(ExprName.ZERO, Number.class);
   public static final Expr ONE = toExpr(ExprName.ONE, Number.class);
+  private static Expr RESULT;
 
   /**
    * Setup the parser
@@ -328,6 +328,15 @@ public class ExprBuilder {
    */
   public static Expr qtExpr(String operator, Expr closuredExpr, String body) {
     return toExpr(operator + " " + ExprName.QT_VAR + " : " + closuredExpr + " : " + body, Boolean.class);
+  }
+
+  /**
+   * Returns the result expression
+   */
+  public static Expr getResult(Class<?> resultType) {
+    if (RESULT==null)
+      RESULT = toExpr(ExprName.RESULT,resultType);
+    return RESULT;
   }
 
 }

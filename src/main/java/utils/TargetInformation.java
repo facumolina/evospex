@@ -300,9 +300,9 @@ public class TargetInformation {
   }
 
   /**
-   * Returns true iff there is some collection attribute in the current context
+   * Returns true iff there is some set expression in the current context
    */
-  public boolean hasCollections() {
+  public boolean hasSets() {
     return setsByType.keySet().size() > 0;
   }
 
@@ -315,10 +315,15 @@ public class TargetInformation {
   }
 
   /**
-   * Returns the all collection attributes
+   * Returns the all the set expressions. This includes all the simple closured expressions, all the double closured expressions
+   * and all the expressions denoting attributes which type is Collection.
    */
-  public static List<Expr> getCollections() {
-    throw new UnsupportedOperationException("Implements this");
+  public List<Expr> getSets() {
+    List<Expr> allSets = new LinkedList<>();
+    allSets.addAll(simpleClosuredExpressions);
+    allSets.addAll(doubleClosuredExpressions);
+    // TODO Collection attributes should also be added here
+    return allSets;
   }
 
   /**
