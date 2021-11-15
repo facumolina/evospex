@@ -799,25 +799,31 @@ public class GenesFactory {
    * - all n: e.*(f+g) : n.f.*(f+g).r in n.g.*(f+g).r
    */
   public List<Gene> createsGenesFromDoubleClosuredExpressionsForValues(Expr doubleClosuredExpr)
-      throws InvalidConfigurationException, Err {
+      throws InvalidConfigurationException {
     Set<Expr> joineableExpressions = targetInfo.getJoineableExpressionsOfCurrentType(doubleClosuredExpr.classOfElemsInSet());
     List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
+    Class<?> typeElemsInSet = doubleClosuredExpr.classOfElemsInSet();
+
     // For each joineable expr generate the quantified expressions
     for (Expr joineableExpr : joineableExpressions) {
+      if (typeElemsInSet.equals(joineableExpr.type()))
+        continue;
       if (Number.class.isAssignableFrom(joineableExpr.type())) {
         // Values are numeric
-        // all n: e.*(f+g) : (n.f != Null) => n.r op n.f.r
+        // all n: e.*(f+g) : (n.f != null) => n.r op n.f.r
         geneValue = GeneValuesFactory.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
-
+        // all n: e.*(f+g) : (n.g != Null) => n.r op n.g.r
+        geneValue = GeneValuesFactory.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
+        genes.add(new ExprGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
         throw new UnsupportedOperationException("Handle boolean value properly");
       } else {
         // Values are objects
-        // all n: e.*(f+g) : (n.r != Null)
-        geneValue = GeneValuesFactory.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        // all n: e.*(f+g) : (n.r != null)
+        geneValue = GeneValuesFactory.doubleQtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
     }
