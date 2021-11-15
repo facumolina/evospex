@@ -92,6 +92,7 @@ public class GenesFactory {
     }
     if (resultExample != null
         && (resultExample instanceof Integer || resultExample instanceof Double)) {
+      // TODO fix this
       targetInfo.addVariableForType(Integer.class, ExprName.RESULT);
     }
 
@@ -195,12 +196,11 @@ public class GenesFactory {
       if (addComplex) {
         // Create genes quantifying the simple closured expressions
         if (parameters.getConsiderSimpleClosuredExpressions())
-          genes.addAll(createsGenesFromSimpleClosuredExpressionsAndIntExpressions(evaluableSimpleClosuredExpressions,
-                  evaluableJoinedExpressionsOfTypeInt));
+          genes.addAll(createsGenesFromSimpleClosuredExpressions(evaluableSimpleClosuredExpressions));
 
         // Create genes quantifying the double closured expressions
         if (parameters.getConsiderDoubleClosuredExpressions())
-          genes.addAll(createsGenesFromDoubleClosuredExpressionsAndIntExpressions(evaluableDoubleClosuredExpressions, evaluableJoinedExpressionsOfTypeInt));
+          genes.addAll(createsGenesFromDoubleClosuredExpressions(evaluableDoubleClosuredExpressions));
 
         // Create genes using the example result expression
         if (resultExample != null)
@@ -240,13 +240,6 @@ public class GenesFactory {
       Expr geneExpr = ExprBuilder.eq(ExprBuilder.RESULT, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
       genes.add(new ExprGene(conf, newValue, targetInfo));
-      //for (Expr e : contextInfo.getEvaluableExpressions()) {
-      //  if (e.type().toString().contains("this/boolean")) {
-      //    geneExpr = ExprBinary.Op.EQUALS.make(null, null, resultVar, e);
-      //    ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-      //    genes.add(new ExprGene(conf, geneValue, contextInfo));
-      //  }
-      //}
     } else if (resultExample instanceof Integer || resultExample instanceof Double) {
       // The result is int or double, compare it with int expressions
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
@@ -304,7 +297,7 @@ public class GenesFactory {
    */
   private void collections_equalities(Collection c, Expr collection_expr, List<Gene> genes)
       throws InvalidConfigurationException {
-    Class<?> collection_type = guessElementType(c);
+    Class<?> collection_type = JavaClassesUtils.guessElementType(c);
     if (collection_type != null) {
       List<Expr> collections = targetInfo.getSetsOfType(collection_type);
       for (Expr collection : collections) {
@@ -324,40 +317,6 @@ public class GenesFactory {
     Expr geneExpr = ExprBuilder.eq(e, ExprBuilder.NULL);
     ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
     return new ExprGene(conf, geneValue, targetInfo);
-  }
-
-  private Set<Class<?>> supers(Class<?> c) {
-    if (c == null)
-      return new HashSet<>();
-
-    Set<Class<?>> s = supers(c.getSuperclass());
-    s.add(c);
-    return s;
-  }
-
-  private Class<?> lowestCommonSuper(Class<?> a, Class<?> b) {
-    Set<Class<?>> aSupers = supers(a);
-    while (!aSupers.contains(b)) {
-      b = b.getSuperclass();
-    }
-    return b;
-  }
-
-  /**
-   * Guess type of collection object
-   */
-  private Class<?> guessElementType(Collection<?> collection) {
-    Class<?> guess = null;
-    for (Object o : collection) {
-      if (o != null) {
-        if (guess == null) {
-          guess = o.getClass();
-        } else if (guess != o.getClass()) {
-          guess = lowestCommonSuper(guess, o.getClass());
-        }
-      }
-    }
-    return guess;
   }
 
   /**
@@ -572,26 +531,6 @@ public class GenesFactory {
   }
 
   /**
-   * Creates genes comparing evaluable expressions over this and this_pre
-   * 
-   * @throws InvalidConfigurationException
-   */
-  public List<Gene> createGenesComparingJoinedExpressionsDifferentObjs(
-      List<ExprContext> evaluableJoinedExpressions) throws InvalidConfigurationException {
-    List<Gene> genes = new LinkedList<>();
-    for (int j = 0; j < evaluableJoinedExpressions.size() - 1; j++) {
-      ExprContext leftExpr = evaluableJoinedExpressions.get(j);
-      for (int k = j + 1; k < evaluableJoinedExpressions.size(); k++) {
-        ExprContext rightExpr = evaluableJoinedExpressions.get(k);
-        if (rightExpr.toString().contains("thizPre"))
-          continue;
-        throw new UnsupportedOperationException("Implement this properly");
-      }
-    }
-    return genes;
-  }
-
-  /**
    * Returns true if both joined expressions are over the same field
    */
   private boolean sameField(Expr expr1, Expr expr2) {
@@ -606,39 +545,8 @@ public class GenesFactory {
    * Creates genes from simple closured expressions considering: - Quantified expressions with body
    * predicating about shapes - Quantified expressions with body predicating about values
    */
-  public List<Gene> createsGenesFromSimpleClosuredExpressionsAndIntExpressions(List<Expr> simpleClosuredExpressions, List<Expr> joinedExpressionsOfTypeInt) {
-    return null;
-  }
-
-  /**
-   * Creates genes from simple closured expressions considering: - Quantified expressions with body
-   * predicating about shapes - Quantified expressions with body predicating about values
-   */
-  public List<Gene> createsGenesFromSimpleClosuredExpressions(List<Expr> simpleClosuredExpressions,
-      List<Expr> joinedExpressionsOfTypeInt) throws InvalidConfigurationException, Err {
-    List<Gene> genes = new LinkedList<Gene>();
-    for (int j = 0; j < simpleClosuredExpressions.size(); j++) {
-      Expr evaluableExpr = simpleClosuredExpressions.get(j);
-      if (evaluableExpr.toString().contains("thizPre") && !parameters.learnPre())
-        continue;
-      Expr correctedEvaluableExpr = evaluableExpr;
-
-      // Create genes with expressions which body is a predicate about shapes
-      genes.addAll(createsGenesFromSimpleClosuredExpressionsForShape(correctedEvaluableExpr));
-
-      // Create genes with expressions which body is a predicate about values
-      genes.addAll(createsGenesFromSimpleClosuredExpressionsForValues(correctedEvaluableExpr));
-
-      if (parameters.getConsiderCardinalityExpressions()) {
-        // For each expression i of type int: #(e.*f)=i
-        for (int k = 0; k < joinedExpressionsOfTypeInt.size(); k++) {
-          Expr intExpression = joinedExpressionsOfTypeInt.get(k);
-          ExprGeneValue geneValue = createsCardinalityExpression(correctedEvaluableExpr,intExpression);
-          genes.add(new ExprGene(conf, geneValue, targetInfo));
-        }
-      }
-    }
-    return genes;
+  public List<Gene> createsGenesFromSimpleClosuredExpressions(List<Expr> simpleClosuredExpressions) throws InvalidConfigurationException {
+    throw new UnsupportedOperationException("Implement this!");
   }
 
   /**
@@ -709,8 +617,7 @@ public class GenesFactory {
    * - Quantified expressions with body predicating about shapes
    * - Quantified expressions with body predicating about values
    */
-  public List<Gene> createsGenesFromDoubleClosuredExpressionsAndIntExpressions(List<Expr> doubleClosuredExpressions,
-                                                              List<Expr> joinedExpressionsOfIntType) throws InvalidConfigurationException, Err {
+  public List<Gene> createsGenesFromDoubleClosuredExpressions(List<Expr> doubleClosuredExpressions) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
     for (int j = 0; j < doubleClosuredExpressions.size(); j++) {
       Expr evaluableExpr = doubleClosuredExpressions.get(j);
@@ -723,10 +630,11 @@ public class GenesFactory {
       // Create genes with expressions which body is a predicate about values
       genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(evaluableExpr));
 
+      // Create genes with cardinality expressions
       if (parameters.getConsiderCardinalityExpressions()) {
-        // For each expression i of type int: #(e.*f) = i
-        for (int k = 0; k < joinedExpressionsOfIntType.size(); k++) {
-          Expr intExpression = joinedExpressionsOfIntType.get(k);
+        List<Expr> joinedExpressionsOfIntType = targetInfo.getJoinedExpressionsOfTypeInt();
+        // For each expression i of type int: #(e.*(f+g)) = i
+        for (Expr intExpression : joinedExpressionsOfIntType) {
           ExprGeneValue geneValue = createsCardinalityExpression(evaluableExpr,intExpression);
           genes.add(new ExprGene(conf, geneValue, targetInfo));
         }
@@ -826,6 +734,7 @@ public class GenesFactory {
         geneValue = GeneValuesFactory.doubleQtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
+      // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
     }
     return genes;
   }
