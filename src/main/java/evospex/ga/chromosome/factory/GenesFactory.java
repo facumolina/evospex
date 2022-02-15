@@ -537,6 +537,8 @@ public class GenesFactory {
     String strExpr2 = expr2.toString();
     int lastJoinIdx1 = strExpr1.lastIndexOf(".");
     int lastJoinIdx2 = strExpr2.lastIndexOf(".");
+    if (lastJoinIdx1==-1 || lastJoinIdx2==-1)
+      return false;
     return strExpr1.substring(lastJoinIdx1).equals(strExpr2.substring(lastJoinIdx2));
   }
 
