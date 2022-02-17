@@ -136,6 +136,21 @@ public class ExprBuilder {
 
   /**
    * Quantify the given closured expression with the given operator. The quantified expression body will specify a property
+   * involving two variables and it is the following expression:
+   * - op n : e.*f : n != n.f
+   */
+  public static Expr qtExprTwoVars(String operator, Expr closuredExpr) {
+    // Get the set expression
+    Set_exprContext s = ExprUtils.getClosuredExprSet(closuredExpr);
+    Closure_fieldContext field_1 = s.closure_field();
+    String body = ExprName.QT_VAR + " " + ExprOperator.NOT_EQ + " " + ExprName.QT_VAR + ExprOperator.JOIN + field_1.ID();
+    Expr e = toExpr(getDecl(operator, closuredExpr) + " : " + body, Boolean.class);
+    e.setClassOfElemsInSet(closuredExpr.classOfElemsInSet());
+    return e;
+  }
+
+  /**
+   * Quantify the given closured expression with the given operator. The quantified expression body will specify a property
    * involving two variables and it is determined as follow:
    * - op n : e.*(f+g) : n != n.f if code = 1
    * - op n : e.*(f+g) : n != n.g if code = 2
