@@ -14,6 +14,17 @@ import evospex.ga.chromosome.ExprGeneValue;
 public class GeneValuesFactory {
 
   /**
+   * Given a closured expression e.*f and a quantification operator creates the gene value with the
+   * expression:
+   * - op n : e.*f : n != n.f
+   */
+  public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression, String op) {
+    Expr qtExpr = ExprBuilder.qtExprTwoVars(op, closuredExpression);
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_VAR : ExprGeneType.SOME_VAR_VAR;
+    return new ExprGeneValue(qtExpr, geneType);
+  }
+
+  /**
    * Given a closured expression e.*(f+g), a quantification operator and an int i creates a gene
    * value with expression:
    * - op n : e.*(f+g) : n != n.f if i = 1

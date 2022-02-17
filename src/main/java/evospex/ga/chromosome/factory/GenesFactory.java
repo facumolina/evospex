@@ -543,48 +543,52 @@ public class GenesFactory {
   }
 
   /**
-   * Creates genes from simple closured expressions considering: - Quantified expressions with body
-   * predicating about shapes - Quantified expressions with body predicating about values
+   * Creates genes from simple closured expressions considering:
+   * - Quantified expressions with a body predicating about shapes
+   * - Quantified expressions with a body predicating about values
    */
   public List<Gene> createsGenesFromSimpleClosuredExpressions(List<Expr> simpleClosuredExpressions) throws InvalidConfigurationException {
-    throw new UnsupportedOperationException("Implement this!");
+    List<Gene> genes = new LinkedList<>();
+    for (int j = 0; j < simpleClosuredExpressions.size(); j++) {
+      Expr evaluableExpr = simpleClosuredExpressions.get(j);
+      if (evaluableExpr.toString().contains(ExprName.THIS_PRE) && !parameters.learnPre())
+        continue;
+
+      // Create genes with expressions which body is a predicate about shapes
+      genes.addAll(createsGenesFromSimpleClosuredExpressionsForShape(evaluableExpr));
+
+      // Create genes with expressions which body is a predicate about values
+      //genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(evaluableExpr));
+
+    }
+    System.out.println("Genes: "+genes);
+    return genes;
   }
 
   /**
    * Creates genes from simple closured expressions. Given a simple closured expression e.*f creates
    * genes with the following expressions:
-   * 
-   * - (all + some) n : e.*f : n != null
-   * 
-   * - (all + some) n : e.*f : n.f != null
-   * 
-   * - (all + some) n : e.*f : n != n.f
-   * 
-   * - (all + some) n : e.*f : n in n.^f
-   * 
-   * @throws InvalidConfigurationException
+   * - all n : e.*f : n != null
+   * - all n : e.*f : n.f != null
+   * - all n : e.*f : n != n.f
+   * - all n : e.*f : n in n.^f
    */
-  public List<Gene> createsGenesFromSimpleClosuredExpressionsForShape(Expr simpleClosuredExpr)
-      throws InvalidConfigurationException {
-    List<Gene> genes = new LinkedList<Gene>();
+  public List<Gene> createsGenesFromSimpleClosuredExpressionsForShape(Expr simpleClosuredExpr) throws InvalidConfigurationException {
+    List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
 
     // (all + some) n : e.*f : n != null
-    // geneValue =
-    // ChromosomeGenesFactory.createsQtExpressionVarPredicate(correctedEvaluableExpr,"all");
+    // geneValue = ChromosomeGenesFactory.createsQtExpressionVarPredicate(correctedEvaluableExpr,"all");
 
     // (all + some) n : e.*f : n.f != null
-    // geneValue =
-    // ChromosomeGenesFactory.createsQtExpressionNextVarPredicate(correctedEvaluableExpr,"all");
+    // geneValue = ChromosomeGenesFactory.createsQtExpressionNextVarPredicate(correctedEvaluableExpr,"all");
 
     // (all + some) n : e.*f : n != n.f
-    geneValue = GenesFactory.createsQtExpressionVarVarPredicate(simpleClosuredExpr,
-        "all");
+    geneValue = GeneValuesFactory.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*f : n in n.^f
-    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(simpleClosuredExpr,
-        "all");
+    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     return genes;
@@ -615,8 +619,8 @@ public class GenesFactory {
 
   /**
    * Creates genes from double closured expressions considering:
-   * - Quantified expressions with body predicating about shapes
-   * - Quantified expressions with body predicating about values
+   * - Quantified expressions with a body predicating about shapes
+   * - Quantified expressions with a body predicating about values
    */
   public List<Gene> createsGenesFromDoubleClosuredExpressions(List<Expr> doubleClosuredExpressions) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
@@ -773,15 +777,6 @@ public class GenesFactory {
    * e.*f : n.f != null
    */
   public static ExprGeneValue createsQtExpressionNextVarPredicate(Expr closuredExpression,
-      String op) {
-    throw new UnsupportedOperationException("Implement this!");
-  }
-
-  /**
-   * Given a closured expression e.*f and a quantification operator creates the gene value with the
-   * expression op n : e.*f : n != n.f
-   */
-  public static ExprGeneValue createsQtExpressionVarVarPredicate(Expr closuredExpression,
       String op) {
     throw new UnsupportedOperationException("Implement this!");
   }
