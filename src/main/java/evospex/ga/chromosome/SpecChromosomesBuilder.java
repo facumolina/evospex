@@ -11,7 +11,7 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 import utils.TargetInformation;
 
 import java.util.*;

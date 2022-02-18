@@ -18,10 +18,10 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
 import evospex.ga.chromosome.gene.ExprGene;
-import report.Stats;
+import evospex.report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.TargetInformation;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 
 public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements Comparable {
 

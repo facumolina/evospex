@@ -1,4 +1,4 @@
-package report;
+package evospex.report;
 
 import evospex.ga.chromosome.SpecChromosome;
 

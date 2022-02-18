@@ -12,7 +12,6 @@ import evospex.expression.evaluator.NonEvaluableExpressionException;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
-import evospex.ga.chromosome.gene.factory.GeneValuesFactory;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -24,7 +23,7 @@ import rfm.dynalloyCompiler.ast.ExprQt;
 import rfm.dynalloyCompiler.ast.Type;
 import utils.JavaClassesUtils;
 import utils.TargetInformation;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 
 /**
  * This class represents a Genes Factory, which allows to create the genes that will be part of the population of

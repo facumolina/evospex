@@ -24,10 +24,10 @@ import evospex.ga.fitnessfunction.PostConditionSpecEvaluator;
 import evospex.ga.operator.ChromosomeCrossoverOperator;
 import evospex.ga.operator.ExprGeneMutationOperator;
 import evospex.ga.operator.SpecChromosomeNaturalSelector;
-import report.Report;
-import report.Stats;
+import evospex.report.Report;
+import evospex.report.Stats;
 import utils.TargetInformation;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 
 
 /**

@@ -1,9 +1,9 @@
-package report;
+package evospex.report;
 
 import java.util.List;
 
 import evospex.expression.Expr;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 
 /**
  * Report GA executions

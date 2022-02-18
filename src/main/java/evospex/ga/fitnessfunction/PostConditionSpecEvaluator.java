@@ -18,9 +18,9 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 
 import evospex.target.MethodExecution;
-import report.Stats;
+import evospex.report.Stats;
 
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 import utils.FitnessValue;
 
 /**

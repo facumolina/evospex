@@ -13,7 +13,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.NaturalSelector;
 import org.jgap.Population;
 
-import report.Stats;
+import evospex.report.Stats;
 
 /**
  * The InvariantChromosomeNaturalSelector implements a NaturalSelector. This selector ensure that

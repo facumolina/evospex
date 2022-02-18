@@ -3,8 +3,6 @@ package evospex;
 import evospex.ga.EvoSpexGA;
 import org.jgap.InvalidConfigurationException;
 
-import utils.EvoSpexParameters;
-
 /**
  * Class main.EvoSpex is the main class of the system. It allows to start the evolutionary process
  * from a given target class that has only one method with the statement assert(true); denoting the

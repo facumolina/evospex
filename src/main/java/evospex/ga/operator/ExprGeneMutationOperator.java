@@ -18,9 +18,9 @@ import org.jgap.data.config.Configurable;
 
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneValue;
-import report.Stats;
+import evospex.report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
-import utils.EvoSpexParameters;
+import evospex.EvoSpexParameters;
 
 /**
  * Mutation operator
