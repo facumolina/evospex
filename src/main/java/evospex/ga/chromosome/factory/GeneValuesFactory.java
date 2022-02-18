@@ -50,6 +50,17 @@ public class GeneValuesFactory {
   }
 
   /**
+   * Given a double closured expression e.*f, an expression r and a quantification operator op
+   * creates a gene value with one of the following expression:
+   * - op n : e.*(f) | (n.f!=null)=> n.r = n.f.r
+   */
+  public static ExprGeneValue singleQtTwoVarValuesComparison(Expr closured, Expr toJoinWithVarExpr, String op) {
+    Expr qtExpr = ExprBuilder.qtExprTwoVarValuesComparison(closured, toJoinWithVarExpr, op, 1);
+    ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_VALUE_VAR_VALUE : ExprGeneType.SOME_VAR_VALUE_VAR_VALUE;
+    return new ExprGeneValue(qtExpr, geneType);
+  }
+
+  /**
    * Given a double closured expression e.*(f+g), a quantification operator and an int i creates
    * a gene value with the following expressions:
    * - op n : e.*(f+g) : n in n.^f if i=1
@@ -73,11 +84,11 @@ public class GeneValuesFactory {
   }
 
   /**
-   * Given a double closured expression e.*(f+g), an expression r and a quantification operator
+   * Given a closured expression e.*(f), an expression r and a quantification operator
    * creates a gene value with the expression
-   * - op n : e.*(f+g) | n.r != null
+   * - op n : e.*(f) | n.r != null
    */
-  public static ExprGeneValue doubleQtSingleValueComparison(Expr closured, Expr toJoinWithVarExpr, String op) {
+  public static ExprGeneValue qtSingleValueComparison(Expr closured, Expr toJoinWithVarExpr, String op) {
     Expr qtExpr = ExprBuilder.qtExprOneVarValueComparison(closured, toJoinWithVarExpr, ExprBuilder.NULL, op);
     ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_VALUE : ExprGeneType.SOME_VAR_VALUE;
     return new ExprGeneValue(qtExpr, geneType);

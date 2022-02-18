@@ -558,7 +558,7 @@ public class GenesFactory {
       genes.addAll(createsGenesFromSimpleClosuredExpressionsForShape(evaluableExpr));
 
       // Create genes with expressions which body is a predicate about values
-      //genes.addAll(createsGenesFromDoubleClosuredExpressionsForValues(evaluableExpr));
+      genes.addAll(createsGenesFromSimpleClosuredExpressionsForValues(evaluableExpr));
 
     }
     System.out.println("Genes: "+genes);
@@ -595,26 +595,43 @@ public class GenesFactory {
   }
 
   /**
-   * Creates genes from simple closured expressions for values If the type of the variable n is T,
-   * then for each relation r : T -> AnotherType creates the following quantified expressions:
+   * Creates genes from simple closured expressions for values. If the type of the variable n is T,
+   * then for each var r : T -> AnotherType creates the following quantified expressions:
    * 
-   * - all n : e.*f : (n.next != Null) -> n.value = n.next.value
+   * - all n: e.*f : n.r != null
+   * - all n: e.*f : n.r != n.f.r
+   * - all n: e.*f : (n.r = v) => (n.f.r = v)
+   * - all n: e.*f : n.r in n.^f.r
    */
-  public List<Gene> createsGenesFromSimpleClosuredExpressionsForValues(Expr simpleClosuredExpr)
-      throws InvalidConfigurationException, Err {
+  public List<Gene> createsGenesFromSimpleClosuredExpressionsForValues(Expr simpleClosuredExpr) throws InvalidConfigurationException {
 
-    Class<?> typeOfElementsInSet = simpleClosuredExpr.type();
-    Set<Expr> joinableExpressions = targetInfo
-        .getJoineableExpressionsOfCurrentType(typeOfElementsInSet);
-
+    Set<Expr> joineableExpressions = targetInfo.getJoineableExpressionsOfCurrentType(simpleClosuredExpr.classOfElemsInSet());
     List<Gene> genes = new LinkedList<>();
     ExprGeneValue geneValue;
+    Class<?> typeElemsInSet = simpleClosuredExpr.classOfElemsInSet();
 
     // For each joineable expr generate the quantified expressions
-    for (Expr joineableExpr : joinableExpressions) {
-      throw new UnsupportedOperationException("imeplement this properly");
+    for (Expr joineableExpr : joineableExpressions) {
+      if (typeElemsInSet.equals(joineableExpr.type()))
+        continue;
+      if (Number.class.isAssignableFrom(joineableExpr.type())) {
+        // Values are numeric
+        // all n: e.*f : (n.f != null) => n.r op n.f.r
+        geneValue = GeneValuesFactory.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        genes.add(new ExprGene(conf, geneValue, targetInfo));
+      } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
+        // Values are booleans
+        throw new UnsupportedOperationException("Handle boolean value properly");
+      } else {
+        // Values are objects
+        // all n: e.*(f+g) : (n.r != null)
+        geneValue = GeneValuesFactory.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        genes.add(new ExprGene(conf, geneValue, targetInfo));
+      }
+      // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
     }
     return genes;
+
   }
 
   /**
@@ -736,7 +753,7 @@ public class GenesFactory {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValuesFactory.doubleQtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValuesFactory.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
