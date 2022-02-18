@@ -284,7 +284,7 @@ public class ExprBuilder {
     Set_exprContext s = ExprUtils.getClosuredExprSet(closured);
     Closure_fieldContext field_1 = s.closure_field();
     Closure_fieldContext field_2 = field_1.closure_field();
-    if (field_2 == null)
+    if (field_2 == null && code==2)
       throw new IllegalArgumentException("The closured expression is supposed to be double closured");
 
     Expr e;
