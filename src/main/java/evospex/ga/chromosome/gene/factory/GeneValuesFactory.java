@@ -1,10 +1,10 @@
-package evospex.ga.chromosome.factory;
+package evospex.ga.chromosome.gene.factory;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprOperator;
-import evospex.ga.chromosome.ExprGeneType;
-import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.gene.ExprGeneType;
+import evospex.ga.chromosome.gene.ExprGeneValue;
 
 /**
  * This class represents a Gene Values Factory, which allows to create specific gene values.
