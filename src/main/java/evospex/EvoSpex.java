@@ -80,34 +80,6 @@ public class EvoSpex {
   }
 
   /**
-   * Process the given file
-   */
-  public static int processClass(String filePath) throws Exception {
-    System.out.println("Starting learning process for: " + filePath);
-    EvoSpexParameters params = new EvoSpexParameters();
-    EvoSpexGA learner = new EvoSpexGA(filePath, params);
-    learner.learnSpecFromEmptySpec();
-    return 1;
-  }
-
-  /**
-   * Process the given file and attempt to learn the postcondition of the given method
-   * 
-   * @throws InvalidConfigurationException
-   */
-  public static int processClass(String filePath, String inputsFile, String positivesFile,
-                                 String negativesFile) throws Exception {
-    System.out.println("Starting learning process for: " + filePath);
-    EvoSpexParameters params = new EvoSpexParameters();
-    params.setInputsFilename(inputsFile);
-    params.setPositivesFilename(positivesFile);
-    params.setNegativesFilename(negativesFile);
-    EvoSpexGA learner = new EvoSpexGA(filePath, params);
-    learner.learnPostCondition();
-    return 1;
-  }
-
-  /**
    * Process the given file and attempt to learn the postcondition of the given method
    * 
    * @throws InvalidConfigurationException

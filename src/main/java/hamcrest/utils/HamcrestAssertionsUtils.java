@@ -1,18 +1,10 @@
 package hamcrest.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import evospex.expression.ExprGrammarParser;
-import org.jgap.Gene;
-import org.jgap.impl.IntegerGene;
-
-import evospex.ga.chromosome.ExprGene;
-import evospex.ga.chromosome.ExprGeneValue;
 import evospex.ga.chromosome.SpecChromosome;
 import hamcrest.assertion.HamcrestAssertion;
 import hamcrest.assertion.QuantifiedHamcrestAssertion;
-import hamcrest.assertion.SimpleHamcrestAssertion;
 import hamcrest.assertion.SimpleSetHamcrestAssertion;
 import hamcrest.expression.BinaryHamcrestExpr;
 import hamcrest.expression.HamcrestExpr;
@@ -32,7 +24,6 @@ import rfm.dynalloyCompiler.ast.ExprUnary;
 import rfm.dynalloyCompiler.ast.ExprVar;
 import rfm.dynalloyCompiler.ast.Func;
 import rfm.dynalloyCompiler.ast.Sig.PrimSig;
-import utils.TargetInformation;
 
 /**
  * Utils to generate Hamcrest assertions from chromosomes containing Alloy specifications

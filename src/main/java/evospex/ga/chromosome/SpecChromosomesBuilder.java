@@ -78,8 +78,7 @@ public class SpecChromosomesBuilder {
       examplesConsidered += 2;
 
     }
-    if (resultExample != null
-            && (resultExample instanceof Integer || resultExample instanceof Double)) {
+    if (resultExample != null && (resultExample instanceof Integer || resultExample instanceof Double)) {
       // TODO fix this
       targetInfo.addVariableForType(Integer.class, ExprName.RESULT);
     }
