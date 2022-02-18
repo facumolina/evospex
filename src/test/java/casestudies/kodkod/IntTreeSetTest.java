@@ -2,8 +2,6 @@ package casestudies.kodkod;
 
 import org.junit.Test;
 
-import hamcrest.utils.ExpressionEvaluator;
-
 public class IntTreeSetTest {
 
   @Test

@@ -3,7 +3,6 @@ package report;
 import java.util.List;
 
 import evospex.expression.Expr;
-import hamcrest.assertion.HamcrestAssertion;
 import utils.EvoSpexParameters;
 
 /**
