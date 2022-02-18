@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import evospex.expression.ExprBuilder;
-import evospex.ga.chromosome.ExprGeneType;
+import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
@@ -16,8 +16,8 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 import org.jgap.data.config.Configurable;
 
-import evospex.ga.chromosome.ExprGene;
-import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneValue;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.EvoSpexParameters;

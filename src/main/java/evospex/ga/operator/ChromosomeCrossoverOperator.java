@@ -17,7 +17,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
-import evospex.ga.chromosome.ExprGene;
+import evospex.ga.chromosome.gene.ExprGene;
 import report.Stats;
 import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.TargetInformation;

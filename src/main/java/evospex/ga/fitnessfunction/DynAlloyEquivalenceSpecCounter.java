@@ -1,6 +1,5 @@
 package evospex.ga.fitnessfunction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,10 +10,8 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.impl.IntegerGene;
 
-import evospex.ga.chromosome.ExprGene;
-import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ConfigurationProperties;
-import rfm.dynalloyCompiler.ast.Expr;
 import wrapper.DynAlloyRunner;
 
 /**

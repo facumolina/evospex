@@ -11,15 +11,15 @@ import java.util.Random;
 
 import evospex.ConfigurationProperties;
 import evospex.CustomConfiguration;
+import evospex.ga.chromosome.SpecChromosomesBuilder;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 
-import evospex.ga.chromosome.factory.GenesFactory;
-import evospex.ga.chromosome.ExprGene;
-import evospex.ga.chromosome.ExprGeneValueCloneHandler;
+import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneValueCloneHandler;
 import evospex.ga.chromosome.SpecChromosome;
 import evospex.ga.fitnessfunction.DynAlloyEquivalenceSpecCounter;
 import evospex.ga.fitnessfunction.DynAlloyPassingAssertionsCounter;
@@ -49,7 +49,7 @@ public class EvoSpexGA {
   private TargetInformation targetInformation; // Contains information regarding the target and method
   private Class<?> targetClass; // Target class under analysis
   private EvoSpexParameters parameters; // Evolutionary process arguments
-  private GenesFactory cgfactory;
+  private SpecChromosomesBuilder scbuilder;
 
   /**
    * Constructor
@@ -185,8 +185,7 @@ public class EvoSpexGA {
     conf.setSampleChromosome(sampleChromosome);
     conf.setKeepPopulationSizeConstant(false);
     conf.setPreservFittestIndividual(true);
-    cgfactory = new GenesFactory(conf, runner, genes_num, targetInformation,
-        parameters);
+    scbuilder = new SpecChromosomesBuilder(conf, genes_num, targetInformation, parameters);
   }
 
   /**
@@ -219,7 +218,7 @@ public class EvoSpexGA {
    */
   public void learnSpec() throws InvalidConfigurationException {
     conf.setFitnessFunction(new DynAlloyPassingAssertionsCounter(runner));
-    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
+    List<SpecChromosome> initialChromosomes = scbuilder.buildInitialPopulation();
     conf.setPopulationSize(initialChromosomes.size());
 
     Genotype population = Genotype.randomInitialGenotype(conf);
@@ -249,7 +248,7 @@ public class EvoSpexGA {
   public void learnSpecFromSpec() throws InvalidConfigurationException {
 
     conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
-    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
+    List<SpecChromosome> initialChromosomes = scbuilder.buildInitialPopulation();
     conf.setPopulationSize(parameters.getPopulationSize());
 
     Genotype population = Genotype.randomInitialGenotype(conf);
@@ -342,7 +341,7 @@ public class EvoSpexGA {
     // Add the fitness function
     conf.setFitnessFunction(new DynAlloyEquivalenceSpecCounter(runner, genes_num));
     // Initial chromosomes
-    List<SpecChromosome> initialChromosomes = cgfactory.buildInitialPopulation();
+    List<SpecChromosome> initialChromosomes = scbuilder.buildInitialPopulation();
     System.out
         .println("Amount of genes per Chromosome: " + initialChromosomes.get(0).getGenes().length);
     conf.setPopulationSize(parameters.getPopulationSize());
@@ -399,7 +398,7 @@ public class EvoSpexGA {
     conf.setFitnessFunction(new PostConditionSpecEvaluator(genes_num, parameters));
 
     // Initial chromosomes
-    List<SpecChromosome> initialPopulation = cgfactory.buildInitialPopulation();
+    List<SpecChromosome> initialPopulation = scbuilder.buildInitialPopulation();
     conf.setPopulationSize(parameters.getPopulationSize());
 
     // Initial report

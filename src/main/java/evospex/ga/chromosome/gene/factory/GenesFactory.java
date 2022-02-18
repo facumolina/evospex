@@ -12,6 +12,7 @@ import evospex.expression.evaluator.NonEvaluableExpressionException;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.factory.GeneValuesFactory;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;

@@ -1,4 +1,4 @@
-package evospex.ga.chromosome;
+package evospex.ga.chromosome.gene;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;

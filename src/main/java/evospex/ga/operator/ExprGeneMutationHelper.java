@@ -1,9 +1,9 @@
 package evospex.ga.operator;
 
 import evospex.expression.ExprBuilder;
-import evospex.ga.chromosome.ExprGene;
-import evospex.ga.chromosome.ExprGeneType;
-import evospex.ga.chromosome.ExprGeneValue;
+import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneType;
+import evospex.ga.chromosome.gene.ExprGeneValue;
 
 import java.util.LinkedList;
 import java.util.List;

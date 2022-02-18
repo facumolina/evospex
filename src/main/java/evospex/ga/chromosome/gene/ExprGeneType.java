@@ -1,4 +1,4 @@
-package evospex.ga.chromosome;
+package evospex.ga.chromosome.gene;
 
 /**
  * This class represents the types of the gene's value depending which type of expression contains

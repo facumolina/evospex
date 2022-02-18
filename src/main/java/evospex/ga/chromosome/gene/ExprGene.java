@@ -1,4 +1,4 @@
-package evospex.ga.chromosome;
+package evospex.ga.chromosome.gene;
 
 import java.util.Collection;
 import java.util.List;

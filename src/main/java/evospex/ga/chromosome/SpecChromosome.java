@@ -4,6 +4,7 @@ import java.util.*;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.ga.chromosome.gene.ExprGene;
 import org.jgap.BaseChromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessEvaluator;
