@@ -481,7 +481,7 @@ public class GenesFactory {
    * then for each var r : T -> AnotherType creates the following quantified expressions:
    * 
    * - all n: e.*f : n.r != null
-   * - all n: e.*f : n.r != n.f.r
+   * - all n: e.*f : n.f!=null => n.r = n.f.r
    * - all n: e.*f : (n.r = v) => (n.f.r = v)
    * - all n: e.*f : n.r in n.^f.r
    */
@@ -651,54 +651,6 @@ public class GenesFactory {
   public ExprGeneValue createsCardinalityExpression(Expr closuredExpression, Expr intExpr) {
     Expr qtExpr = ExprBuilder.cardinalityExpr(closuredExpression, intExpr);
     return new ExprGeneValue(qtExpr, ExprGeneType.CARDINALITY);
-  }
-
-  /**
-   * Given a simple closured expression e.*f, an expression r and a quantification operator creates
-   * a gene value with the following expression:
-   * - op n : e.*f : n.r = n.f.r
-   */
-  public static ExprGeneValue createsSimpleQtExpressionVarValueVarValueComparisonPredicate(
-      ExprContext closuredExpr, ExprContext toJoinWithVarExpr, String returnTypeExpr, String op) {
-    throw new UnsupportedOperationException("Implement this!!");
-  }
-
-  /**
-   * Given a closured expression e.*f and a quantification operator creates the expression op n :
-   * e.*f : n != null
-   */
-  public static ExprGeneValue createsQtExpressionVarPredicate(Expr closuredExpression, String op) {
-    throw new UnsupportedOperationException("Implement this!");
-  }
-
-  /**
-   * Given a closured expression e.*f and a quantification operator creates the expression op n :
-   * e.*f : n.f != null
-   */
-  public static ExprGeneValue createsQtExpressionNextVarPredicate(Expr closuredExpression,
-      String op) {
-    throw new UnsupportedOperationException("Implement this!");
-  }
-
-  /**
-   * Given a closured expression e.*(f+g), an expression r, a quantification operator and an int i
-   * creates a gene value with expression - op n : e.*(f+g) : n.r = v => n.f.r = v if i = 1 - op n :
-   * e.*(f+g) : n.r = v => n.g.r = v if i = 2 where v is possiblev value for an expression like r
-   */
-  public static ExprGeneValue createsQtExpressionVarValueVarValuePredicate(Expr closuredExpression,
-      Expr toJoinWithVarExpr, String returnTypeExpr, Expr value, String op, int i) {
-    throw new UnsupportedOperationException("Implement this!");
-  }
-
-  /**
-   * Given a closured expression e.*(f+g), an expression r, a quantification operator and an int i
-   * creates a gene value with expression - op n : e.*(f+g) : n.r = v => n.f != null if i = 1 - op n
-   * : e.*(f+g) : n.r = v => n.g != null if i = 2 where v is possiblev value for an expression like
-   * r
-   */
-  public static ExprGeneValue createsQtExpressionVarValueVarPredicate(Expr closuredExpression,
-      Expr toJoinWithVarExpr, String returnTypeExpr, Expr value, String op, int i) {
-    throw new UnsupportedOperationException("Implement this!");
   }
 
   /**

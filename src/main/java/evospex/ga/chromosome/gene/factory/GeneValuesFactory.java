@@ -50,9 +50,9 @@ public class GeneValuesFactory {
   }
 
   /**
-   * Given a double closured expression e.*f, an expression r and a quantification operator op
-   * creates a gene value with one of the following expression:
-   * - op n : e.*(f) | (n.f!=null)=> n.r = n.f.r
+   * Given a single closured expression e.*f, an expression r and a quantification operator op
+   * creates a gene value with the following expression:
+   * - op n : e.*(f) | (n.f!=null) => n.r = n.f.r
    */
   public static ExprGeneValue singleQtTwoVarValuesComparison(Expr closured, Expr toJoinWithVarExpr, String op) {
     Expr qtExpr = ExprBuilder.qtExprTwoVarValuesComparison(closured, toJoinWithVarExpr, op, 1);
