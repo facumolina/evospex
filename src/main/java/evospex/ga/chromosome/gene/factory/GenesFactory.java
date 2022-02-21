@@ -16,11 +16,6 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 
-import rfm.dynalloy.Err;
-
-import rfm.dynalloyCompiler.ast.ExprQt;
-
-import rfm.dynalloyCompiler.ast.Type;
 import utils.JavaClassesUtils;
 import utils.TargetInformation;
 import evospex.EvoSpexParameters;
@@ -666,7 +661,7 @@ public class GenesFactory {
    * - op n : e.*f : n.r = n.f.r
    */
   public static ExprGeneValue createsSimpleQtExpressionVarValueVarValueComparisonPredicate(
-      ExprContext closuredExpr, ExprContext toJoinWithVarExpr, Type returnTypeExpr, ExprQt.Op op) throws Err {
+      ExprContext closuredExpr, ExprContext toJoinWithVarExpr, String returnTypeExpr, String op) {
     throw new UnsupportedOperationException("Implement this!!");
   }
 
@@ -693,7 +688,7 @@ public class GenesFactory {
    * e.*(f+g) : n.r = v => n.g.r = v if i = 2 where v is possiblev value for an expression like r
    */
   public static ExprGeneValue createsQtExpressionVarValueVarValuePredicate(Expr closuredExpression,
-      Expr toJoinWithVarExpr, Type returnTypeExpr, Expr value, String op, int i) throws Err {
+      Expr toJoinWithVarExpr, String returnTypeExpr, Expr value, String op, int i) {
     throw new UnsupportedOperationException("Implement this!");
   }
 
@@ -704,7 +699,7 @@ public class GenesFactory {
    * r
    */
   public static ExprGeneValue createsQtExpressionVarValueVarPredicate(Expr closuredExpression,
-      Expr toJoinWithVarExpr, Type returnTypeExpr, Expr value, String op, int i) throws Err {
+      Expr toJoinWithVarExpr, String returnTypeExpr, Expr value, String op, int i) {
     throw new UnsupportedOperationException("Implement this!");
   }
 
