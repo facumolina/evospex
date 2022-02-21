@@ -19,7 +19,6 @@ import org.jgap.data.config.Configurable;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import evospex.report.Stats;
-import rfm.dynalloyCompiler.ast.ExprConstant;
 import evospex.EvoSpexParameters;
 
 /**
@@ -34,8 +33,6 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
 
   /**
    * Constructor
-   * 
-   * @param a_configuration
    * @throws InvalidConfigurationException
    */
   public ExprGeneMutationOperator(Configuration a_configuration, EvoSpexParameters parameters)
@@ -46,7 +43,7 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
 
   public void setMutationProb(double mProb) {
     if (mProb < 0 || mProb > 1)
-      throw new IllegalArgumentException("Invalid probabilty");
+      throw new IllegalArgumentException("Invalid probability");
 
     mutationProb = mProb;
   }
@@ -101,26 +98,18 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
           // Set the new chromosome with fitness -1 so it will be recalculated
           copyOfChromosome.setFitnessValueDirectly(-1);
 
-          // if (chrom.getAmountOfCounterexamples().compareTo(new Double(0))==0) {
-          // try {
-          // genes[positionToMutate] = new ExprGene(chrom.getConfiguration(),new
-          // ExprGeneValue(ExprConstant.TRUE),null);
-          // } catch (InvalidConfigurationException e) {
-          // e.printStackTrace();
-          // }
-          // } else {
           ExprGene toMutate = (ExprGene) genes[positionToMutate];
           toMutate.setAmountOfGenesInChromosome(chrom.getAmountOfActiveGenes());
           toMutate.setIsPartOfSolution(chrom.getAmountOfNegativeCounterexamples() == 0);
           mutateGene(toMutate, generator);
-          // }
+
 
           if (activeGenesPositions.size() > 1) {
             // The cloned chromosome has more than one gene. So create one new chromosome that
             // contains just the new gene
             try {
               ExprGeneValue geneValue = (ExprGeneValue) genes[positionToMutate].getAllele();
-              if (!geneValue.getExpression().equals(ExprConstant.TRUE)) {
+              if (!geneValue.getExpression().equals(ExprBuilder.TRUE)) {
                 ExprGene newGene = new ExprGene(copyOfChromosome.getConfiguration(),
                     geneValue.clone(),
                     ((ExprGene) genes[positionToMutate]).getTargetInformation());
@@ -154,27 +143,13 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
   }
 
   /**
-   * Print all the chromosomes
-   */
-  private void printChromosomes(List a_candidateChromosomes) {
-    System.out.println("Total: " + a_candidateChromosomes.size());
-    for (int i = 0; i < a_candidateChromosomes.size(); i++) {
-      Object o = a_candidateChromosomes.get(i);
-      System.out.println("Pos" + i + " " + o.toString());
-    }
-  }
-
-  /**
    * Returns all the positions of the genes array in which the expression is not true
-   * 
-   * @param genes
-   * @return
    */
   private List<Integer> getActivePositions(Gene[] genes) {
-    LinkedList<Integer> activePositions = new LinkedList<Integer>();
+    LinkedList<Integer> activePositions = new LinkedList<>();
     for (int j = 0; j < genes.length; j++) {
       ExprGene gene = (ExprGene) genes[j];
-      if (!gene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+      if (!gene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
         activePositions.add(j);
       }
     }

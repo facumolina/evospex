@@ -2,10 +2,10 @@ package evospex.ga.operator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
@@ -19,7 +19,6 @@ import org.jgap.RandomGenerator;
 
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.report.Stats;
-import rfm.dynalloyCompiler.ast.ExprConstant;
 import utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
@@ -208,23 +207,6 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
   }
 
   /**
-   * Returns all the positions of the genes array in which the expression is not true
-   * 
-   * @param genes
-   * @return
-   */
-  private List<Integer> getActivePositions(Gene[] genes) {
-    LinkedList<Integer> activePositions = new LinkedList<Integer>();
-    for (int j = 0; j < genes.length; j++) {
-      ExprGene gene = (ExprGene) genes[j];
-      if (!gene.getValue().getExpression().equals(ExprConstant.TRUE)) {
-        activePositions.add(j);
-      }
-    }
-    return activePositions;
-  }
-
-  /**
    * Returns true if the two chromosomes are adequate for crossover
    */
   private boolean canPerformCrossover(SpecChromosome chrom1, SpecChromosome chrom2) {
@@ -288,7 +270,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
         int i = 0;
         for (int j = 0; j < firstGenes.length; j++) {
           ExprGene gene = (ExprGene) firstGenes[j];
-          if (gene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+          if (gene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
             gene.setAllele(secondGenes[i].getAllele());
             i++;
           }
@@ -382,7 +364,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
       for (int i = position; i < genes.length; i++) {
         ExprGene currentGene = (ExprGene) genes[i];
         if ((currentGene != null)
-            && !currentGene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+            && !currentGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
           return new ExprGene(currentGene.getConfiguration(), currentGene.getValue().clone(),
               currentGene.getTargetInformation());
         }
@@ -415,7 +397,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
     for (int i = 0; i < genesArray.length && positionToAdd < 0; i++) {
       ExprGene currentGene = (ExprGene) genesArray[i];
       if ((currentGene == null)
-          || currentGene.getValue().getExpression().equals(ExprConstant.TRUE)) {
+          || currentGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
         positionToAdd = i;
       }
     }
