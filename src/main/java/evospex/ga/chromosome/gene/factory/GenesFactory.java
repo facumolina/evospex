@@ -29,16 +29,14 @@ import evospex.EvoSpexParameters;
 public class GenesFactory {
 
   private Configuration conf;
-  private int genes_num;
   private final TargetInformation targetInfo;
   private EvoSpexParameters parameters;
 
   /**
    * Constructor
    */
-  public GenesFactory(Configuration conf, int genes, TargetInformation info, EvoSpexParameters params) {
+  public GenesFactory(Configuration conf, TargetInformation info, EvoSpexParameters params) {
     this.conf = conf;
-    genes_num = genes;
     targetInfo = info;
     parameters = params;
   }

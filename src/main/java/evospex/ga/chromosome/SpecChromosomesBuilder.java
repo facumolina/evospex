@@ -24,11 +24,11 @@ import java.util.*;
  */
 public class SpecChromosomesBuilder {
 
-  private Configuration conf;
-  private int genes_num;
+  private final Configuration conf;
+  private final int genes_num;
   private final TargetInformation targetInfo;
-  private EvoSpexParameters parameters;
-  private GenesFactory genesFactory;
+  private final EvoSpexParameters parameters;
+  private final GenesFactory genesFactory;
 
   /**
    * Constructor
@@ -38,7 +38,7 @@ public class SpecChromosomesBuilder {
     genes_num = genes;
     targetInfo = info;
     parameters = params;
-    genesFactory = new GenesFactory(conf, genes, info, params);
+    genesFactory = new GenesFactory(conf, info, params);
   }
 
   /**
@@ -59,7 +59,7 @@ public class SpecChromosomesBuilder {
     List<MethodExecution> allNegatives = parameters.getNegativeObjects();
 
     Random r = new Random();
-    boolean addComplex = true; // Add complex formulas (comparisons, quantifications, result, args)
+    boolean addComplex = true; // Add complex formulas (comparisons, quantification, result, args)
     while (examplesConsidered < parameters.getAmountOfExamplesForInitialChromosomesGeneration()) {
       // Get a random positive and negative objects
       MethodExecution pos = allPositives.get(r.nextInt(allPositives.size()));
@@ -78,7 +78,7 @@ public class SpecChromosomesBuilder {
       examplesConsidered += 2;
 
     }
-    if (resultExample != null && (resultExample instanceof Integer || resultExample instanceof Double)) {
+    if (resultExample instanceof Integer || resultExample instanceof Double) {
       // TODO fix this
       targetInfo.addVariableForType(Integer.class, ExprName.RESULT);
     }
