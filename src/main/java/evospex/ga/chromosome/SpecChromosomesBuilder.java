@@ -5,7 +5,7 @@ import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
-import evospex.ga.chromosome.gene.builder.GenesBuilder;
+import evospex.ga.chromosome.gene.builder.*;
 import evospex.target.MethodExecution;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -28,7 +28,7 @@ public class SpecChromosomesBuilder {
   private final int genes_num;
   private final TargetInformation targetInfo;
   private final EvoSpexParameters parameters;
-  private final GenesBuilder genesBuilder;
+  private List<GeneBuilder> geneBuilders;
 
   /**
    * Constructor
@@ -38,7 +38,27 @@ public class SpecChromosomesBuilder {
     genes_num = genes;
     targetInfo = info;
     parameters = params;
-    genesBuilder = new GenesBuilder(conf, info, params);
+    setUpGeneBuilders();
+  }
+
+  /**
+   * Set up the gene builders;
+   */
+  private void setUpGeneBuilders() {
+    geneBuilders = new LinkedList<>();
+    if (parameters.getConsiderJoinedExpressions())
+      geneBuilders.add(new FromJoinedExpressionsGeneBuilder(conf, targetInfo, parameters));
+    if (parameters.getConsiderJoinedExpressionsComparisons()) {
+      geneBuilders.add(new FromJoinedExpressionsComparisonsGeneBuilder(conf, targetInfo, parameters));
+    }
+    if (parameters.getConsiderSimpleClosuredExpressions())
+      geneBuilders.add(new FromSimpleClosuredExpressionsGeneBuilder(conf, targetInfo, parameters));
+    if (parameters.getConsiderDoubleClosuredExpressions())
+      geneBuilders.add(new FromDoubleClosuredExpressionsGeneBuilder(conf, targetInfo, parameters));
+
+    geneBuilders.add(new FromResultObjectGeneBuilder(conf, targetInfo, parameters));
+    geneBuilders.add(new FromArgumentsGeneBuilder(conf, targetInfo, parameters));
+    geneBuilders.add(new FromMapsGeneBuilder(conf, targetInfo, parameters));
   }
 
   /**
@@ -54,27 +74,23 @@ public class SpecChromosomesBuilder {
     LinkedList<SpecChromosome> chromosomes = new LinkedList<>();
     int examplesConsidered = 0;
     Object resultExample = EvoSpexParameters.RESULT_EXAMPLE;
-    List<Object> argsExample = EvoSpexParameters.ARGS_EXAMPLES;
+
     List<MethodExecution> allPositives = parameters.getPositiveObjects();
     List<MethodExecution> allNegatives = parameters.getNegativeObjects();
 
     Random r = new Random();
-    boolean addComplex = true; // Add complex formulas (comparisons, quantification, result, args)
     while (examplesConsidered < parameters.getAmountOfExamplesForInitialChromosomesGeneration()) {
       // Get a random positive and negative objects
       MethodExecution pos = allPositives.get(r.nextInt(allPositives.size()));
       MethodExecution neg = allNegatives.get(r.nextInt(allNegatives.size()));
 
       try {
-        chromosomes.addAll(generateChromosomesFromObject(pos.getObjectFinalState(), true,
-                resultExample, argsExample, addComplex));
-        chromosomes.addAll(generateChromosomesFromObject(neg.getObjectFinalState(), false,
-                resultExample, argsExample, addComplex));
+        chromosomes.addAll(generateChromosomesFromObject(pos.getObjectFinalState(), true));
+        chromosomes.addAll(generateChromosomesFromObject(neg.getObjectFinalState(), false));
       } catch (Exception e) {
         e.printStackTrace();
       }
 
-      addComplex = false; // Only once
       examplesConsidered += 2;
 
     }
@@ -90,16 +106,12 @@ public class SpecChromosomesBuilder {
    * Generates a list of individuals from an instance of the target class
    * @param o is an instance of the target class
    * @param isPositive indicates if belongs to a positive or negative example
-   * @param resultExample is an example of a method execution result
-   * @param argsExamples is an example of a method execution arguments
-   * @param addComplex indicates if complex expressions (quantification, etc) must be computed from the example
    * @return a list of individuals computed from the given arguments
    */
-  public List<SpecChromosome> generateChromosomesFromObject(Object o, boolean isPositive,
-                                                            Object resultExample, List<Object> argsExamples, boolean addComplex) throws InvalidConfigurationException {
+  public List<SpecChromosome> generateChromosomesFromObject(Object o, boolean isPositive) throws InvalidConfigurationException {
     List<SpecChromosome> chromosomes = new LinkedList<>();
-    List<Gene> genes = genesBuilder.createGenesFromObject(o, isPositive, resultExample, argsExamples,
-            addComplex);
+
+    List<Gene> genes = buildGenesFromObject(o, isPositive);
 
     if (parameters.getInitialChromosomesUnary()) {
       // For each gene create one chromosome that contains just one gene at the first position:
@@ -144,6 +156,21 @@ public class SpecChromosomesBuilder {
       }
     }
     return chromosomes;
+  }
+
+  /**
+   * Build genes using the gene builders
+   */
+  private List<Gene> buildGenesFromObject(Object o, boolean isPositive) throws InvalidConfigurationException {
+    List<Gene> genes = new LinkedList<>();
+    for (GeneBuilder builder : geneBuilders) {
+      if (builder instanceof FromJoinedExpressionsGeneBuilder) {
+        FromJoinedExpressionsGeneBuilder fromJoinedExpressionsGeneBuilder = (FromJoinedExpressionsGeneBuilder) builder;
+        fromJoinedExpressionsGeneBuilder.setObject(o, isPositive);
+      }
+      genes.addAll(builder.build());
+    }
+    return genes;
   }
 
 }
