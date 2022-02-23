@@ -5,7 +5,7 @@ import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
-import evospex.ga.chromosome.gene.factory.GenesFactory;
+import evospex.ga.chromosome.gene.builder.GenesBuilder;
 import evospex.target.MethodExecution;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -28,7 +28,7 @@ public class SpecChromosomesBuilder {
   private final int genes_num;
   private final TargetInformation targetInfo;
   private final EvoSpexParameters parameters;
-  private final GenesFactory genesFactory;
+  private final GenesBuilder genesBuilder;
 
   /**
    * Constructor
@@ -38,7 +38,7 @@ public class SpecChromosomesBuilder {
     genes_num = genes;
     targetInfo = info;
     parameters = params;
-    genesFactory = new GenesFactory(conf, info, params);
+    genesBuilder = new GenesBuilder(conf, info, params);
   }
 
   /**
@@ -98,7 +98,7 @@ public class SpecChromosomesBuilder {
   public List<SpecChromosome> generateChromosomesFromObject(Object o, boolean isPositive,
                                                             Object resultExample, List<Object> argsExamples, boolean addComplex) throws InvalidConfigurationException {
     List<SpecChromosome> chromosomes = new LinkedList<>();
-    List<Gene> genes = genesFactory.createGenesFromObject(o, isPositive, resultExample, argsExamples,
+    List<Gene> genes = genesBuilder.createGenesFromObject(o, isPositive, resultExample, argsExamples,
             addComplex);
 
     if (parameters.getInitialChromosomesUnary()) {

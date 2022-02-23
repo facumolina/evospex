@@ -1,4 +1,4 @@
-package evospex.ga.chromosome.gene.factory;
+package evospex.ga.chromosome.gene.builder;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
@@ -7,11 +7,11 @@ import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 
 /**
- * This class represents a Gene Values Factory, which allows to create specific gene values.
+ * This class represents a Gene Values Builder, which allows to build specific gene values.
  *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class GeneValuesFactory {
+public class GeneValuesBuilder {
 
   /**
    * Given a closured expression e.*f and a quantification operator creates the gene value with the

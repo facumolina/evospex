@@ -1,10 +1,9 @@
-package evospex.ga.chromosome.gene.factory;
+package evospex.ga.chromosome.gene.builder;
 
 import java.util.*;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
-import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.expression.evaluator.ExpressionEvaluator;
@@ -21,12 +20,12 @@ import utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
 /**
- * This class represents a Genes Factory, which allows to create the genes that will be part of the population of
+ * This class represents a Genes Builder, which allows to build genes that will be part of the population of
  * Chromosomes by providing methods to create specific genes.
  * 
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class GenesFactory {
+public class GenesBuilder {
 
   private Configuration conf;
   private final TargetInformation targetInfo;
@@ -35,7 +34,7 @@ public class GenesFactory {
   /**
    * Constructor
    */
-  public GenesFactory(Configuration conf, TargetInformation info, EvoSpexParameters params) {
+  public GenesBuilder(Configuration conf, TargetInformation info, EvoSpexParameters params) {
     this.conf = conf;
     targetInfo = info;
     parameters = params;
@@ -466,11 +465,11 @@ public class GenesFactory {
     // geneValue = ChromosomeGenesFactory.createsQtExpressionNextVarPredicate(correctedEvaluableExpr,"all");
 
     // (all + some) n : e.*f : n != n.f
-    geneValue = GeneValuesFactory.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*f : n in n.^f
-    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     return genes;
@@ -481,7 +480,7 @@ public class GenesFactory {
    * then for each var r : T -> AnotherType creates the following quantified expressions:
    * 
    * - all n: e.*f : n.r != null
-   * - all n: e.*f : n.f!=null => n.r = n.f.r
+   * - all n: e.*f : n.f!=null => n.r op n.f.r
    * - all n: e.*f : (n.r = v) => (n.f.r = v)
    * - all n: e.*f : n.r in n.^f.r
    */
@@ -499,7 +498,7 @@ public class GenesFactory {
       if (Number.class.isAssignableFrom(joineableExpr.type())) {
         // Values are numeric
         // all n: e.*f : (n.f != null) => n.r op n.f.r
-        geneValue = GeneValuesFactory.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValuesBuilder.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
@@ -507,7 +506,7 @@ public class GenesFactory {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValuesFactory.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValuesBuilder.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
@@ -566,30 +565,30 @@ public class GenesFactory {
     ExprGeneValue geneValue;
 
     // (all + some) n: e.*(f+g) : n != n.f
-    geneValue = GeneValuesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n != n.g
-    geneValue = GeneValuesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*(f+g) : n = n.f.g
-    geneValue = GeneValuesFactory.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 4);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 4);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^f
-    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
     // (all + some) n: e.*(f+g) : n in n.^g
-    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^(f+g)
-    geneValue = GeneValuesFactory.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // all n: e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
-    geneValue = GeneValuesFactory.createsQtExpressionSetSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValuesBuilder.createsQtExpressionSetSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     return genes;
@@ -624,10 +623,10 @@ public class GenesFactory {
       if (Number.class.isAssignableFrom(joineableExpr.type())) {
         // Values are numeric
         // all n: e.*(f+g) : (n.f != null) => n.r op n.f.r
-        geneValue = GeneValuesFactory.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
+        geneValue = GeneValuesBuilder.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
         // all n: e.*(f+g) : (n.g != Null) => n.r op n.g.r
-        geneValue = GeneValuesFactory.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
+        geneValue = GeneValuesBuilder.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
@@ -635,7 +634,7 @@ public class GenesFactory {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValuesFactory.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValuesBuilder.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
