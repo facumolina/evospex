@@ -5,17 +5,12 @@ import java.util.List;
 /**
  * This class represents a particular method execution. A method execution has the components o,
  * o_f, args and r where:
- * 
  * - o is the object from which the method was invoked
- * 
  * - o_f is the final state of the object from which the method was invoked
- * 
  * - args are the method arguments and,
- * 
  * - r is the method execution result
- * 
- * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class MethodExecution {
 
