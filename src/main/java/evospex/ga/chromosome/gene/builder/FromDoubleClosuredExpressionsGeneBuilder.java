@@ -2,11 +2,9 @@ package evospex.ga.chromosome.gene.builder;
 
 import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
-import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -17,6 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * FromDoubleClosuredExpressionsGeneBuilder class: allows to build genes from double closured expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
   /**
@@ -30,8 +33,7 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
   public List<Gene> build() throws InvalidConfigurationException {
     List<Expr> doubleClosuredExpressions = targetInfo.getDoubleClosuredExpressions();
     List<Gene> genes = new LinkedList<>();
-    for (int j = 0; j < doubleClosuredExpressions.size(); j++) {
-      Expr evaluableExpr = doubleClosuredExpressions.get(j);
+    for (Expr evaluableExpr : doubleClosuredExpressions) {
       if (evaluableExpr.toString().contains(ExprName.THIS_PRE) && !parameters.learnPre())
         continue;
 
@@ -46,7 +48,7 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
         List<Expr> joinedExpressionsOfIntType = targetInfo.getJoinedExpressionsOfTypeInt();
         // For each expression i of type int: #(e.*(f+g)) = i
         for (Expr intExpression : joinedExpressionsOfIntType) {
-          ExprGeneValue geneValue = GenesBuilderUtils.createsCardinalityExpression(evaluableExpr,intExpression);
+          ExprGeneValue geneValue = GeneBuilderUtils.createsCardinalityExpression(evaluableExpr, intExpression);
           genes.add(new ExprGene(conf, geneValue, targetInfo));
         }
       }
@@ -73,30 +75,30 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
     ExprGeneValue geneValue;
 
     // (all + some) n: e.*(f+g) : n != n.f
-    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n != n.g
-    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*(f+g) : n = n.f.g
-    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 4);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 4);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^f
-    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
     // (all + some) n: e.*(f+g) : n in n.^g
-    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^(f+g)
-    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // all n: e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
-    geneValue = GeneValuesBuilder.createsQtExpressionSetSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionSetSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     return genes;
@@ -131,10 +133,10 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
       if (Number.class.isAssignableFrom(joineableExpr.type())) {
         // Values are numeric
         // all n: e.*(f+g) : (n.f != null) => n.r op n.f.r
-        geneValue = GeneValuesBuilder.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
+        geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
         // all n: e.*(f+g) : (n.g != Null) => n.r op n.g.r
-        geneValue = GeneValuesBuilder.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
+        geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
@@ -142,7 +144,7 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValuesBuilder.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValueBuilderUtils.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)

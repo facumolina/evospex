@@ -11,6 +11,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * FromMapsGeneBuilder class: allows to build genes involving fields of type java.util.Map.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromMapsGeneBuilder extends GeneBuilder {
 
   /**

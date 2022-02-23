@@ -10,12 +10,17 @@ import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
-import sun.awt.image.ImageWatched;
 import utils.TargetInformation;
 
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * FromArgumentsGeneBuilder class: allows to build genes using the arguments of the target method
+ * as building blocks of the gene's expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromArgumentsGeneBuilder extends GeneBuilder {
 
   /**
@@ -24,6 +29,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
   public FromArgumentsGeneBuilder(Configuration conf, TargetInformation info, EvoSpexParameters params) {
     super(conf, info, params);
   }
+
   @Override
   public List<Gene> build() throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();
@@ -43,7 +49,6 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
    * Create a set of genes using from a method's argument value
    * @param argValue is a possible value for the argument
    * @param argLabel is a label identifying the argument
-   * @throws InvalidConfigurationException
    */
   public List<Gene> createGenesFromArgValue(Object argValue, String argLabel) throws InvalidConfigurationException {
     List<Gene> genes = new LinkedList<>();

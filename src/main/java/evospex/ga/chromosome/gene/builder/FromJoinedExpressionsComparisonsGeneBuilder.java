@@ -16,6 +16,11 @@ import utils.TargetInformation;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * FromJoinedExpressionsComparisonsGeneBuilder class: allows to build genes by comparing joined expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
 
   /**
@@ -51,8 +56,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
     List<Gene> genes = new LinkedList<>();
     Object[] values = targetInfo.getExpressionsByEvaluationValue().keySet().toArray();
     for (int j = 0; j < values.length; j++) {
-      List<Expr> expressionsThatEvaluateToValue = targetInfo.getExpressionsByEvaluationValue()
-              .get(values[j]);
+      List<Expr> expressionsThatEvaluateToValue = targetInfo.getExpressionsByEvaluationValue().get(values[j]);
       // Add a equality gene for each pair of expressions that evaluate to the same value
       for (int k = 0; k < expressionsThatEvaluateToValue.size() - 1; k++) {
         Expr leftExpression = expressionsThatEvaluateToValue.get(k);
@@ -61,7 +65,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
           if (!leftExpression.type().isAssignableFrom(rightExpression.type())
                   || leftExpression.toString().equals(rightExpression.toString()))
             continue;
-          if (!sameField(leftExpression, rightExpression))
+          if (GeneBuilderUtils.differentFields(leftExpression, rightExpression))
             continue;
           ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
           Expr geneExpr = ExprBuilder.eq(leftExpression, rightExpression);
@@ -74,13 +78,12 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
       // current value and the right side expression evaluates to some other value
       for (Expr leftExpression : expressionsThatEvaluateToValue) {
         for (int k = j + 1; k < values.length; k++) {
-          List<Expr> rightExpressions = targetInfo.getExpressionsByEvaluationValue()
-                  .get(values[k]);
+          List<Expr> rightExpressions = targetInfo.getExpressionsByEvaluationValue().get(values[k]);
           for (Expr rightExpression : rightExpressions) {
             if (!leftExpression.type().isAssignableFrom(rightExpression.type())
                     && !leftExpression.toString().equals(rightExpression.toString()))
               continue;
-            if (!sameField(leftExpression, rightExpression))
+            if (GeneBuilderUtils.differentFields(leftExpression, rightExpression))
               continue;
             ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
             Expr geneExpr = ExprBuilder.neq(leftExpression, rightExpression);
@@ -104,7 +107,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
         Expr rightExpr = evaluableJoinedExpressions.get(k);
         if (rightExpr.toString().contains(ExprName.THIS_PRE))
           continue;
-        if (leftExpr.type().equals(rightExpr)) {
+        if (leftExpr.type().equals(rightExpr.type())) {
           if (JavaClassesUtils.isNumber(leftExpr.type())) {
             // We are comparing numeric expressions
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
@@ -121,17 +124,6 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
     return genes;
   }
 
-  /**
-   * Returns true if both joined expressions are over the same field
-   */
-  private boolean sameField(Expr expr1, Expr expr2) {
-    String strExpr1 = expr1.toString();
-    String strExpr2 = expr2.toString();
-    int lastJoinIdx1 = strExpr1.lastIndexOf(".");
-    int lastJoinIdx2 = strExpr2.lastIndexOf(".");
-    if (lastJoinIdx1==-1 || lastJoinIdx2==-1)
-      return false;
-    return strExpr1.substring(lastJoinIdx1).equals(strExpr2.substring(lastJoinIdx2));
-  }
+
 
 }

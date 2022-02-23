@@ -11,7 +11,7 @@ import evospex.ga.chromosome.gene.ExprGeneValue;
  *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class GeneValuesBuilder {
+public class GeneValueBuilderUtils {
 
   /**
    * Given a closured expression e.*f and a quantification operator creates the gene value with the

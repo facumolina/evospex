@@ -17,6 +17,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * FromMapsGeneBuilder class: allows to build genes using the result of the target method
+ * as building blocks of the gene's expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromResultObjectGeneBuilder extends GeneBuilder {
 
   /**
@@ -51,14 +57,14 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       if (targetInfo.hasSets()) {
         List<Expr> sets = targetInfo.getSets();
         for (Expr setExpr : sets) {
-          ExprGeneValue newValue = GenesBuilderUtils.createsCardinalityExpression(setExpr, resultExpr);
+          ExprGeneValue newValue = GeneBuilderUtils.createsCardinalityExpression(setExpr, resultExpr);
           genes.add(new ExprGene(conf, newValue, targetInfo));
         }
       }
     } else if (resultExample instanceof String) {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      ExprGeneValue newValue = GenesBuilderUtils.createsGeneExprEqualToNull(resultExpr);
+      ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
       genes.add(new ExprGene(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
@@ -71,11 +77,11 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       }*/
     } else {
       if (resultExample instanceof Collection) {
-        collections_equalities((Collection) resultExample, resultExpr, genes);
+        collectionsEqualities((Collection) resultExample, resultExpr, genes);
       }
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      ExprGeneValue newValue = GenesBuilderUtils.createsGeneExprEqualToNull(resultExpr);
+      ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
       genes.add(new ExprGene(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
@@ -92,11 +98,8 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
 
   /**
    * Equality with other Collections of same type
-   *
-   * @throws InvalidConfigurationException
    */
-  private void collections_equalities(Collection c, Expr collection_expr, List<Gene> genes)
-          throws InvalidConfigurationException {
+  private void collectionsEqualities(Collection c, Expr collection_expr, List<Gene> genes) throws InvalidConfigurationException {
     Class<?> collection_type = JavaClassesUtils.guessElementType(c);
     if (collection_type != null) {
       List<Expr> collections = targetInfo.getSetsOfType(collection_type);

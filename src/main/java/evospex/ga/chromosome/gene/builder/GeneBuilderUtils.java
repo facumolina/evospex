@@ -5,7 +5,7 @@ import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 
-public class GenesBuilderUtils {
+public class GeneBuilderUtils {
 
   /**
    * Given a closured expression e.*f and an expression i of type int creates a gene value with

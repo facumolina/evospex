@@ -19,6 +19,11 @@ import utils.TargetInformation;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * FromJoinedExpressionsGeneBuilder class: allows to build genes from joined expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromJoinedExpressionsGeneBuilder extends GeneBuilder {
 
   private Object o;

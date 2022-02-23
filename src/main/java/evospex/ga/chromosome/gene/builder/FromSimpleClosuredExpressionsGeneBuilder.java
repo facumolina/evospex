@@ -15,6 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * FromSimpleClosuredExpressionsGeneBuilder class: allows to build genes from double closured expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
   /**
@@ -28,8 +33,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
   public List<Gene> build() throws InvalidConfigurationException {
     List<Expr> simpleClosuredExpressions = targetInfo.getSimpleClosuredExpressions();
     List<Gene> genes = new LinkedList<>();
-    for (int j = 0; j < simpleClosuredExpressions.size(); j++) {
-      Expr evaluableExpr = simpleClosuredExpressions.get(j);
+    for (Expr evaluableExpr : simpleClosuredExpressions) {
       if (evaluableExpr.toString().contains(ExprName.THIS_PRE) && !parameters.learnPre())
         continue;
 
@@ -63,11 +67,11 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
     // geneValue = ChromosomeGenesFactory.createsQtExpressionNextVarPredicate(correctedEvaluableExpr,"all");
 
     // (all + some) n : e.*f : n != n.f
-    geneValue = GeneValuesBuilder.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*f : n in n.^f
-    geneValue = GeneValuesBuilder.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
+    geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
     genes.add(new ExprGene(conf, geneValue, targetInfo));
 
     return genes;
@@ -96,7 +100,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
       if (Number.class.isAssignableFrom(joineableExpr.type())) {
         // Values are numeric
         // all n: e.*f : (n.f != null) => n.r op n.f.r
-        geneValue = GeneValuesBuilder.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValueBuilderUtils.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
@@ -104,7 +108,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValuesBuilder.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
