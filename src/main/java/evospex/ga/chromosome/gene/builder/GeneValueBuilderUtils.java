@@ -88,8 +88,8 @@ public class GeneValueBuilderUtils {
    * creates a gene value with the expression
    * - op n : e.*(f) | n.r != null
    */
-  public static ExprGeneValue qtSingleValueComparison(Expr closured, Expr toJoinWithVarExpr, String op) {
-    Expr qtExpr = ExprBuilder.qtExprOneVarValueComparison(closured, toJoinWithVarExpr, ExprBuilder.NULL, op);
+  public static ExprGeneValue qtSingleValueComparison(Expr closured, Expr toJoinWithVarExpr, Expr toCmp, String op) {
+    Expr qtExpr = ExprBuilder.qtExprOneVarValueComparison(closured, toJoinWithVarExpr, toCmp, op);
     ExprGeneType geneType = op.equals(ExprOperator.ALL) ? ExprGeneType.FORALL_VAR_VALUE : ExprGeneType.SOME_VAR_VALUE;
     return new ExprGeneValue(qtExpr, geneType);
   }

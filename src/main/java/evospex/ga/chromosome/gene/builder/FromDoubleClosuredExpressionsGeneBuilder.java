@@ -2,6 +2,7 @@ package evospex.ga.chromosome.gene.builder;
 
 import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
+import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGene;
@@ -144,7 +145,7 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValueBuilderUtils.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL);
+        geneValue = GeneValueBuilderUtils.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprBuilder.NULL, ExprOperator.ALL);
         genes.add(new ExprGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)

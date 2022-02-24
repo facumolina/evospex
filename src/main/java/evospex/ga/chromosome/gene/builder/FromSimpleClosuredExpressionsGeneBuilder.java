@@ -2,6 +2,7 @@ package evospex.ga.chromosome.gene.builder;
 
 import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
+import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGene;
@@ -90,31 +91,67 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
     Set<Expr> joineableExpressions = targetInfo.getJoineableExpressionsOfCurrentType(simpleClosuredExpr.classOfElemsInSet());
     List<Gene> genes = new LinkedList<>();
-    ExprGeneValue geneValue;
     Class<?> typeElemsInSet = simpleClosuredExpr.classOfElemsInSet();
 
     // For each joineable expr generate the quantified expressions
     for (Expr joineableExpr : joineableExpressions) {
       if (typeElemsInSet.equals(joineableExpr.type()))
         continue;
-      if (Number.class.isAssignableFrom(joineableExpr.type())) {
-        // Values are numeric
-        // all n: e.*f : (n.f != null) => n.r op n.f.r
-        geneValue = GeneValueBuilderUtils.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
-        genes.add(new ExprGene(conf, geneValue, targetInfo));
-      } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
-        // Values are booleans
-        throw new UnsupportedOperationException("Handle boolean value properly");
-      } else {
-        // Values are objects
-        // all n: e.*(f+g) : (n.r != null)
-        geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
-        genes.add(new ExprGene(conf, geneValue, targetInfo));
-      }
-      // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
+      genes.addAll(createsGenesFromSimpleClosuredExpressionOneValue(simpleClosuredExpr, joineableExpr));
+      genes.addAll(createsGenesFromSimpleClosuredExpressionTwoValues(simpleClosuredExpr, joineableExpr));
     }
     return genes;
 
   }
 
+  /**
+   * Creates genes from a simple closured expressions and a joineable type for a single value. Given the expressions
+   * e.*f with elements of type T and the expression r : T -> AnotherType, creates the following quantified expressions:
+   * - all n: e.*f : n.r if r is boolean
+   * - all n: e.*f : n.r op 0 if r is a numeric type
+   * - all n: e.*f : n.r op null if r is a reference type
+   */
+  private List<Gene> createsGenesFromSimpleClosuredExpressionOneValue(Expr simpleClosuredExpr, Expr joineableExpr) throws InvalidConfigurationException {
+    List<Gene> genes = new LinkedList<>();
+    ExprGeneValue geneValue;
+    if (Number.class.isAssignableFrom(joineableExpr.type())) {
+      // all n: e.*f : n.r op 0
+      geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.ZERO, ExprOperator.ALL);
+      genes.add(new ExprGene(conf, geneValue, targetInfo));
+    } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
+      // Values are booleans
+      throw new UnsupportedOperationException("Handle boolean value properly");
+    } else {
+      // Values are objects
+      // all n: e.*f : n.r op null
+      geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.NULL, ExprOperator.ALL);
+      genes.add(new ExprGene(conf, geneValue, targetInfo));
+    }
+    return genes;
+  }
+
+
+  /**
+   * Creates genes from a simple closured expressions and a joineable type for a single value. Given the expressions
+   * e.*f with elements of type T and the expression r : T -> AnotherType, creates the following quantified expressions:
+   * - all n: e.*f : n.f!=null => n.r op n.f.r
+   * - all n: e.*f : (n.r = v) => (n.f.r = v)
+   */
+  private List<Gene> createsGenesFromSimpleClosuredExpressionTwoValues(Expr simpleClosuredExpr, Expr joineableExpr) throws InvalidConfigurationException {
+    List<Gene> genes = new LinkedList<>();
+    ExprGeneValue geneValue;
+    if (Number.class.isAssignableFrom(joineableExpr.type())) {
+      // all n: e.*f : (n.f != null) => n.r op n.f.r
+      geneValue = GeneValueBuilderUtils.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
+      genes.add(new ExprGene(conf, geneValue, targetInfo));
+    } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
+      // Values are booleans
+      throw new UnsupportedOperationException("Handle boolean value properly");
+    } else {
+      // Values are objects
+      throw new UnsupportedOperationException("Handle object value properly");
+    }
+    // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
+    return genes;
+  }
 }
