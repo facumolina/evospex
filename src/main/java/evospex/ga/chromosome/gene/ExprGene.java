@@ -35,7 +35,7 @@ import utils.TargetInformation;
 public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
   private ExprGeneValue value;
-  private TargetInformation targetInfo;
+  private final TargetInformation targetInfo;
   private int amountOfGenesInChromosome = 0;
   private boolean isPartOfSolution;
 
