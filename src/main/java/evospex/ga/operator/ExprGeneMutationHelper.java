@@ -78,7 +78,11 @@ public class ExprGeneMutationHelper {
         addTrueMutation = true;
         break;
       case FORALL_VAR_VALUE:
+        applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
         applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+        if (Number.class.isAssignableFrom(gene.getValue().getExpression().classOfValues())) {
+          applicableMutations.add(ExprGeneMutations.REPLACE_OP);
+        }
         // applicableMutations.add(DynAlloySpecLearnerMutations.TO_SOME);
         addTrueMutation = true;
         break;
