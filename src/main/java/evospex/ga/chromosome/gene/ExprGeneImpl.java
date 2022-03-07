@@ -13,15 +13,6 @@ public class ExprGeneImpl extends ExprGene {
   }
 
   @Override
-  public Gene newGene() {
-    ExprGeneImpl result = (ExprGeneImpl)this.newGeneInternal();
-    result.setConstraintChecker(this.getConstraintChecker());
-    result.setEnergy(this.getEnergy());
-    result.setApplicationData(this.getApplicationData());
-    return result;
-  }
-
-  @Override
   protected Gene newGeneInternal() {
     try {
       return new ExprGeneImpl(getConfiguration(), value.clone(), targetInfo);
@@ -106,20 +97,6 @@ public class ExprGeneImpl extends ExprGene {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Retrieves a string representation of the Expr Gene
-   */
-  @Override
-  public String toString() {
-    String representation;
-    if (getInternalValue() == null) {
-      representation = "null";
-    } else {
-      representation = getInternalValue().toString() + " - " + this.getClass().getSimpleName();
-    }
-    return representation;
   }
 
   @Override

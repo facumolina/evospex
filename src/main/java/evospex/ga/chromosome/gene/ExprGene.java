@@ -170,6 +170,15 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
     return value;
   }
 
+  @Override
+  public Gene newGene() {
+    Gene result = this.newGeneInternal();
+    result.setConstraintChecker(this.getConstraintChecker());
+    result.setEnergy(this.getEnergy());
+    result.setApplicationData(this.getApplicationData());
+    return result;
+  }
+
   /**
    * Apply some quantifier mutation
    */
@@ -879,37 +888,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is cardinality
    */
   protected void applyCardinalityMutation() {
-    String mutationToApply = getSomeApplicableMutation();
-    Expr expr = value.getExpression();
-    // Check the expression is adequate
-    Compare_opContext cmp_op = expr.exprCtx().compare_op();
-    if (cmp_op==null)
-      throw new IllegalStateException("The expression "+expr+" should be a comparison with = or !=");
-    List<ExprContext> expressions = expr.exprCtx().expr();
-    if (expressions.size() != 2)
-      throw new IllegalStateException("The expression "+expr+" should only have two expressions");
-
-    ExprContext left = expressions.get(0);
-    ExprContext right = expressions.get(1);
-
-    if (mutationToApply.equals(ExprGeneMutations.ADD_ONE)) {
-      // Add one at the right expression
-      String exprStr = left.getText() + " " + cmp_op.getText() + " " + right.getText()
-              + " " + ExprOperator.PLUS + " " + ExprName.ONE;
-      Expr newExpr = ExprBuilder.toExpr(exprStr, Boolean.class);
-      value.setExpression(newExpr, false);
-    } else if (mutationToApply.equals(ExprGeneMutations.SUB_ONE)) {
-      // Subtract one at the right expression
-      String exprStr = left.getText() + " " + cmp_op.getText() + " " + right.getText()
-              + " " + ExprOperator.MINUS + " " + ExprName.ONE;
-      Expr newExpr = ExprBuilder.toExpr(exprStr, Boolean.class);
-      value.setExpression(newExpr, false);
-    } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)){
-      // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
-    } else {
-      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   @Override
@@ -930,6 +909,20 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    */
   public boolean isDefault() {
     return value.getExpression().equals(ExprBuilder.TRUE);
+  }
+
+  /**
+   * Retrieves a string representation of the Expr Gene
+   */
+  @Override
+  public String toString() {
+    String representation;
+    if (getInternalValue() == null) {
+      representation = "null";
+    } else {
+      representation = getInternalValue().toString() + " - " + this.getClass().getSimpleName();
+    }
+    return representation;
   }
 
 }

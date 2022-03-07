@@ -27,15 +27,6 @@ public class CardinalityGene extends ExprGene {
   }
 
   @Override
-  public Gene newGene() {
-    CardinalityGene result = (CardinalityGene)this.newGeneInternal();
-    result.setConstraintChecker(this.getConstraintChecker());
-    result.setEnergy(this.getEnergy());
-    result.setApplicationData(this.getApplicationData());
-    return result;
-  }
-
-  @Override
   protected Gene newGeneInternal() {
     try {
       return new CardinalityGene(getConfiguration(), value.clone(), targetInfo);
@@ -81,17 +72,6 @@ public class CardinalityGene extends ExprGene {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  @Override
-  public String toString() {
-    String representation;
-    if (getInternalValue() == null) {
-      representation = "null";
-    } else {
-      representation = getInternalValue().toString() + " - CARDINALITY GENE";
-    }
-    return representation;
   }
 
   @Override
