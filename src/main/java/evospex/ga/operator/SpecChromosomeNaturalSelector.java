@@ -16,11 +16,11 @@ import org.jgap.Population;
 import evospex.report.Stats;
 
 /**
- * The InvariantChromosomeNaturalSelector implements a NaturalSelector. This selector ensure that
+ * The SpecChromosomeNaturalSelector implements a NaturalSelector. This selector ensure that
  * the best chromosomes and the best unary chromosomes (those of size one) are preserved in the
  * population for the next generation
  * 
- * @author fmolina
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class SpecChromosomeNaturalSelector extends NaturalSelector {
 
@@ -53,7 +53,7 @@ public class SpecChromosomeNaturalSelector extends NaturalSelector {
     super(a_config);
     m_chromosomes = new Population(a_config);
     m_fitnessValueComparator = new FitnessAgeValueComparator();
-    addedChromosomes = new HashSet<String>();
+    addedChromosomes = new HashSet<>();
   }
 
   @Override
@@ -78,7 +78,7 @@ public class SpecChromosomeNaturalSelector extends NaturalSelector {
 
     // To select a chromosome, we just go thru the sorted list.
     SpecChromosome selectedChromosome;
-    Set<String> unarySelectedGenes = new HashSet<String>();
+    Set<String> unarySelectedGenes = new HashSet<>();
 
     int validAdded = 0;
     for (int i = 0; i < validToSelect; i++) {
