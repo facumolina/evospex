@@ -320,6 +320,7 @@ public class SpecChromosome extends BaseChromosome {
    * returning it. If that is not possible, then a new Chromosome instance will be constructed and
    * its value set appropriately before returning.
    */
+  @Override
   public synchronized Object clone() {
     // Before doing anything, make sure that a Configuration object
     // has been set on this Chromosome. If not, then throw an
@@ -330,21 +331,7 @@ public class SpecChromosome extends BaseChromosome {
           + "Chromosome prior to invocation of the clone() method.");
     }
     SpecChromosome copy = null;
-    // Now, first see if we can pull a Chromosome from the pool and just
-    // set its gene values (alleles) appropriately.
-    // ------------------------------------------------------------
-    IChromosomePool pool = getConfiguration().getChromosomePool();
-    if (pool != null) {
-      copy = (SpecChromosome) pool.acquireChromosome();
-      if (copy != null) {
-        Gene[] genes = copy.getGenes();
-        for (int i = 0; i < size(); i++) {
-          genes[i].setAllele(getGene(i).getAllele());
-        }
-      }
-    }
     try {
-      if (copy == null) {
         // We couldn't fetch a Chromosome from the pool, so we need to create
         // a new one. First we make a copy of each of the Genes. We explicity
         // use the Gene at each respective gene location (locus) to create the
@@ -355,39 +342,11 @@ public class SpecChromosome extends BaseChromosome {
           Gene[] copyOfGenes = new Gene[size];
           for (int i = 0; i < copyOfGenes.length; i++) {
             copyOfGenes[i] = getGene(i).newGene();
-            Object allele = getGene(i).getAllele();
-            if (allele != null) {
-              IJGAPFactory factory = getConfiguration().getJGAPFactory();
-              if (factory != null) {
-                ICloneHandler cloner = factory.getCloneHandlerFor(allele, allele.getClass());
-                if (cloner != null) {
-                  try {
-                    allele = cloner.perform(allele, null, this);
-                  } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                  }
-                }
-              }
-            }
-            copyOfGenes[i].setAllele(allele);
           }
-          // Now construct a new Chromosome with the copies of the genes and
-          // return it. Also clone the IApplicationData object later on.
-          // ---------------------------------------------------------------
-          if (getClass() == SpecChromosome.class) {
-            copy = new SpecChromosome(getConfiguration(), copyOfGenes);
-          } else {
-            copy = (SpecChromosome) getConfiguration().getSampleChromosome().clone();
-            copy.setGenes(copyOfGenes);
-          }
+          copy = new SpecChromosome(getConfiguration(), copyOfGenes);
         } else {
-          if (getClass() == SpecChromosome.class) {
             copy = new SpecChromosome(getConfiguration());
-          } else {
-            copy = (SpecChromosome) getConfiguration().getSampleChromosome().clone();
-          }
         }
-      }
       copy.setFitnessValue(m_fitnessValue);
       // Clone constraint checker.
       // -------------------------
