@@ -3,6 +3,7 @@ package evospex.ga.chromosome;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import evospex.ga.chromosome.gene.builder.*;
@@ -119,12 +120,12 @@ public class SpecChromosomesBuilder {
       for (int i = 0; i < genes.size(); i++) {
         Gene[] new_genes = new Gene[genes_num];
         ExprGene exprGene = (ExprGene) genes.get(i);
-        ExprGene newExprGene = new ExprGene(conf, exprGene.getValue().clone(), targetInfo);
+        Gene newExprGene = exprGene.newGene();
         // Always the gene must be in the first position
         new_genes[0] = newExprGene;
         // The rest of the genes vales is : true
         for (int j = 1; j < new_genes.length; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
+          new_genes[j] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -132,7 +133,7 @@ public class SpecChromosomesBuilder {
       }
     } else {
       // Create chromosomes with each gene randomly picked.
-      genes.add(new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo));
+      genes.add(new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo));
       int chromosomesToCreate = parameters.getPopulationSize()
               / parameters.getAmountOfExamplesForInitialChromosomesGeneration();
       for (int i = 0; i < chromosomesToCreate; i++) {
@@ -145,10 +146,10 @@ public class SpecChromosomesBuilder {
           if (usedGenes.add(r))
             new_genes[j] = genes.get(r);
           else
-            new_genes[j] = ((ExprGene) genes.get(r)).clone();
+            new_genes[j] = genes.get(r).newGene();
         }
         for (int j = genes_to_fill; j < genes_num; j++) {
-          new_genes[j] = new ExprGene(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
+          new_genes[j] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);

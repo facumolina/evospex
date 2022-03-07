@@ -4,9 +4,7 @@ import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.*;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -44,7 +42,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       targetInfo.addVariableForType(Boolean.class, ExprName.RESULT);
       Expr geneExpr = ExprBuilder.eq(resultExpr, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-      genes.add(new ExprGene(conf, newValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
     } else if (Number.class.isAssignableFrom(resultExample.getClass())) {
       // The result is a numeric type, thus compare it with expressions of the same type
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
@@ -52,20 +50,20 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);
-        genes.add(new ExprGene(conf, newValue, targetInfo));
+        genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
       }
       if (targetInfo.hasSets()) {
         List<Expr> sets = targetInfo.getSets();
         for (Expr setExpr : sets) {
           ExprGeneValue newValue = GeneBuilderUtils.createsCardinalityExpression(setExpr, resultExpr);
-          genes.add(new ExprGene(conf, newValue, targetInfo));
+          genes.add(new CardinalityGene(conf, newValue, targetInfo));
         }
       }
     } else if (resultExample instanceof String) {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
       ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
-      genes.add(new ExprGene(conf, newValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains(resultExample.getClass().getSimpleName())
@@ -82,7 +80,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
       ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
-      genes.add(new ExprGene(conf, newValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains("this/" + resultExample.getClass().getSimpleName())) {
@@ -106,7 +104,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       for (Expr collection : collections) {
         Expr geneExpr = ExprBuilder.eq(collection_expr, collection);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-        genes.add(new ExprGene(conf, geneValue, targetInfo));
+        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
       }
     }
   }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import evospex.expression.ExprBuilder;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
@@ -108,15 +109,17 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
             // The cloned chromosome has more than one gene. So create one new chromosome that
             // contains just the new gene
             try {
-              ExprGeneValue geneValue = (ExprGeneValue) genes[positionToMutate].getAllele();
+              Gene geneInPos = genes[positionToMutate];
+              ExprGeneValue geneValue = (ExprGeneValue) geneInPos.getAllele();
               if (!geneValue.getExpression().equals(ExprBuilder.TRUE)) {
-                ExprGene newGene = new ExprGene(copyOfChromosome.getConfiguration(),
-                    geneValue.clone(),
-                    ((ExprGene) genes[positionToMutate]).getTargetInformation());
+                //ExprGene newGene = new ExprGene(copyOfChromosome.getConfiguration(),
+                //    geneValue.clone(),
+                //    ((ExprGene) genes[positionToMutate]).getTargetInformation());
+                ExprGene newGene = (ExprGene)geneInPos.newGene();
                 Gene[] newGenes = new Gene[genes.length];
                 newGenes[0] = newGene;
                 for (int k = 1; k < newGenes.length; k++) {
-                  newGenes[k] = new ExprGene(copyOfChromosome.getConfiguration(), new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), null);
+                  newGenes[k] = new ExprGeneImpl(copyOfChromosome.getConfiguration(), new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), null);
                 }
                 SpecChromosome newUnitaryChromosome = new SpecChromosome(
                     copyOfChromosome.getConfiguration(), newGenes);

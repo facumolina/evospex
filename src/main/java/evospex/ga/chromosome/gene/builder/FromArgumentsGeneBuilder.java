@@ -5,6 +5,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
@@ -61,7 +62,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         // argLabel = e where e is an integer expression.
         for (Expr expr : targetInfo.getIntEvaluableExpressions()) {
           ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
-          genes.add(new ExprGene(conf, newValue, targetInfo));
+          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
         }
       } else {
         // The value is a reference
@@ -70,7 +71,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
           Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(argLabel,argValue.getClass()), expr);
           System.out.println("Created eq expr for arg: "+geneExpr);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-          genes.add(new ExprGene(conf, newValue, targetInfo));
+          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
         }
       }
 
@@ -101,7 +102,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         try {
           Expr inExpr = ExprBuilder.in(argExpr, set);
           ExprGeneValue geneValue = new ExprGeneValue(inExpr, ExprGeneType.INCLUSION);
-          genes.add(new ExprGene(conf, geneValue, targetInfo));
+          genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
         } catch (InvalidConfigurationException e) {
           throw new IllegalStateException("Invalid config exception when adding considering expr: " + set);
         }
@@ -121,7 +122,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         // Create a gene with the expression argLabel in collection
         Expr geneExpr = ExprBuilder.in(ExprBuilder.toExpr(argLabel, expr.type()), expr);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.INCLUSION);
-        genes.add(new ExprGene(conf, geneValue, targetInfo));
+        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
       }
     }
     return genes;

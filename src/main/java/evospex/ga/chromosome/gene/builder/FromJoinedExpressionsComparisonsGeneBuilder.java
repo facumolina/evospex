@@ -5,6 +5,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
@@ -70,7 +71,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
           ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
           Expr geneExpr = ExprBuilder.eq(leftExpression, rightExpression);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, geneType);
-          genes.add(new ExprGene(conf, newValue, targetInfo));
+          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
         }
       }
 
@@ -88,7 +89,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
             ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
             Expr geneExpr = ExprBuilder.neq(leftExpression, rightExpression);
             ExprGeneValue newValue = new ExprGeneValue(geneExpr, geneType);
-            genes.add(new ExprGene(conf, newValue, targetInfo));
+            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
           }
         }
       }
@@ -112,11 +113,11 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
             // We are comparing numeric expressions
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.NUMERIC_COMPARISON);
-            genes.add(new ExprGene(conf, newValue, targetInfo));
+            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
           } else {
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.EQUALITY);
-            genes.add(new ExprGene(conf, newValue, targetInfo));
+            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
           }
         }
       }

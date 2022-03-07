@@ -8,6 +8,7 @@ import evospex.expression.evaluator.NonEvaluableExpressionException;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
@@ -74,13 +75,13 @@ public class FromJoinedExpressionsGeneBuilder extends GeneBuilder {
       targetInfo.updateEvaluationValueInfo(result,expr);
       Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.toExpr(result.toString(), result.getClass()), Boolean.class);
       ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
-      return new ExprGene(conf, newValue, targetInfo);
+      return new ExprGeneImpl(conf, newValue, targetInfo);
     } else {
       // The result is not a number, then compare with null
       targetInfo.updateEvaluationValueInfo(ExprBuilder.NULL, expr);
       Expr newExpr = ExprBuilder.applyOp(expr, opStr, ExprBuilder.NULL, Boolean.class);
       ExprGeneValue newValue = new ExprGeneValue(newExpr, ExprGeneType.EQUALITY);
-      return new ExprGene(conf, newValue, targetInfo);
+      return new ExprGeneImpl(conf, newValue, targetInfo);
     }
   }
 }

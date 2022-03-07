@@ -6,6 +6,7 @@ import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -69,11 +70,11 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
     // (all + some) n : e.*f : n != n.f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
-    genes.add(new ExprGene(conf, geneValue, targetInfo));
+    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*f : n in n.^f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
-    genes.add(new ExprGene(conf, geneValue, targetInfo));
+    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
 
     return genes;
   }
@@ -117,7 +118,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
     if (Number.class.isAssignableFrom(joineableExpr.type())) {
       // all n: e.*f : n.r op 0
       geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.ZERO, ExprOperator.ALL);
-      genes.add(new ExprGene(conf, geneValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
     } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
       // Values are booleans
       throw new UnsupportedOperationException("Handle boolean value properly");
@@ -125,7 +126,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
       // Values are objects
       // all n: e.*f : n.r op null
       geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.NULL, ExprOperator.ALL);
-      genes.add(new ExprGene(conf, geneValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
     }
     return genes;
   }
@@ -143,7 +144,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
     if (Number.class.isAssignableFrom(joineableExpr.type())) {
       // all n: e.*f : (n.f != null) => n.r op n.f.r
       geneValue = GeneValueBuilderUtils.singleQtTwoVarValuesComparison(simpleClosuredExpr, joineableExpr, ExprOperator.ALL);
-      genes.add(new ExprGene(conf, geneValue, targetInfo));
+      genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
     } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
       // Values are booleans
       throw new UnsupportedOperationException("Handle boolean value properly");

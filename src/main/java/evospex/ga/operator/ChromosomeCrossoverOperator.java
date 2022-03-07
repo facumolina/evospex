@@ -7,6 +7,9 @@ import java.util.Set;
 
 import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosome;
+import evospex.ga.chromosome.gene.ExprGeneImpl;
+import evospex.ga.chromosome.gene.ExprGeneType;
+import evospex.ga.chromosome.gene.ExprGeneValue;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -168,8 +171,9 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
             usedChromosomes.add(chromosome.toString());
             ExprGene currentGene = (ExprGene) chromosome.getGenes()[0];
             if (currentAmountOfGenes < genesSize) {
-              genes[currentAmountOfGenes] = new ExprGene(currentGene.getConfiguration(),
-                  currentGene.getValue().clone(), currentGene.getTargetInformation());
+              //genes[currentAmountOfGenes] = new ExprGene(currentGene.getConfiguration(),
+              //    currentGene.getValue().clone(), currentGene.getTargetInformation());
+              genes[currentAmountOfGenes] = currentGene.newGene();
               currentAmountOfGenes++;
             }
             if (currentAmountOfGenes == genesSize) {
@@ -360,18 +364,14 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
    * given position
    */
   private Gene getFirstNonTrivialGene(Gene[] genes, int position) {
-    try {
+
       for (int i = position; i < genes.length; i++) {
         ExprGene currentGene = (ExprGene) genes[i];
         if ((currentGene != null)
             && !currentGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
-          return new ExprGene(currentGene.getConfiguration(), currentGene.getValue().clone(),
-              currentGene.getTargetInformation());
+          return currentGene.newGene();
         }
       }
-    } catch (InvalidConfigurationException e) {
-
-    }
     return null;
   }
 
@@ -381,7 +381,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
   private void initializeGenes(Gene[] genesArray, Configuration conf, TargetInformation dsi) {
     try {
       for (int i = 0; i < genesArray.length; i++) {
-        genesArray[i] = new ExprGene(conf, dsi);
+        genesArray[i] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), dsi);
       }
     } catch (InvalidConfigurationException e) {
       e.printStackTrace();

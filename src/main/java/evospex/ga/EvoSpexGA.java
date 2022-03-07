@@ -11,14 +11,14 @@ import java.util.Random;
 
 import evospex.ConfigurationProperties;
 import evospex.CustomConfiguration;
+import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosomesBuilder;
+import evospex.ga.chromosome.gene.*;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.InvalidConfigurationException;
 
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneValueCloneHandler;
 import evospex.ga.chromosome.SpecChromosome;
 import evospex.ga.fitnessfunction.PostConditionSpecEvaluator;
 import evospex.ga.operator.ChromosomeCrossoverOperator;
@@ -122,7 +122,7 @@ public class EvoSpexGA {
     genes_num = parameters.amountOfGenes();
     Gene[] sampleGenes = new Gene[genes_num];
     for (int i = 0; i < genes_num; i++) {
-      sampleGenes[i] = new ExprGene(conf, targetInformation);
+      sampleGenes[i] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInformation);
     }
     SpecChromosome sampleChromosome = new SpecChromosome(conf, sampleGenes);
     // Set up the configuration

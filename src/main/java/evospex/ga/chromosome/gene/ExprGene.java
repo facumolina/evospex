@@ -32,10 +32,10 @@ import utils.TargetInformation;
  * 
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
-public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
+public abstract class ExprGene extends BaseGene implements Gene, java.io.Serializable {
 
-  private ExprGeneValue value;
-  private final TargetInformation targetInfo;
+  protected ExprGeneValue value;
+  protected final TargetInformation targetInfo;
   private int amountOfGenesInChromosome = 0;
   private boolean isPartOfSolution;
 
@@ -56,7 +56,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Constructor with a given value
    * @param a_conf is the configuration object
    * @param value is the given expression value to be part of this gene
-   * @para info is the target information object
+   * @param info is the target information object
    * @throws InvalidConfigurationException
    */
   public ExprGene(Configuration a_conf, ExprGeneValue value, TargetInformation info)
@@ -102,15 +102,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
     this.isPartOfSolution = partOfSolution;
   }
 
-  @Override
-  protected Gene newGeneInternal() {
-    try {
-      return new ExprGene(getConfiguration(), this.value.clone(), this.targetInfo);
-    } catch (InvalidConfigurationException ex) {
-      throw new IllegalStateException(ex.getMessage());
-    }
-  }
-
   /**
    * Sets the given expression value as the new value for this gene
    */
@@ -121,7 +112,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Update the previous expression
    */
-  private void updatePreviousExpression(ExprGeneValue newValue) {
+  protected void updatePreviousExpression(ExprGeneValue newValue) {
     if (this.value.getPrevious() == null || !newValue.getExpression().equals(ExprBuilder.TRUE)) {
       this.value.setPrevious(newValue);
     }
@@ -180,87 +171,9 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   }
 
   /**
-   * Apply mutation according to the gene type
-   */
-  public void applyMutation(int index, double a_percentage) {
-    try {
-      updatePreviousExpression(value.clone());
-      switch (value.getGeneType()) {
-      case CARDINALITY:
-        applyCardinalityMutation();
-        break;
-      case CONSTANT:
-        applyConstantMutation();
-        break;
-      case EMPTYNESS:
-        applyEmptynessMutation();
-        break;
-      case EQUALITY:
-        applyEqualityMutation();
-        break;
-      case NUMERIC_COMPARISON:
-        applyIntComparisonMutation();
-        break;
-      case NEGATION:
-        applyNegationMutation();
-        break;
-      case INCLUSION:
-        applyInclusionMutation();
-        break;
-      case FORALL:
-        applyForAllMutation();
-        break;
-      case FORALL_VAR_VALUE:
-        applyForAllVarValueMutation();
-        break;
-      case FORALL_VAR_VAR:
-        applyForAllVarVarMutation();
-        break;
-      case FORALL_VAR_VALUE_VAR_VALUE:
-        applyForAllVarValueVarValueMutation();
-        break;
-      case FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON:
-        applyForAllVarValuesDoubleIntComparisonMutation();
-        break;
-      case FORALL_VAR_VALUES_DOUBLE_QT_INT_COMPARISON:
-        applyForAllVarValuesDoubleQuantificationIntComparisonMutation();
-        break;
-      case FORALL_VAR_SET:
-        applyForAllVarSetMutation();
-        break;
-      case FORALL_SET_SET:
-        applyForAllSetSetMutation();
-        break;
-      case SOME:
-        applySomeMutation();
-        break;
-      case SOME_VAR_VAR:
-        applySomeVarVarMutation();
-        break;
-      case SOME_VAR_SET:
-        applySomeVarSetMutation();
-        break;
-      case SOME_SET_SET:
-        applySomeSetSetMutation();
-        break;
-      case SOMEQT:
-        applySomeQuantifierMutation();
-        break;
-      case NO:
-        applyNoMutation();
-        break;
-      default:
-        applyDefaultMutation();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
    * Apply some quantifier mutation
    */
-  private void applySomeQuantifierMutation() {
+  protected void applySomeQuantifierMutation() {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -282,7 +195,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  private void applySomeVarVarMutation() {
+  protected void applySomeVarVarMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.NEGATE_BODY:
@@ -302,7 +215,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  private void applySomeVarSetMutation() {
+  protected void applySomeVarSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.NEGATE_BODY)) {
       throw new UnsupportedOperationException("implement this");
@@ -321,7 +234,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two sets
    */
-  private void applySomeSetSetMutation() {
+  protected void applySomeSetSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.NEGATE_BODY:
@@ -346,7 +259,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply emptyness mutation
    */
-  private void applyEmptynessMutation() {
+  protected void applyEmptynessMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.SOME)) {
       // Change some expr to no expr
@@ -360,14 +273,14 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply default mutation
    */
-  private void applyDefaultMutation() {
+  protected void applyDefaultMutation() {
     // TODO Auto-generated method stub
   }
 
   /**
    * Apply mutation when the gene expression is some
    */
-  private void applySomeMutation() {
+  protected void applySomeMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.EMPTYNESS)) {
       // Change some expr to no expr
@@ -381,7 +294,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is no and set the expression to some
    */
-  private void applyNoMutation() {
+  protected void applyNoMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.TO_SOME)) {
       // Change no expr to some expr
@@ -395,7 +308,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  private void applyForAllMutation() {
+  protected void applyForAllMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -427,7 +340,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and
    * the body is about one value
    */
-  private void applyForAllVarValueMutation() {
+  protected void applyForAllVarValueMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -484,7 +397,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two variables
    */
-  private void applyForAllVarVarMutation() {
+  protected void applyForAllVarVarMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -551,7 +464,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation of two variables n.value=v0 OP n.g.value=v0
    */
-  private void applyForAllVarValueVarValueMutation() {
+  protected void applyForAllVarValueVarValueMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -660,7 +573,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation like op[n.value,n.f.value] AND op[n.value,n.g.value]
    */
-  private void applyForAllVarValuesDoubleIntComparisonMutation() {
+  protected void applyForAllVarValuesDoubleIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.OP_NOT_EQ:
@@ -687,7 +600,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  private void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() {
+  protected void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
       ExprGeneMutationHelper.toTrue(value);
@@ -700,7 +613,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about a variable and a set
    */
-  private void applyForAllVarSetMutation() {
+  protected void applyForAllVarSetMutation() {
     Expr expr = value.getExpression();
     String mutationToApply = getSomeApplicableMutation();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -736,7 +649,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two sets
    */
-  private void applyForAllSetSetMutation() {
+  protected void applyForAllSetSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -762,7 +675,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is in
    */
-  private void applyInclusionMutation() {
+  protected void applyInclusionMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr  = value.getExpression();
     List<ExprContext> expressions = expr.exprCtx().expr();
@@ -808,7 +721,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is equal or not equal
    */
-  private void applyEqualityMutation() {
+  protected void applyEqualityMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
 
@@ -837,7 +750,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    * Apply mutation when the gene expression is an int comparison ( int [=,<>,<,>,<=,>=] int)
    *
    */
-  private void applyIntComparisonMutation() {
+  protected void applyIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Expr newExpr;
@@ -925,7 +838,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Gets randomly an applicable mutation for the current gene type
    */
-  private String getSomeApplicableMutation() {
+  protected String getSomeApplicableMutation() {
     List<String> mutations = ExprGeneMutationHelper.getApplicableMutations(this);
     if (mutations.size() > 0) {
       Random random = new Random();
@@ -938,7 +851,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is not
    */
-  private void applyNegationMutation() {
+  protected void applyNegationMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals("Negate")) {
       // Negate the expression, that is remove the not operator
@@ -952,7 +865,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is constant
    */
-  private void applyConstantMutation() {
+  protected void applyConstantMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals("Previous")) {
       // Get some previous expression
@@ -965,7 +878,7 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
   /**
    * Apply mutation when the gene expression is cardinality
    */
-  private void applyCardinalityMutation() {
+  protected void applyCardinalityMutation() {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     // Check the expression is adequate
@@ -1017,28 +930,6 @@ public class ExprGene extends BaseGene implements Gene, java.io.Serializable {
    */
   public boolean isDefault() {
     return value.getExpression().equals(ExprBuilder.TRUE);
-  }
-
-  /**
-   * Retrieves a string representation of the Expr Gene
-   */
-  @Override
-  public String toString() {
-    String representation;
-    if (getInternalValue() == null) {
-      representation = "null";
-    } else {
-      representation = getInternalValue().toString();
-    }
-    return representation;
-  }
-
-  public ExprGene clone() {
-    try {
-      return new ExprGene(getConfiguration(), this.value.clone(), this.targetInfo);
-    } catch (InvalidConfigurationException ex) {
-      throw new IllegalStateException(ex.getMessage());
-    }
   }
 
 }
