@@ -875,13 +875,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is constant
    */
   protected void applyConstantMutation() {
-    String mutationToApply = getSomeApplicableMutation();
-    if (mutationToApply.equals("Previous")) {
-      // Get some previous expression
-      Random random = new Random();
-      int randomNumber = random.nextInt(1);
-      value = value.getPrevious();
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**

@@ -2,10 +2,7 @@ package evospex.ga.chromosome;
 
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.*;
 import evospex.ga.chromosome.gene.builder.*;
 import evospex.target.MethodExecution;
 import org.jgap.Configuration;
@@ -125,7 +122,7 @@ public class SpecChromosomesBuilder {
         new_genes[0] = newExprGene;
         // The rest of the genes vales is : true
         for (int j = 1; j < new_genes.length; j++) {
-          new_genes[j] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
+          new_genes[j] = new ConstantGene(conf, targetInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);
@@ -133,7 +130,7 @@ public class SpecChromosomesBuilder {
       }
     } else {
       // Create chromosomes with each gene randomly picked.
-      genes.add(new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo));
+      genes.add(new ConstantGene(conf, targetInfo));
       int chromosomesToCreate = parameters.getPopulationSize()
               / parameters.getAmountOfExamplesForInitialChromosomesGeneration();
       for (int i = 0; i < chromosomesToCreate; i++) {
@@ -149,7 +146,7 @@ public class SpecChromosomesBuilder {
             new_genes[j] = genes.get(r).newGene();
         }
         for (int j = genes_to_fill; j < genes_num; j++) {
-          new_genes[j] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInfo);
+          new_genes[j] = new ConstantGene(conf, targetInfo);
         }
         SpecChromosome chromosome = new SpecChromosome(conf, new_genes);
         chromosome.setFitnessValueDirectly(-1);

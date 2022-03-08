@@ -122,7 +122,7 @@ public class EvoSpexGA {
     genes_num = parameters.amountOfGenes();
     Gene[] sampleGenes = new Gene[genes_num];
     for (int i = 0; i < genes_num; i++) {
-      sampleGenes[i] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), targetInformation);
+      sampleGenes[i] = new ConstantGene(conf, targetInformation);
     }
     SpecChromosome sampleChromosome = new SpecChromosome(conf, sampleGenes);
     // Set up the configuration

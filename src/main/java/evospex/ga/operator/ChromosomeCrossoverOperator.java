@@ -7,9 +7,7 @@ import java.util.Set;
 
 import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosome;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.*;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -20,7 +18,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
-import evospex.ga.chromosome.gene.ExprGene;
 import evospex.report.Stats;
 import utils.TargetInformation;
 import evospex.EvoSpexParameters;
@@ -378,10 +375,10 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
   /**
    * Initialize a genes array with true expressions
    */
-  private void initializeGenes(Gene[] genesArray, Configuration conf, TargetInformation dsi) {
+  private void initializeGenes(Gene[] genesArray, Configuration conf, TargetInformation targetInfo) {
     try {
       for (int i = 0; i < genesArray.length; i++) {
-        genesArray[i] = new ExprGeneImpl(conf, new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), dsi);
+        genesArray[i] = new ConstantGene(conf, targetInfo);
       }
     } catch (InvalidConfigurationException e) {
       e.printStackTrace();

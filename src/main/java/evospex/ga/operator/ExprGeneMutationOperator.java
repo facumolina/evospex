@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import evospex.expression.ExprBuilder;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.ExprGeneType;
+import evospex.ga.chromosome.gene.*;
 import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
@@ -17,8 +16,6 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 import org.jgap.data.config.Configurable;
 
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneValue;
 import evospex.report.Stats;
 import evospex.EvoSpexParameters;
 
@@ -119,7 +116,7 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
                 Gene[] newGenes = new Gene[genes.length];
                 newGenes[0] = newGene;
                 for (int k = 1; k < newGenes.length; k++) {
-                  newGenes[k] = new ExprGeneImpl(copyOfChromosome.getConfiguration(), new ExprGeneValue(ExprBuilder.TRUE, ExprGeneType.CONSTANT), null);
+                  newGenes[k] = new ConstantGene(copyOfChromosome.getConfiguration(), null);
                 }
                 SpecChromosome newUnitaryChromosome = new SpecChromosome(
                     copyOfChromosome.getConfiguration(), newGenes);
