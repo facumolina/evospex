@@ -7,6 +7,11 @@ import utils.TargetInformation;
 
 import java.util.Random;
 
+/**
+ * This class represents a constant gene. A constant gene is a gene which value is a constant expression, such as true.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class ConstantGene extends ExprGene {
 
   public ConstantGene(Configuration a_conf, TargetInformation info) throws InvalidConfigurationException {
