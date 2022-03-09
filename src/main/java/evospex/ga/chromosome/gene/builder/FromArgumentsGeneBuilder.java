@@ -4,10 +4,7 @@ import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.*;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -71,7 +68,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
           Expr geneExpr = ExprBuilder.eq(ExprBuilder.toExpr(argLabel,argValue.getClass()), expr);
           System.out.println("Created eq expr for arg: "+geneExpr);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+          genes.add(new EqualityGene(conf, newValue, targetInfo));
         }
       }
 

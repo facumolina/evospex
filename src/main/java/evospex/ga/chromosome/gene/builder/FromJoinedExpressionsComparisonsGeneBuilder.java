@@ -4,10 +4,7 @@ import evospex.EvoSpexParameters;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
-import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.*;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
@@ -71,7 +68,10 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
           ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
           Expr geneExpr = ExprBuilder.eq(leftExpression, rightExpression);
           ExprGeneValue newValue = new ExprGeneValue(geneExpr, geneType);
-          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+          if (ExprGeneType.EQUALITY.equals(geneType))
+            genes.add(new EqualityGene(conf, newValue, targetInfo));
+          else
+            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
         }
       }
 
@@ -89,7 +89,10 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
             ExprGeneType geneType = JavaClassesUtils.isNumber(leftExpression.type())?ExprGeneType.NUMERIC_COMPARISON:ExprGeneType.EQUALITY;
             Expr geneExpr = ExprBuilder.neq(leftExpression, rightExpression);
             ExprGeneValue newValue = new ExprGeneValue(geneExpr, geneType);
-            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+            if (ExprGeneType.EQUALITY.equals(geneType))
+              genes.add(new EqualityGene(conf, newValue, targetInfo));
+            else
+              genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
           }
         }
       }
@@ -117,7 +120,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
           } else {
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.EQUALITY);
-            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+            genes.add(new EqualityGene(conf, newValue, targetInfo));
           }
         }
       }

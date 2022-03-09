@@ -42,7 +42,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       targetInfo.addVariableForType(Boolean.class, ExprName.RESULT);
       Expr geneExpr = ExprBuilder.eq(resultExpr, (Boolean) resultExample ? ExprBuilder.TRUE : ExprBuilder.FALSE);
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+      genes.add(new EqualityGene(conf, newValue, targetInfo));
     } else if (Number.class.isAssignableFrom(resultExample.getClass())) {
       // The result is a numeric type, thus compare it with expressions of the same type
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
@@ -63,7 +63,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
       ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
-      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+      genes.add(new EqualityGene(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains(resultExample.getClass().getSimpleName())
@@ -80,7 +80,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // Equal to null
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
       ExprGeneValue newValue = GeneBuilderUtils.createsGeneExprEqualToNull(resultExpr);
-      genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+      genes.add(new EqualityGene(conf, newValue, targetInfo));
       // Equal to vars of same type
       /*for (Expr e : contextInfo.getEvaluableExpressions()) {
         if (e.type().toString().contains("this/" + resultExample.getClass().getSimpleName())) {
@@ -104,7 +104,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       for (Expr collection : collections) {
         Expr geneExpr = ExprBuilder.eq(collection_expr, collection);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
-        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+        genes.add(new EqualityGene(conf, geneValue, targetInfo));
       }
     }
   }

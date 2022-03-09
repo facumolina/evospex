@@ -731,28 +731,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is equal or not equal
    */
   protected void applyEqualityMutation() {
-    String mutationToApply = getSomeApplicableMutation();
-    Expr expr = value.getExpression();
-
-    // Check the expression is adequate
-    Compare_opContext cmp_op = expr.exprCtx().compare_op();
-    if (cmp_op==null)
-      throw new IllegalStateException("The expression "+expr+" should be a comparison with = or !=");
-    List<ExprContext> expressions = expr.exprCtx().expr();
-    if (expressions.size() != 2)
-      throw new IllegalStateException("The expression "+expr+" should only have two expressions");
-
-    if (mutationToApply.equals(ExprGeneMutations.NEGATE)) {
-      ExprContext left = expressions.get(0);
-      ExprContext right = expressions.get(1);
-      String new_op = cmp_op.getText().equals(ExprOperator.EQ)?ExprOperator.NOT_EQ:ExprOperator.EQ;
-      Expr mutatedExpr = ExprBuilder.toExpr(left.getText() + " " + new_op + " " + right.getText(), Boolean.class);
-      value.setExpression(mutatedExpr, false);
-    } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)){
-      ExprGeneMutationHelper.toTrue(value);
-    } else {
-      throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**
