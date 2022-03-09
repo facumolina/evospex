@@ -28,7 +28,7 @@ public class ConstantGene extends ExprGene {
   }
 
   @Override
-  public void applyMutation(int i, double v) {
+  public ExprGene mutate() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals("Previous")) {
       // Get some previous expression
@@ -36,5 +36,10 @@ public class ConstantGene extends ExprGene {
       int randomNumber = random.nextInt(1);
       value = value.getPrevious();
     }
+    return this;
   }
+
+  @Override
+  public void applyMutation(int i, double v) { }
+
 }

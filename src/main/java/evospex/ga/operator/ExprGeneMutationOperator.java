@@ -99,8 +99,13 @@ public class ExprGeneMutationOperator extends BaseGeneticOperator implements Con
           ExprGene toMutate = (ExprGene) genes[positionToMutate];
           toMutate.setAmountOfGenesInChromosome(chrom.getAmountOfActiveGenes());
           toMutate.setIsPartOfSolution(chrom.getAmountOfNegativeCounterexamples() == 0);
-          mutateGene(toMutate, generator);
-
+          //mutateGene(toMutate, generator);
+          try {
+            toMutate = toMutate.mutate();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          genes[positionToMutate] = toMutate;
 
           if (activeGenesPositions.size() > 1) {
             // The cloned chromosome has more than one gene. So create one new chromosome that

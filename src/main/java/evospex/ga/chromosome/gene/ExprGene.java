@@ -180,9 +180,15 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   }
 
   /**
+   * Return a mutated gene from this gene
+   * We will use this method for mutations since in certain situations a mutation may return a different type of gene.
+   */
+  public abstract ExprGene mutate() throws org.jgap.InvalidConfigurationException;
+
+  /**
    * Apply some quantifier mutation
    */
-  protected void applySomeQuantifierMutation() {
+  protected ExprGene applySomeQuantifierMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -194,9 +200,11 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     default:
-      break;
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -204,7 +212,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  protected void applySomeVarVarMutation() {
+  protected ExprGene applySomeVarVarMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.NEGATE_BODY:
@@ -214,9 +222,11 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      throw new UnsupportedOperationException("implement this");
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     default:
-      break;
+      throw new UnsupportedOperationException("implement this");
     }
   }
 
@@ -224,7 +234,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two variables
    */
-  protected void applySomeVarSetMutation() {
+  protected ExprGene applySomeVarSetMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.NEGATE_BODY)) {
       throw new UnsupportedOperationException("implement this");
@@ -243,7 +253,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator some and the body
    * is a predicate about two sets
    */
-  protected void applySomeSetSetMutation() {
+  protected ExprGene applySomeSetSetMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.NEGATE_BODY:
@@ -258,8 +268,9 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
-      break;
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     default:
       throw new UnsupportedOperationException("implement this");
     }
@@ -268,7 +279,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply emptyness mutation
    */
-  protected void applyEmptynessMutation() {
+  protected ExprGene applyEmptynessMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.SOME)) {
       // Change some expr to no expr
@@ -282,14 +293,14 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply default mutation
    */
-  protected void applyDefaultMutation() {
-    // TODO Auto-generated method stub
+  protected ExprGene applyDefaultMutation() {
+    throw new UnsupportedOperationException("implement this");
   }
 
   /**
    * Apply mutation when the gene expression is some
    */
-  protected void applySomeMutation() {
+  protected ExprGene applySomeMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.EMPTYNESS)) {
       // Change some expr to no expr
@@ -303,7 +314,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is no and set the expression to some
    */
-  protected void applyNoMutation() {
+  protected ExprGene applyNoMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals(ExprGeneMutations.TO_SOME)) {
       // Change no expr to some expr
@@ -317,7 +328,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  protected void applyForAllMutation() {
+  protected ExprGene applyForAllMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -334,12 +345,14 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       value.setExpression(newExpr, false);
+      return this;
     } else if (ExprGeneMutations.TO_SOME.equals(mutationToApply)) {
       // Create a new expression with the some quantifier
       throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -349,7 +362,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and
    * the body is about one value
    */
-  protected void applyForAllVarValueMutation() {
+  protected ExprGene applyForAllVarValueMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -366,6 +379,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       value.setExpression(newExpr, false);
+      return this;
     } else if (ExprGeneMutations.REPLACE_OP.equals(mutationToApply)) {
       if (body.compare_op() != null) {
         ExprContext left = body.expr().get(0);
@@ -376,6 +390,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
         value.setExpression(newExpr, false);
+        return this;
       } else {
         throw new IllegalStateException("Can't perform REPLACE_OP mutation on expression: "+expr);
       }
@@ -388,6 +403,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
         value.setExpression(newExpr, false);
+        return this;
       } else {
         throw new IllegalStateException("Can't perform REPLACE_VALUE mutation on expression: "+expr);
       }
@@ -396,7 +412,9 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -406,7 +424,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two variables
    */
-  protected void applyForAllVarVarMutation() {
+  protected ExprGene applyForAllVarVarMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -424,6 +442,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
+      return this;
     } else if (ExprGeneMutations.JOIN_COMPATIBLE_EXPR.equals(mutationToApply)) {
       // Append a compatible expression in the right side of the body
       List<ExprContext> expressions = body.expr();
@@ -445,6 +464,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
           newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
           value.setExpression(newExpr, false);
         }
+        return this;
       } else {
         ExprContext leftExpr = expressions.get(0);
         ExprContext rightExpr = expressions.get(1);
@@ -457,13 +477,16 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
           newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
           value.setExpression(newExpr, false);
         }
+        return this;
       }
     } else if (ExprGeneMutations.TO_SOME.equals(mutationToApply)) {
       // Create a new expression with the some quantifier
       throw new UnsupportedOperationException("implement this");
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -473,7 +496,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation of two variables n.value=v0 OP n.g.value=v0
    */
-  protected void applyForAllVarValueVarValueMutation() {
+  protected ExprGene applyForAllVarValueVarValueMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -492,6 +515,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       newExpr.setClassOfValues(expr.classOfValues());
       value.setExpression(newExpr, false);
+      return this;
     } else if (ExprGeneMutations.REPLACE_VALUE.equals(mutationToApply)){
       if (body.binary_op()!=null) {
         ExprContext left = body.expr().get(0);
@@ -521,6 +545,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
         value.setExpression(newExpr, false);
+        return this;
       } else {
         throw new IllegalStateException("Can't perform REPLACE_VALUE mutation on expression: "+expr);
       }
@@ -539,6 +564,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
         value.setExpression(newExpr, false);
+        return this;
       } else {
         throw new IllegalStateException("Can't perform NEGATE_RIGHT_EQUALITY mutation on expression: "+expr);
       }
@@ -568,11 +594,14 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
         newExpr.setClassOfValues(expr.classOfValues());
         value.setExpression(newExpr, false);
+        return this;
       } else {
         throw new IllegalStateException("Can't perform REPLACE_OP mutation on expression: "+expr);
       }
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -582,7 +611,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about some relation like op[n.value,n.f.value] AND op[n.value,n.g.value]
    */
-  protected void applyForAllVarValuesDoubleIntComparisonMutation() {
+  protected ExprGene applyForAllVarValuesDoubleIntComparisonMutation() {
     String mutationToApply = getSomeApplicableMutation();
     switch (mutationToApply) {
     case ExprGeneMutations.OP_NOT_EQ:
@@ -604,15 +633,18 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       // Change implies equality
       throw new UnsupportedOperationException("implement this");
     }
+    return this;
   }
 
   /**
    * Apply mutation when the gene expression is a quantification with the operator all
    */
-  protected void applyForAllVarValuesDoubleQuantificationIntComparisonMutation() {
+  protected ExprGene applyForAllVarValuesDoubleQuantificationIntComparisonMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
     }
@@ -622,7 +654,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about a variable and a set
    */
-  protected void applyForAllVarSetMutation() {
+  protected ExprGene applyForAllVarSetMutation() throws InvalidConfigurationException {
     Expr expr = value.getExpression();
     String mutationToApply = getSomeApplicableMutation();
     Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
@@ -642,12 +674,15 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
       value.setExpression(newExpr, false);
+      return this;
     } else if (mutationToApply.equals(ExprGeneMutations.TO_SOME)) {
       // Create a new expression with the some quantifier
       throw new UnsupportedOperationException("implement this");
     } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)) {
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("implement this");
     }
@@ -658,7 +693,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is a quantification with the operator all and the body
    * is a predicate about two sets
    */
-  protected void applyForAllSetSetMutation() {
+  protected ExprGene applyForAllSetSetMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
 
     switch (mutationToApply) {
@@ -674,8 +709,9 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
-      break;
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     default:
       throw new UnsupportedOperationException("implement this");
     }
@@ -684,7 +720,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is in
    */
-  protected void applyInclusionMutation() {
+  protected ExprGene applyInclusionMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr  = value.getExpression();
     List<ExprContext> expressions = expr.exprCtx().expr();
@@ -700,6 +736,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
+      return this;
     } else if (ExprGeneMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
       Set<String> sameTypeVars = targetInfo.getVariablesOfType(expr.classOfElemsInSet());
       Random random = new Random();
@@ -709,6 +746,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.INCLUSION);
+      return this;
     } else if (ExprGeneMutations.REPLACE_SET.equals(mutationToApply)) {
       List<Expr> possibleCollections = targetInfo.getSetsOfType(expr.classOfElemsInSet());
       if (possibleCollections.size() > 0) {
@@ -720,8 +758,11 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
         value.setExpression(newExpr, false);
         value.setGeneType(ExprGeneType.INCLUSION);
       }
+      return this;
     } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      ExprGeneMutationHelper.toTrue(value);
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     } else {
       throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
     }
@@ -730,15 +771,14 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is equal or not equal
    */
-  protected void applyEqualityMutation() {
+  protected ExprGene applyEqualityMutation() {
     throw new IllegalStateException("We should not be here!!!");
   }
 
   /**
    * Apply mutation when the gene expression is an int comparison ( int [=,<>,<,>,<=,>=] int)
-   *
    */
-  protected void applyIntComparisonMutation() {
+  protected ExprGene applyIntComparisonMutation() throws InvalidConfigurationException {
     String mutationToApply = getSomeApplicableMutation();
     Expr expr = value.getExpression();
     Expr newExpr;
@@ -753,20 +793,21 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       newExpr = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + expr.exprCtx().getText() + ExprDelimiter.RP, Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.ADD_ONE:
       // Add one at the right expression
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.PLUS + " " + ExprBuilder.ONE, Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.SUB_ONE:
       // Subtract one at the right expression
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
               + ExprOperator.MINUS + " " + ExprBuilder.ONE, Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
+      return this;
     case ExprGeneMutations.ADD_EXPR:
       // Add a random integer expression to the right expression
       Expr exprToAdd = targetInfo.getRandomIntExpr();
@@ -774,7 +815,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
               + ExprOperator.PLUS + " " + exprToAdd.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.SUB_EXPR:
       // Subtract a random integer expression to the right expression
       Expr exprToSub = targetInfo.getRandomIntExpr();
@@ -782,20 +823,20 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
               + ExprOperator.MINUS + " " + exprToSub.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.REPLACE_RIGHT:
       // Replace the right expression
       Expr replacementExpr = targetInfo.getRandomIntExpr();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + replacementExpr.exprCtx().getText(), Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.REPLACE_OP:
       String newOp = ExprOperator.getRandomNumericCmpOp();
       newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
       value.setExpression(newExpr, false);
       value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      break;
+      return this;
     case ExprGeneMutations.EQ_SUB_ONE:
       // Create eq expression and subtract one at the right expression
       throw new UnsupportedOperationException("implement this");
@@ -816,8 +857,9 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
       throw new UnsupportedOperationException("implement this");
     case ExprGeneMutations.TO_TRUE:
       // Set the expression to true
-      ExprGeneMutationHelper.toTrue(value);
-      break;
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
     default:
       throw new IllegalStateException("Mutation " + mutationToApply + " not implemented!");
     }
@@ -839,7 +881,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is not
    */
-  protected void applyNegationMutation() {
+  protected ExprGene applyNegationMutation() {
     String mutationToApply = getSomeApplicableMutation();
     if (mutationToApply.equals("Negate")) {
       // Negate the expression, that is remove the not operator
@@ -853,14 +895,14 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Apply mutation when the gene expression is constant
    */
-  protected void applyConstantMutation() {
+  protected ExprGene applyConstantMutation() {
     throw new IllegalStateException("We should not be here!!!");
   }
 
   /**
    * Apply mutation when the gene expression is cardinality
    */
-  protected void applyCardinalityMutation() {
+  protected ExprGene applyCardinalityMutation() {
     throw new IllegalStateException("We should not be here!!!");
   }
 

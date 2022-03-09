@@ -21,83 +21,66 @@ public class ExprGeneImpl extends ExprGene {
     }
   }
 
-  /**
-   * Apply mutation according to the gene type
-   */
-  public void applyMutation(int index, double a_percentage) {
+  @Override
+  public ExprGene mutate() throws InvalidConfigurationException {
     try {
       updatePreviousExpression(value.clone());
       switch (value.getGeneType()) {
         case CARDINALITY:
-          applyCardinalityMutation();
-          break;
+          return applyCardinalityMutation();
         case CONSTANT:
-          applyConstantMutation();
-          break;
+          return applyConstantMutation();
         case EMPTYNESS:
-          applyEmptynessMutation();
-          break;
+          return applyEmptynessMutation();
         case EQUALITY:
-          applyEqualityMutation();
-          break;
+          return applyEqualityMutation();
         case NUMERIC_COMPARISON:
-          applyIntComparisonMutation();
-          break;
+          return applyIntComparisonMutation();
         case NEGATION:
-          applyNegationMutation();
-          break;
+          return applyNegationMutation();
         case INCLUSION:
-          applyInclusionMutation();
-          break;
+          return applyInclusionMutation();
         case FORALL:
-          applyForAllMutation();
-          break;
+          return applyForAllMutation();
         case FORALL_VAR_VALUE:
-          applyForAllVarValueMutation();
-          break;
+          return applyForAllVarValueMutation();
         case FORALL_VAR_VAR:
-          applyForAllVarVarMutation();
-          break;
+          return applyForAllVarVarMutation();
         case FORALL_VAR_VALUE_VAR_VALUE:
-          applyForAllVarValueVarValueMutation();
-          break;
+          return applyForAllVarValueVarValueMutation();
         case FORALL_VAR_VALUES_DOUBLE_INT_COMPARISON:
-          applyForAllVarValuesDoubleIntComparisonMutation();
-          break;
+          return applyForAllVarValuesDoubleIntComparisonMutation();
         case FORALL_VAR_VALUES_DOUBLE_QT_INT_COMPARISON:
-          applyForAllVarValuesDoubleQuantificationIntComparisonMutation();
-          break;
+          return applyForAllVarValuesDoubleQuantificationIntComparisonMutation();
         case FORALL_VAR_SET:
-          applyForAllVarSetMutation();
-          break;
+          return applyForAllVarSetMutation();
         case FORALL_SET_SET:
-          applyForAllSetSetMutation();
-          break;
+          return applyForAllSetSetMutation();
         case SOME:
-          applySomeMutation();
-          break;
+          return applySomeMutation();
         case SOME_VAR_VAR:
-          applySomeVarVarMutation();
-          break;
+          return applySomeVarVarMutation();
         case SOME_VAR_SET:
-          applySomeVarSetMutation();
-          break;
+          return applySomeVarSetMutation();
         case SOME_SET_SET:
-          applySomeSetSetMutation();
-          break;
+          return applySomeSetSetMutation();
         case SOMEQT:
-          applySomeQuantifierMutation();
-          break;
+          return applySomeQuantifierMutation();
         case NO:
-          applyNoMutation();
-          break;
+          return applyNoMutation();
         default:
-          applyDefaultMutation();
+          return applyDefaultMutation();
       }
     } catch (Exception e) {
       e.printStackTrace();
+      throw e;
     }
   }
+
+  /**
+   * Apply mutation according to the gene type
+   */
+  public void applyMutation(int index, double a_percentage) { }
 
   @Override
   protected ExprGeneImpl clone() {

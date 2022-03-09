@@ -29,6 +29,36 @@ public class EqualityGene extends ExprGene {
   }
 
   @Override
+  public ExprGene mutate() throws InvalidConfigurationException {
+    updatePreviousExpression(value.clone());
+    String mutationToApply = getSomeApplicableMutation();
+    Expr expr = value.getExpression();
+
+    // Check the expression is adequate
+    ExprGrammarParser.Compare_opContext cmp_op = expr.exprCtx().compare_op();
+    if (cmp_op==null)
+      throw new IllegalStateException("The expression "+expr+" should be a comparison with = or !=");
+    List<ExprGrammarParser.ExprContext> expressions = expr.exprCtx().expr();
+    if (expressions.size() != 2)
+      throw new IllegalStateException("The expression "+expr+" should only have two expressions");
+
+    if (mutationToApply.equals(ExprGeneMutations.NEGATE)) {
+      ExprGrammarParser.ExprContext left = expressions.get(0);
+      ExprGrammarParser.ExprContext right = expressions.get(1);
+      String new_op = cmp_op.getText().equals(ExprOperator.EQ)?ExprOperator.NOT_EQ:ExprOperator.EQ;
+      Expr mutatedExpr = ExprBuilder.toExpr(left.getText() + " " + new_op + " " + right.getText(), Boolean.class);
+      value.setExpression(mutatedExpr, false);
+      return this;
+    } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)){
+      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
+      trueGene.updatePreviousExpression(value);
+      return trueGene;
+    } else {
+      throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
+    }
+  }
+
+  @Override
   public void applyMutation(int i, double v) {
     updatePreviousExpression(value.clone());
     String mutationToApply = getSomeApplicableMutation();
