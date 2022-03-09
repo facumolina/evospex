@@ -74,13 +74,4 @@ public class CardinalityGene extends ExprGene {
     }
   }
 
-  @Override
-  protected CardinalityGene clone() {
-    try {
-      return new CardinalityGene(getConfiguration(), value.clone(), targetInfo);
-    } catch (InvalidConfigurationException ex) {
-      throw new IllegalStateException(ex.getMessage());
-    }
-  }
-
 }
