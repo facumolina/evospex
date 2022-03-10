@@ -17,6 +17,7 @@ import evospex.expression.symbol.ExprDelimiter;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.type.ExprGeneType;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import evospex.ga.operator.ExprGeneMutationHelper;
 import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.BaseGene;

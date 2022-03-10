@@ -11,9 +11,9 @@ import java.util.Random;
 
 import evospex.ConfigurationProperties;
 import evospex.CustomConfiguration;
-import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosomesBuilder;
 import evospex.ga.chromosome.gene.*;
+import evospex.ga.chromosome.gene.value.ExprGeneValueCloneHandler;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.Genotype;

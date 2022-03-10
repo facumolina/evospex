@@ -1,5 +1,6 @@
 package evospex.ga.chromosome.gene;
 
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;

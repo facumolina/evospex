@@ -1,5 +1,6 @@
-package evospex.ga.chromosome.gene;
+package evospex.ga.chromosome.gene.value;
 
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.ICloneHandler;
 
 /**

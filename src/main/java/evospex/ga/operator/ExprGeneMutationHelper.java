@@ -3,7 +3,7 @@ package evospex.ga.operator;
 import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.type.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 
 import java.util.LinkedList;
 import java.util.List;

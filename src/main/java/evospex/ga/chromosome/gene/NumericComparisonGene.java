@@ -5,6 +5,7 @@ import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser;
 import evospex.expression.symbol.ExprDelimiter;
 import evospex.expression.symbol.ExprOperator;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.Configuration;
 import org.jgap.Gene;

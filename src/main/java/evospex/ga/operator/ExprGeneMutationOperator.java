@@ -8,6 +8,7 @@ import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.gene.*;
 import evospex.ga.chromosome.SpecChromosome;
 import evospex.ga.chromosome.gene.type.ExprGeneType;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;

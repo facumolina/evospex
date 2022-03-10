@@ -4,7 +4,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.type.ExprGeneType;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 
 /**
  * This class represents a Gene Values Builder, which allows to build specific gene values.
