@@ -52,7 +52,7 @@
   	<dependency>
   		<groupId>org.jgrapht</groupId>
   		<artifactId>jgrapht-core</artifactId>
-  		<version>0.9.1</version>
+  		<version>1.4.0</version>
   	</dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-jexl3 -->
     <dependency>

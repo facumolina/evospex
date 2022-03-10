@@ -9,8 +9,8 @@ import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
-import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedPseudograph;
 
 /**
  * This class keeps some useful information regarding the target class and method.
@@ -21,7 +21,7 @@ public class TargetInformation {
 
   private Class<?> cut; // The current cut
   private TypeGraph typeGraph; // Current cut type graph
-  private DirectedGraph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
+  private DirectedPseudograph<String, DefaultEdge> structureGraph; // Graph maintaining the current target class relations
 
 
   private final int scope; // Scope (defined in the alloy file)
