@@ -2,7 +2,7 @@ package evospex.ga.chromosome.gene.builder;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
-import evospex.ga.chromosome.gene.ExprGeneType;
+import evospex.ga.chromosome.gene.type.ExprGeneType;
 import evospex.ga.chromosome.gene.ExprGeneValue;
 
 public class GeneBuilderUtils {

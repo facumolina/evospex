@@ -5,6 +5,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.*;
+import evospex.ga.chromosome.gene.type.ExprGeneType;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;

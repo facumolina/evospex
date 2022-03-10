@@ -2,6 +2,7 @@ package evospex.ga.chromosome.gene;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.ga.chromosome.gene.type.ExprGeneType;
 
 /**
  * This class represents a gene's value.
