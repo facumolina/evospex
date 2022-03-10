@@ -71,7 +71,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
           if (ExprGeneType.EQUALITY.equals(geneType))
             genes.add(new EqualityGene(conf, newValue, targetInfo));
           else
-            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+            genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
         }
       }
 
@@ -92,7 +92,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
             if (ExprGeneType.EQUALITY.equals(geneType))
               genes.add(new EqualityGene(conf, newValue, targetInfo));
             else
-              genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+              genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
           }
         }
       }
@@ -116,7 +116,7 @@ public class FromJoinedExpressionsComparisonsGeneBuilder extends GeneBuilder {
             // We are comparing numeric expressions
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.NUMERIC_COMPARISON);
-            genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+            genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
           } else {
             Expr geneExpression = ExprBuilder.eq(leftExpr, rightExpr);
             ExprGeneValue newValue = new ExprGeneValue(geneExpression, ExprGeneType.EQUALITY);

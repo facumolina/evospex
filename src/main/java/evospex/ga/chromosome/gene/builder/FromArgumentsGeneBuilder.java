@@ -59,7 +59,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         // argLabel = e where e is an integer expression.
         for (Expr expr : targetInfo.getIntEvaluableExpressions()) {
           ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
-          genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+          genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
         }
       } else {
         // The value is a reference

@@ -50,7 +50,7 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);
-        genes.add(new ExprGeneImpl(conf, newValue, targetInfo));
+        genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
       }
       if (targetInfo.hasSets()) {
         List<Expr> sets = targetInfo.getSets();

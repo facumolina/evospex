@@ -112,7 +112,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   /**
    * Update the previous expression
    */
-  protected void updatePreviousExpression(ExprGeneValue newValue) {
+  public void updatePreviousExpression(ExprGeneValue newValue) {
     if (this.value.getPrevious() == null || !newValue.getExpression().equals(ExprBuilder.TRUE)) {
       this.value.setPrevious(newValue);
     }
@@ -779,90 +779,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is an int comparison ( int [=,<>,<,>,<=,>=] int)
    */
   protected ExprGene applyIntComparisonMutation() throws InvalidConfigurationException {
-    String mutationToApply = getSomeApplicableMutation();
-    Expr expr = value.getExpression();
-    Expr newExpr;
-    List<ExprContext> exprs = expr.exprCtx().expr();
-    if (exprs.size() != 2)
-      throw new IllegalStateException("The expression is not a numeric comparison: "+expr);
-    String op = expr.exprCtx().compare_op().getText();
-    ExprContext left = exprs.get(0);
-    ExprContext right = exprs.get(1);
-    switch (mutationToApply) {
-    case ExprGeneMutations.NEGATE:
-      newExpr = ExprBuilder.toExpr(ExprOperator.NOT_1 + ExprDelimiter.LP + expr.exprCtx().getText() + ExprDelimiter.RP, Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.ADD_ONE:
-      // Add one at the right expression
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
-              + ExprOperator.PLUS + " " + ExprBuilder.ONE, Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.SUB_ONE:
-      // Subtract one at the right expression
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
-              + ExprOperator.MINUS + " " + ExprBuilder.ONE, Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.ADD_EXPR:
-      // Add a random integer expression to the right expression
-      Expr exprToAdd = targetInfo.getRandomIntExpr();
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
-              + ExprOperator.PLUS + " " + exprToAdd.exprCtx().getText(), Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.SUB_EXPR:
-      // Subtract a random integer expression to the right expression
-      Expr exprToSub = targetInfo.getRandomIntExpr();
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
-              + ExprOperator.MINUS + " " + exprToSub.exprCtx().getText(), Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.REPLACE_RIGHT:
-      // Replace the right expression
-      Expr replacementExpr = targetInfo.getRandomIntExpr();
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + replacementExpr.exprCtx().getText(), Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.REPLACE_OP:
-      String newOp = ExprOperator.getRandomNumericCmpOp();
-      newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.NUMERIC_COMPARISON);
-      return this;
-    case ExprGeneMutations.EQ_SUB_ONE:
-      // Create eq expression and subtract one at the right expression
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_EQ:
-      // Now the operator will be =
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_LT:
-      // Now the operator will be <
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_LTE:
-      // Now the operator will be <=
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_GT:
-      // Now the operator will be >
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.OP_GTE:
-      // Now the operator will be >=
-      throw new UnsupportedOperationException("implement this");
-    case ExprGeneMutations.TO_TRUE:
-      // Set the expression to true
-      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
-      trueGene.updatePreviousExpression(value);
-      return trueGene;
-    default:
-      throw new IllegalStateException("Mutation " + mutationToApply + " not implemented!");
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**
