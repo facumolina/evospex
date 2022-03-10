@@ -1,11 +1,10 @@
-package evospex.ga.chromosome.gene.builder;
+package evospex.ga.chromosome.gene;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.ExprGrammarParser;
 import evospex.expression.symbol.ExprDelimiter;
 import evospex.expression.symbol.ExprOperator;
-import evospex.ga.chromosome.gene.*;
 import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -14,6 +13,12 @@ import utils.TargetInformation;
 
 import java.util.List;
 
+/**
+ * This class represents a numeric comparison gene. A numeric comparison  gene is a gene which value is an expression
+ * of the form e op f, where e and f are numeric expressions.
+ *
+ * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
+ */
 public class NumericComparisonGene extends ExprGene {
 
   public NumericComparisonGene(Configuration a_conf, ExprGeneValue value, TargetInformation info) throws InvalidConfigurationException {
