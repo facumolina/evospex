@@ -28,8 +28,6 @@ public class TypeGraph {
       throw new IllegalArgumentException("The CUT can't be null");
     graph = new DirectedPseudograph<>(TypeGraphEdge.class);
     buildGraph(cut, new HashSet<>());
-    System.out.println("Nodes: " + graph.vertexSet().toString());
-    System.out.println("Edges: " + graph.edgeSet().toString());
   }
 
   /**
