@@ -7,6 +7,7 @@ import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.CardinalityGene;
 import evospex.ga.chromosome.gene.ExprGeneImpl;
+import evospex.ga.chromosome.gene.QuantificationSingleValueGene;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -147,7 +148,7 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
         geneValue = GeneValueBuilderUtils.qtSingleValueComparison(doubleClosuredExpr, joineableExpr, ExprBuilder.NULL, ExprOperator.ALL);
-        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+        genes.add(new QuantificationSingleValueGene(conf, geneValue, targetInfo));
       }
       // TODO think about formulas such as all n: e.*(f+g) : (n.r = v) => (n.f.r = v)
     }

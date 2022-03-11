@@ -365,61 +365,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * the body is about one value
    */
   protected ExprGene applyForAllVarValueMutation() throws InvalidConfigurationException {
-    String mutationToApply = getSomeApplicableMutation();
-    Expr expr = value.getExpression();
-    Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
-    if (qt_expr == null)
-      throw new IllegalStateException("The current expression is not a quantified expression");
-    ExprContext body = qt_expr.expr();
-    Set_exprContext set =  qt_expr.set_expr();
-    if (ExprGeneMutations.NEGATE_BODY.equals(mutationToApply)) {
-      // Create the for all expression with the negated body
-      String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
-      if (body.unary_op()!=null && ExprOperator.NOT_1.equals(body.unary_op().getText())) {
-        // The body is already negated, so just remove the negation operation
-        newBodyStr = body.expr().get(0).getText();
-      }
-      Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-      value.setExpression(newExpr, false);
-      return this;
-    } else if (ExprGeneMutations.REPLACE_OP.equals(mutationToApply)) {
-      if (body.compare_op() != null) {
-        ExprContext left = body.expr().get(0);
-        ExprContext right = body.expr().get(1);
-        String newOp = ExprGeneMutations.getRandomBinaryOperator();
-        String newBodyStr = left.getText() + " " + newOp + " " + right.getText();
-        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
-        newExpr.setClassOfValues(expr.classOfValues());
-        value.setExpression(newExpr, false);
-        return this;
-      } else {
-        throw new IllegalStateException("Can't perform REPLACE_OP mutation on expression: "+expr);
-      }
-    } else if (ExprGeneMutations.REPLACE_VALUE.equals(mutationToApply)){
-      if (body.compare_op() != null) {
-        ExprContext left = body.expr().get(0);
-        Object randomValue = targetInfo.randomValueForType(expr.classOfValues());
-        String newBodyStr = left.getText() + " " + body.compare_op().getText() + " " + randomValue;
-        Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
-        newExpr.setClassOfValues(expr.classOfValues());
-        value.setExpression(newExpr, false);
-        return this;
-      } else {
-        throw new IllegalStateException("Can't perform REPLACE_VALUE mutation on expression: "+expr);
-      }
-    } else if (ExprGeneMutations.TO_SOME.equals(mutationToApply)) {
-      // Create a new expression with the some quantifier
-      throw new UnsupportedOperationException("implement this");
-    } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      // Set the expression to true
-      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
-      trueGene.updatePreviousExpression(value);
-      return trueGene;
-    } else {
-      throw new UnsupportedOperationException("Unsupported mutation: "+mutationToApply);
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**

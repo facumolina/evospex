@@ -6,6 +6,7 @@ import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGeneImpl;
+import evospex.ga.chromosome.gene.QuantificationSingleValueGene;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -117,7 +118,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
     if (Number.class.isAssignableFrom(joineableExpr.type())) {
       // all n: e.*f : n.r op 0
       geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.ZERO, ExprOperator.ALL);
-      genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+      genes.add(new QuantificationSingleValueGene(conf, geneValue, targetInfo));
     } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
       // Values are booleans
       throw new UnsupportedOperationException("Handle boolean value properly");
@@ -125,7 +126,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
       // Values are objects
       // all n: e.*f : n.r op null
       geneValue = GeneValueBuilderUtils.qtSingleValueComparison(simpleClosuredExpr, joineableExpr, ExprBuilder.NULL, ExprOperator.ALL);
-      genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+      genes.add(new QuantificationSingleValueGene(conf, geneValue, targetInfo));
     }
     return genes;
   }
