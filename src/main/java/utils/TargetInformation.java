@@ -114,7 +114,6 @@ public class TargetInformation {
    * Build all the initial expressions recursively
    */
   private void buildInitialExpressionsRec(Expr currExpr, Class<?> vertex, int k) {
-    System.out.println("Expr "+currExpr.exprCtx().getText()+" of class "+vertex.getSimpleName());
     if (!currExpr.toString().equals(ExprName.THIS)) {
       joinedExpressions.add(currExpr);
       if (vertex.equals(Integer.class) || vertex.equals(int.class)) {
@@ -144,7 +143,6 @@ public class TargetInformation {
           // And the adjacent expression is not contained in the current expression
           adjacentClosuredExpressions.add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
           Expr closured = ExprBuilder.joinWithRClosure(currExpr, adjacentExprStr);
-          System.out.println("Expr "+ closured + " is set of "+targetVertex.getSimpleName());
           closured.setClassOfElemsInSet(targetVertex);
           simpleClosuredExpressions.add(closured);
           createSets(closured, targetVertex);
