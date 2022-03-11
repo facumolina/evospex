@@ -723,51 +723,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Apply mutation when the gene expression is in
    */
   protected ExprGene applyInclusionMutation() throws InvalidConfigurationException {
-    String mutationToApply = getSomeApplicableMutation();
-    Expr expr  = value.getExpression();
-    List<ExprContext> expressions = expr.exprCtx().expr();
-    if (expressions.size() != 2)
-      throw new IllegalStateException("The expression "+expr+" should only have two expressions");
-    ExprContext left = expressions.get(0);
-    ExprContext right = expressions.get(1);
-    Compare_opContext op = expr.exprCtx().compare_op();
-    if (ExprGeneMutations.NEGATE.equals(mutationToApply)) {
-      if (!op.getText().equals(ExprOperator.IN) && !op.getText().equals(ExprOperator.NOT_IN))
-        throw new IllegalStateException("Can't negate inclusion with operator " + op.getText());
-      String newOp = op.getText().equals(ExprOperator.IN) ? ExprOperator.NOT_IN : ExprOperator.IN;
-      Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + newOp + " " + right.getText(), Boolean.class);
-      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
-      value.setExpression(newExpr, false);
-      return this;
-    } else if (ExprGeneMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
-      Set<String> sameTypeVars = targetInfo.getVariablesOfType(expr.classOfElemsInSet());
-      Random random = new Random();
-      int randomNumber = random.nextInt(sameTypeVars.size());
-      String newVarName = (String) sameTypeVars.toArray()[randomNumber];
-      Expr newExpr = ExprBuilder.toExpr(newVarName + " " + expr.exprCtx().compare_op().getText() + " " + right.getText(), Boolean.class);
-      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
-      value.setExpression(newExpr, false);
-      value.setGeneType(ExprGeneType.INCLUSION);
-      return this;
-    } else if (ExprGeneMutations.REPLACE_SET.equals(mutationToApply)) {
-      List<Expr> possibleCollections = targetInfo.getSetsOfType(expr.classOfElemsInSet());
-      if (possibleCollections.size() > 0) {
-        Random r = new Random();
-        int rN = r.nextInt(possibleCollections.size());
-        Expr newRight = possibleCollections.get(rN);
-        Expr newExpr = ExprBuilder.toExpr(left.getText() + " " + op.getText() + " " + newRight.exprCtx().getText(), Boolean.class);
-        newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
-        value.setExpression(newExpr, false);
-        value.setGeneType(ExprGeneType.INCLUSION);
-      }
-      return this;
-    } else if (ExprGeneMutations.TO_TRUE.equals(mutationToApply)) {
-      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
-      trueGene.updatePreviousExpression(value);
-      return trueGene;
-    } else {
-      throw new UnsupportedOperationException("Unsupported mutation: " + mutationToApply);
-    }
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**

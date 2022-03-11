@@ -101,7 +101,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         try {
           Expr inExpr = ExprBuilder.in(argExpr, set);
           ExprGeneValue geneValue = new ExprGeneValue(inExpr, ExprGeneType.INCLUSION);
-          genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+          genes.add(new InclusionGene(conf, geneValue, targetInfo));
         } catch (InvalidConfigurationException e) {
           throw new IllegalStateException("Invalid config exception when adding considering expr: " + set);
         }
@@ -121,7 +121,7 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         // Create a gene with the expression argLabel in collection
         Expr geneExpr = ExprBuilder.in(ExprBuilder.toExpr(argLabel, expr.type()), expr);
         ExprGeneValue geneValue = new ExprGeneValue(geneExpr, ExprGeneType.INCLUSION);
-        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+        genes.add(new InclusionGene(conf, geneValue, targetInfo));
       }
     }
     return genes;
