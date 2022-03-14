@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * This class represents a QuantificationDoubleVariableGene. A quantification double variable genegene is a gene which value is
+ * This class represents a QuantificationDoubleVariableGene. A quantification double variable gene is a gene which value is
  * a quantified expression qt n : decl : body, where the body is a predicate over two variables (n OP n.f).
  *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
