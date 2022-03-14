@@ -5,10 +5,7 @@ import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
-import evospex.ga.chromosome.gene.CardinalityGene;
-import evospex.ga.chromosome.gene.ExprGeneImpl;
-import evospex.ga.chromosome.gene.QuantificationDoubleValueGene;
-import evospex.ga.chromosome.gene.QuantificationSingleValueGene;
+import evospex.ga.chromosome.gene.*;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -80,15 +77,15 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
     // (all + some) n: e.*(f+g) : n != n.f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationDoubleVariableGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n != n.g
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationDoubleVariableGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*(f+g) : n = n.f.g
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(doubleClosuredExpr, ExprOperator.ALL, 4);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationDoubleVariableGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);

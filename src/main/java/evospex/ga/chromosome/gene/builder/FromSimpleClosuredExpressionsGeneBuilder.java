@@ -7,6 +7,7 @@ import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.ExprGeneImpl;
 import evospex.ga.chromosome.gene.QuantificationDoubleValueGene;
+import evospex.ga.chromosome.gene.QuantificationDoubleVariableGene;
 import evospex.ga.chromosome.gene.QuantificationSingleValueGene;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
@@ -71,7 +72,7 @@ public class FromSimpleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
     // (all + some) n : e.*f : n != n.f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarVarPredicate(simpleClosuredExpr, ExprOperator.ALL);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationDoubleVariableGene(conf, geneValue, targetInfo));
 
     // (all + some) n : e.*f : n in n.^f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(simpleClosuredExpr, ExprOperator.ALL);
