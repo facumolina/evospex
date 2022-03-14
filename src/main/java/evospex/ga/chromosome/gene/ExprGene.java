@@ -1,25 +1,10 @@
 package evospex.ga.chromosome.gene;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-
-import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
-import evospex.expression.ExprGrammarParser.Unary_opContext;
-import evospex.expression.ExprGrammarParser.Qt_exprContext;
-import evospex.expression.ExprGrammarParser.Compare_opContext;
-import evospex.expression.ExprGrammarParser.ExprContext;
-import evospex.expression.ExprGrammarParser.Set_exprContext;
-
-import evospex.expression.symbol.ExprDelimiter;
-import evospex.expression.symbol.ExprName;
-import evospex.expression.symbol.ExprOperator;
-import evospex.ga.chromosome.gene.type.ExprGeneType;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import evospex.ga.operator.ExprGeneMutationHelper;
-import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.BaseGene;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -45,7 +30,6 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * Default constructor with a default value (true)
    * @param a_conf is the configuration object
    * @param info is the target information object
-   * @throws InvalidConfigurationException
    */
   public ExprGene(Configuration a_conf, TargetInformation info) throws InvalidConfigurationException {
     super(a_conf);
@@ -59,7 +43,6 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * @param a_conf is the configuration object
    * @param value is the given expression value to be part of this gene
    * @param info is the target information object
-   * @throws InvalidConfigurationException
    */
   public ExprGene(Configuration a_conf, ExprGeneValue value, TargetInformation info)
       throws InvalidConfigurationException {
@@ -203,14 +186,6 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
   @Override
   public Object getInternalValue() {
     return value;
-  }
-
-  public int compareTo(ExprGene other) {
-    if (value.getExpression().equals(other.getValue().getExpression())) {
-      return 0;
-    } else {
-      return 1;
-    }
   }
 
   /**
