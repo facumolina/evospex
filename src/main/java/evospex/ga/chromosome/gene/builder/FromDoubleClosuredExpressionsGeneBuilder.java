@@ -7,6 +7,7 @@ import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
 import evospex.ga.chromosome.gene.CardinalityGene;
 import evospex.ga.chromosome.gene.ExprGeneImpl;
+import evospex.ga.chromosome.gene.QuantificationDoubleValueGene;
 import evospex.ga.chromosome.gene.QuantificationSingleValueGene;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
@@ -137,10 +138,10 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
         // Values are numeric
         // all n: e.*(f+g) : (n.f != null) => n.r op n.f.r
         geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
-        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+        genes.add(new QuantificationDoubleValueGene(conf, geneValue, targetInfo));
         // all n: e.*(f+g) : (n.g != Null) => n.r op n.g.r
         geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
-        genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+        genes.add(new QuantificationDoubleValueGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
         throw new UnsupportedOperationException("Handle boolean value properly");
