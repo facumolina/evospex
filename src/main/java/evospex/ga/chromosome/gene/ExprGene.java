@@ -432,38 +432,7 @@ public abstract class ExprGene extends BaseGene implements Gene, java.io.Seriali
    * is a predicate about a variable and a set
    */
   protected ExprGene applyForAllVarSetMutation() throws InvalidConfigurationException {
-    Expr expr = value.getExpression();
-    String mutationToApply = getSomeApplicableMutation();
-    Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
-    if (qt_expr == null)
-      throw new IllegalStateException("The current expression is not a quantified expression");
-    ExprContext body = qt_expr.expr();
-    Set_exprContext set =  qt_expr.set_expr();
-    if (mutationToApply.equals(ExprGeneMutations.NEGATE_BODY)) {
-      // Create the for all expression with the negated body
-      String newBodyStr = ExprOperator.NOT_1 + ExprDelimiter.LP + body.getText() + ExprDelimiter.RP;
-      if (ExprOperator.NOT_1.equals(body.unary_op())) {
-        // The body is already negated, so just remove the negation operation
-        newBodyStr = body.expr().get(0).getText();
-      }
-      if (newBodyStr.contains(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR)) {
-        newBodyStr = newBodyStr.replace(ExprName.QT_VAR + ExprOperator.IN + ExprName.QT_VAR,ExprName.QT_VAR + " " + ExprOperator.IN + " " + ExprName.QT_VAR);
-      }
-      Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
-      value.setExpression(newExpr, false);
-      return this;
-    } else if (mutationToApply.equals(ExprGeneMutations.TO_SOME)) {
-      // Create a new expression with the some quantifier
-      throw new UnsupportedOperationException("implement this");
-    } else if (mutationToApply.equals(ExprGeneMutations.TO_TRUE)) {
-      // Set the expression to true
-      ConstantGene trueGene = new ConstantGene(getConfiguration(), targetInfo);
-      trueGene.updatePreviousExpression(value);
-      return trueGene;
-    } else {
-      throw new UnsupportedOperationException("implement this");
-    }
-
+    throw new IllegalStateException("We should not be here!!!");
   }
 
   /**

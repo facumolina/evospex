@@ -89,18 +89,18 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
 
     // (all + some) n: e.*(f+g) : n in n.^f
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 1);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationVariableSetGene(conf, geneValue, targetInfo));
     // (all + some) n: e.*(f+g) : n in n.^g
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL, 2);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationVariableSetGene(conf, geneValue, targetInfo));
 
     // (all + some) n: e.*(f+g) : n in n.^(f+g)
     geneValue = GeneValueBuilderUtils.createsQtExpressionVarSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationVariableSetGene(conf, geneValue, targetInfo));
 
     // all n: e.*(f+g) : n.f.*(f+g) != n.g.*(f+g)
     geneValue = GeneValueBuilderUtils.createsQtExpressionSetSetPredicate(doubleClosuredExpr, ExprOperator.ALL);
-    genes.add(new ExprGeneImpl(conf, geneValue, targetInfo));
+    genes.add(new QuantificationVariableSetGene(conf, geneValue, targetInfo));
 
     return genes;
   }
