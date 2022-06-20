@@ -18,25 +18,32 @@ mvn clean compile assembly:single
 
 ## Usage
 
-Given a Java class containing a target method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. 
-
+Given a Java class containing a target method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. The state generation phase generates _valid_ states characterizing the actual method behavior and _invalid_ states representing potentially invalid method behavior. 
+ 
 ### States Generation
 
-The state generation phase can be performed with the following command:
+To perform the state generation phase, run the following command:
 ```bash
 ./states_generation.sh <cp> <class> <method>
 ```
-where <cp> is the classpath containing the target class, <class> is the target class fully quallified name and <method> is the target method name. 
+where <cp> is the classpath containing the target class, <class> is the target class fully quallified name and <method> is the target method name. This phase will produce a `states` folder containing the mentioned states for the current subject.
 
 ### Inference
 
-The inference phase is performed as follows. 
+After generation the states, to perform the inference phase run the following command. 
 
 ```bash
 ./evospex.sh <cp> <class> <method>
 ```
 
 ## Example
+
+As an example, to generate a postcondition assertion for the method add(int,java.lang.Object) of class AvlTreeList, you can perform the two phases as follows:
+
+```bash
+./states_generation.sh lib casestudies.motivation.AvlTreeList add(int,java.lang.Object)
+./evospex.sh lib casestudies.motivation.AvlTreeList add(int,java.lang.Object)
+```
   
 ## Output
   
