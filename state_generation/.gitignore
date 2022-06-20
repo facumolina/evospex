@@ -1,0 +1,9 @@
+**/.*.swp
+inputs/
+outputs/
+tmp/
+tests/
+log.txt
+
+# MacOS temporary files
+**/.DS_Store

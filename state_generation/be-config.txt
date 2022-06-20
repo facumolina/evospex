@@ -1,0 +1,13 @@
+--ignore-public-fields
+--only-test-public-members=true
+--usethreads=false
+--instance-generics-integer
+--disable-contracts
+--forbid-null=true
+--enable-syntactic-redundancy
+--filtering=BE
+--all-sequences
+--assert-single-object-hack
+--junit-reflection-allowed=false
+--keep-only-builder-seqs
+--discard-generation-seqs
