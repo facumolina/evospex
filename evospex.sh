@@ -8,4 +8,4 @@ cd $base_folder;
 num_args="$( ls -l in*.xml | wc -l )";
 num_outputs="$( ls -l out*.xml | wc -l )";
 cd $root_dir;
-java -jar target/evospex-jar-with-dependencies.jar $target_class_fqn $2 $num_args $num_outputs $3 $4 $5 $6 $7 $8
+java -jar target/evospex.jar $target_class_fqn $2 $num_args $num_outputs $3 $4 $5 $6 $7 $8
