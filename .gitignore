@@ -1,11 +1,10 @@
 # Folders and files
-ustive-gen/learning-spec/
-field-exhaustive-gen/alloy/
-field-exhaustive-gen/instances/
-/target/
+target/
 bin/
 output/
+states/
 **/.DS_Store
+
 
 # Eclipse stuff
 .project
