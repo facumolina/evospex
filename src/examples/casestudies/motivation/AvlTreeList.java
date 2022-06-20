@@ -36,7 +36,7 @@ public final class AvlTreeList<E> extends AbstractList<E> {
 
   /*---- Fields ----*/
 
-  public Node<E> root; // Never null
+  private Node<E> root; // Never null
 
   /*---- Constructors ----*/
 
@@ -119,26 +119,26 @@ public final class AvlTreeList<E> extends AbstractList<E> {
   public static final class Node<E> {
 
     // A bit of a hack, but more elegant than using null values as leaf nodes.
-    public static final Node<?> EMPTY_LEAF = new Node<Object>();
+    private static final Node<?> EMPTY_LEAF = new Node<Object>();
 
     /*-- Fields --*/
 
     // The object stored at this node. Can be null.
-    public E value;
+    private E value;
 
     // The height of the tree rooted at this node. Empty nodes have height 0.
     // This node has height equal to max(left.height, right.height) + 1.
-    public int height;
+    private int height;
 
     // The number of non-empty nodes in the tree rooted at this node, including this node.
     // Empty nodes have size 0. This node has size equal to left.size + right.size + 1.
-    public int size;
+    private int size;
 
     // The root node of the left subtree.
-    public Node<E> left;
+    private Node<E> left;
 
     // The root node of the right subtree.
-    public Node<E> right;
+    private Node<E> right;
 
     /*-- Constructors --*/
 
