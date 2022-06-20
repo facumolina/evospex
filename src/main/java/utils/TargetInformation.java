@@ -155,7 +155,6 @@ public class TargetInformation {
           Expr fst = adjacentClosuredExpressions.get(i);
           Expr snd = adjacentClosuredExpressions.get(j);
           Expr closured = ExprBuilder.joinWithRClosure(currExpr, fst.toString(), snd.toString());
-          System.out.println("Double closured expr "+ closured);
           closured.setClassOfElemsInSet(fst.type());
           doubleClosuredExpressions.add(closured);
           createSets(closured, fst.type());
@@ -328,7 +327,10 @@ public class TargetInformation {
    * Returns the expressions denoting sets of the given type
    */
   public List<Expr> getSetsOfType(Class<?> type) {
-    List<Expr> sets = new LinkedList<>(setsByType.get(type));
+    List<Expr> exprSets = setsByType.get(type);
+    if (exprSets==null)
+      return new LinkedList<>();
+    List<Expr> sets = new LinkedList<>(exprSets);
     // Additionally, sets of objects should be returned, since they are possible sets for any given type
     if (setsByType.containsKey(Object.class))
       sets.addAll(setsByType.get(Object.class));
