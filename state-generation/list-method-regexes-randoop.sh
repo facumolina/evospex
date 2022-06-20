@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Important: Set EVOSPEX_TEST_GEN environment variable to the root directory of this repo first! 
+export EVOSPEX_TEST_GEN=$(pwd)/state-generation
 
 # Set if not enough memory
 # maxmem=-Xmx8G
-
 if [ -z ${EVOSPEX_TEST_GEN+x} ]; then 
     echo "Error: EVOSPEX_TEST_GEN environment variable must be set before executing $0"
     exit -1
