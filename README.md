@@ -24,16 +24,16 @@ Given a Java class containing a target method, the use of EvoSpex requires two p
 
 To perform the state generation phase, run the following command:
 ```bash
-./states_generation.sh <cp> <class> <method>
+./state-generation.sh <cp> <class> "<method>"
 ```
-where <cp> is the classpath containing the target class, <class> is the target class fully quallified name and <method> is the target method name. This phase will produce a `states` folder containing the mentioned states for the current subject.
+where <cp> is the classpath containing the target class, <class> is the target class fully quallified name and <method> is the target method signature. This phase will produce the `states` folder containing the states for the current target method.
 
 ### Inference
 
-After generation the states, to perform the inference phase run the following command. 
+After generating the states, to perform the inference phase run the following command. 
 
 ```bash
-./evospex.sh <cp> <class> <method>
+./evospex.sh <cp> <class> "<method>"
 ```
 
 ## Example
@@ -41,10 +41,12 @@ After generation the states, to perform the inference phase run the following co
 As an example, to generate a postcondition assertion for the method add(int,java.lang.Object) of class AvlTreeList, you can perform the two phases as follows:
 
 ```bash
-./states_generation.sh lib casestudies.motivation.AvlTreeList add(int,java.lang.Object)
-./evospex.sh lib casestudies.motivation.AvlTreeList add(int,java.lang.Object)
+./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
+./evospex.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
 ```
-  
+
+Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
+
 ## Output
   
 ## Evaluation
