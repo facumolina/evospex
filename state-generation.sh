@@ -15,7 +15,7 @@ echo ''
 
 echo '> Generating states...'
 pushd $EVOSPEX_TEST_GEN > /dev/null
-./gen-randoop-pos-neg-objects.sh $subject_cp $class $method 3
+./gen-randoop-pos-neg-objects.sh $subject_cp $class $method 4
 popd > /dev/null
 mkdir -p states/$class/$method/
 mv $EVOSPEX_TEST_GEN/outputs/* states/$class/$method/
