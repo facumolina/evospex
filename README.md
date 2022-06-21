@@ -33,10 +33,9 @@ where <cp> is the target subject classpath, <class> is the target class fully qu
 After generating the states, to generate perform the inference phase and generate the postcondition assertion run the following command. 
 
 ```bash
-./evospex.sh <cp> <class> "<method>"
+./evospex.sh <cp> <class> <method_states>
 ```
-
-The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
+where "<method_states>" is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
  
 ## Example
 
@@ -44,7 +43,7 @@ As an example, to generate a postcondition assertion for the method add(int,java
 
 ```bash
 ./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
-./evospex.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
+./evospex.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList states/casestudies.motivation.AvlTreeList/add(int,java.lang.Object)/
 ```
 
 Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
@@ -53,11 +52,11 @@ Note: you can list all the possible target methods of a class by running the scr
   
 ## Evaluation
 
-To run EvoSpex on the evaluation subjects, download the subjects:
+The evaluation subjects can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4458256.svg)](https://doi.org/10.5281/zenodo.4458256)
  
-Then, follow the instructions in this repository. 
+Then, to run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper). 
  
 ## Contact
   
-If you experience any issues, please submit an issue or contact us at fmolina@dc.exa.unrc.edu.ar
+If you experience any issues, please submit an issue or contact us at fmolina@dc.exa.unrc.edu.ar!
 
