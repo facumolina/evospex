@@ -692,7 +692,7 @@ public class SpecChromosome extends BaseChromosome {
    * Print the genes
    */
   public void printGenes() {
-    System.out.print("\tGenes:");
+    System.out.print("\tAssertions:");
     System.out.print("[\n");
     int size = getGenes().length;
     for (int i = 0; i < size; i++) {
@@ -708,12 +708,11 @@ public class SpecChromosome extends BaseChromosome {
         }
       }
     }
-    System.out
-        .println("\t]\n\tPos counterexamples: " + getAmountOfPositiveCounterexamples().intValue());
-    System.out.println("\tNeg counterexamples: " + getAmountOfNegativeCounterexamples().intValue());
+    System.out.println("\t]\n\tPositive counterexamples: " + getAmountOfPositiveCounterexamples().intValue());
+    System.out.println("\tNegative counterexamples: " + getAmountOfNegativeCounterexamples().intValue());
 
     if (counterexamplesMutationsStr != null && !counterexamplesMutationsStr.equals("")) {
-      System.out.println("\tNeg counterexamples Mutations: {");
+      System.out.println("\tNegative counterexamples Mutations: {");
       System.out.println(counterexamplesMutationsStr);
       System.out.println("\t}");
     }

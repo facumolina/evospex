@@ -11,7 +11,7 @@ import evospex.expression.evaluator.ExpressionEvaluator;
 import evospex.expression.evaluator.NonEvaluableExpressionException;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.ExprGene;
-import evospex.ga.chromosome.gene.ExprGeneValue;
+import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import evospex.ga.chromosome.SpecChromosome;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
@@ -72,11 +72,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
       return 0;
     }
 
-    boolean b = specChromosome.toString().contains("all") && specChromosome.toString().contains(" in ");
-    if (b) {
-      System.out.println("Chromosome with closured expr");
-      System.out.println(specChromosome);
-    }
     // If already calculated, return directly
     if (calculatedFitness.containsKey(specChromosome.toString())) {
       Stats.FITNESS_COMPUTATION_AVOIDED++;
@@ -84,7 +79,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
       specChromosome.setAmountOfPositiveCounterexamples(value.positiveCounterexamples());
       specChromosome.setAmountOfNegativeCounterexamples(value.negativeCounterexamples());
       specChromosome.setCounterexamplesMutationsStr(value.counterexamplesMutationsStr());
-      if (b) System.out.println("Value: "+value.getFitnessValue());
       return value.getFitnessValue();
     }
 
@@ -102,13 +96,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     double n = negatives.size();
     if (p == 0) {
       n = negativeCounterexamples(expressions, specChromosome);
-      if (b) {System.out.println("Neg: "+n);}
-    } else {
-      if (b) {
-        System.out.println("Pos: "+n);
-        System.out.println("Neg: "+n);
-      }
-
     }
     specChromosome.setAmountOfPositiveCounterexamples(p);
     specChromosome.setAmountOfNegativeCounterexamples(n);
@@ -127,6 +114,9 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
     if (params.considerMcaReward())
       res += (mca / a) * (1 / Math.max(((a * a) - a), 1));
 
+    if (a==1 && p==0)
+      Stats.discovered_properties.add(specChromosome);
+
     // No counterexamples + The more formulas, the better + The less non_equiv genes, the better
     // double res (1000 - n) + (1 / amountOfGenes) * a + (1 / non_equiv(chrom))
     // Report.animate("");
@@ -135,8 +125,8 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
       bestFitness = res;
       int currentTime = (int) (System.currentTimeMillis() - itime) / 1000;
       System.out.println();
-      System.out.println("SPECIFICATION LEARNED AT: " + currentTime + " seconds.");
-      System.out.println("CHROMOSOME FITNESS: " + res);
+      System.out.println("POSTCONDITION ASSERTIONS LEARNED AT: " + currentTime + " seconds.");
+      System.out.println("FITNESS: " + res);
       Stats.FITEST_CHROMOSOME = specChromosome;
       Stats.FITEST_CHROMOSOME_FV = res;
       specChromosome.printGenes();
@@ -146,7 +136,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
         new FitnessValue(p, n, res, specChromosome.getCounterexamplesMutationsStr()));
     Stats.FITNESS_CALCULATION_TIME += System.currentTimeMillis() - timeBeforeFitnessComputation;
     Stats.FITNESS_FUNCTION_EXECUTIONS++;
-    if (b) System.out.println("Value: "+res);
     return res;
   }
 
@@ -207,7 +196,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
    * Evaluates the given expression on the given method execution
    */
   private boolean evaluate(Expr expr, MethodExecution me) {
-    //System.out.println("Evaluating expr: "+expr);
     HashMap<String, Object> current_vars = new HashMap<>();
     current_vars.put(ExprName.THIS_PRE, me.getObjectFrom());
     current_vars.put(ExprName.THIS, me.getObjectFinalState());

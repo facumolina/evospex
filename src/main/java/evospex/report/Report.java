@@ -41,7 +41,7 @@ public class Report {
     System.out.println("Total fitness executions: " + Stats.FITNESS_FUNCTION_EXECUTIONS);
     System.out.println("Best individual found: " + Stats.FITEST_CHROMOSOME_FV);
     System.out.println();
-    System.out.println("Assertions: ");
+    System.out.println("Postcondition Assertions: ");
     List<Expr> assertions = Stats.FITEST_CHROMOSOME.toExprList();
     System.out.println("\tassert(");
     for (int i = 0; i < assertions.size() - 1; i++) {
@@ -49,6 +49,14 @@ public class Report {
     }
     System.out.println("\t" + assertions.get(assertions.size() - 1));
     System.out.println("\t);");
+    System.out.println();
+    /*System.out.println("Discovered valid assertions:");
+    for (SpecChromosome chromosome : Stats.discovered_properties) {
+      List<Expr> chromosomeAssertions = chromosome.toExprList();
+      for (int i = 0; i < chromosomeAssertions.size(); i++) {
+        System.out.println("\t" + chromosomeAssertions.get(i));
+      }
+    }*/
     System.out.println("--------------------------------------------");
     System.out.println();
     System.out.println("CSV line for experimental purposes: ");
@@ -57,45 +65,6 @@ public class Report {
             + "," + Stats.FITEST_CHROMOSOME.getAmountOfNegativeCounterexamples().intValue() + ","
             + assertions.size());
 
-  }
-
-  /**
-   * Animate
-   */
-  private static byte anim;
-
-  public static void animate(String line) {
-    switch (anim) {
-    case 1:
-      print("[ \\ ] " + line);
-      break;
-    case 2:
-      print("[ | ] " + line);
-      break;
-    case 3:
-      print("[ / ] " + line);
-      break;
-    default:
-      anim = 0;
-      print("[ - ] " + line);
-    }
-    anim++;
-  }
-
-  private static String lastLine = "";
-
-  private static void print(String line) {
-    // clear the last line if longer
-    if (lastLine.length() > line.length()) {
-      String temp = "";
-      for (int i = 0; i < lastLine.length(); i++) {
-        temp += " ";
-      }
-      if (temp.length() > 1)
-        System.out.print("\r" + temp);
-    }
-    System.out.print("\r" + line);
-    lastLine = line;
   }
 
 }

@@ -2,6 +2,9 @@ package evospex.report;
 
 import evospex.ga.chromosome.SpecChromosome;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Class containing statistics and numbers collected during the GA execution
  * 
@@ -44,16 +47,19 @@ public class Stats {
   public static SpecChromosome FITEST_CHROMOSOME;
   public static double FITEST_CHROMOSOME_FV;
 
+  // Set of discovered properties
+  public static Set<SpecChromosome> discovered_properties = new HashSet<>();
+
   /**
    * Print the mutation report
    */
   public static void printMutationReport() {
     System.out.println();
     System.out.println("------------- Mutation operator ------------");
-    System.out.println("Chromosomes before mutation: " + CHROMOSOMES_BEFORE_MUTATION);
+    System.out.println("Candidates before mutation: " + CHROMOSOMES_BEFORE_MUTATION);
     System.out.println("Number of mutations: " + MUTATIONS_PERFORMED);
-    System.out.println("New unary chromosomes: " + UNARY_CHROMOSOMES_FROM_MUTATION);
-    System.out.println("Chromosomes after mutation: " + CHROMOSOMES_AFTER_MUTATION);
+    System.out.println("New unary candidates: " + UNARY_CHROMOSOMES_FROM_MUTATION);
+    System.out.println("Candidates after mutation: " + CHROMOSOMES_AFTER_MUTATION);
     System.out.println("--------------------------------------------");
   }
 
@@ -63,10 +69,10 @@ public class Stats {
   public static void printCrossoverReport() {
     System.out.println();
     System.out.println("------------ Crossover operator ------------");
-    System.out.println("Chromosomes before crossover: " + CHROMOSOMES_BEFORE_CROSSOVER);
+    System.out.println("Candidates before crossover: " + CHROMOSOMES_BEFORE_CROSSOVER);
     System.out.println("Number of crossovers: " + NUMBER_OF_CROSSOVERS);
-    System.out.println("Valid chromosomes: " + VALID_CHROMOSOMES);
-    System.out.println("Chromosomes after crossover: " + CHROMOSOMES_AFTER_CROSSOVER);
+    System.out.println("Valid candidates: " + VALID_CHROMOSOMES);
+    System.out.println("Candidates after crossover: " + CHROMOSOMES_AFTER_CROSSOVER);
     System.out.println("--------------------------------------------");
   }
 
@@ -76,12 +82,12 @@ public class Stats {
   public static void printSelectionReport() {
     System.out.println();
     System.out.println("------------- Selection process ------------");
-    System.out.println("Chromosomes before selection: " + CHROMOSOMES_BEFORE_SELECTION);
+    System.out.println("Candidates before selection: " + CHROMOSOMES_BEFORE_SELECTION);
     System.out.println("Selected by fitness order: " + SELECTED_BY_FITNESS + " (valid: "
         + ACTUAL_VALID_INDIVIDUALS + ")");
     System.out.println("Unary invalid preserved: " + UNARY_INVALID_PRESERVED);
     System.out.println("Extra valid preserved: " + UNARY_VALID_PRESERVED);
-    System.out.println("Total chromosomes to next generation: " + MOVED_TO_NEXT_GEN);
+    System.out.println("Candidates to next generation: " + MOVED_TO_NEXT_GEN);
     System.out.println("--------------------------------------------");
   }
 
@@ -94,7 +100,8 @@ public class Stats {
     System.out.println("Time spent so far: " + (FITNESS_CALCULATION_TIME / 1000) + " (sec)");
     System.out.println("Total executions: " + FITNESS_FUNCTION_EXECUTIONS);
     System.out.println("Avoided executions: " + FITNESS_COMPUTATION_AVOIDED);
-    System.out.println("Best individual so far: " + FITEST_CHROMOSOME_FV);
+    System.out.println("Best candidate postcondition so far: " + FITEST_CHROMOSOME_FV);
+    System.out.println("Candidate Postcondition Assertions:");
     System.out.println();
     FITEST_CHROMOSOME.printGenes();
     System.out.println("--------------------------------------------");
