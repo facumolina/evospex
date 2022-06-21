@@ -88,7 +88,7 @@ omitmethods="toString|hashCode|equals|clone|compareTo|javax.swing.*|ASTNode.dump
 
 echo ""
 echo "> Executing test generation with Randoop"
-cmd="java -ea $maxmem -cp ${randoop_jar}:${project_classpath} randoop.main.Main gentests $test_classes --serialize-folder=$mutator_inputs --serialize-method=\"$regex_method\" --junit-package-name=$package --junit-output-dir=$outdir_tests --time-limit=$timelimit --literals-level=ALL --literals-file=$literals --omit-methods=\"$omitmethods\""
+cmd="java -ea $maxmem -cp ${randoop_jar}:${project_classpath} randoop.main.Main gentests $test_classes --serialize-folder=$mutator_inputs --serialize-method=\"$regex_method\" --junit-package-name=$package --junit-output-dir=$outdir_tests --time-limit=$timelimit --literals-level=ALL --literals-file=$literals --omit-methods=\"$omitmethods\" --forbid-null=true"
 
 echo -e "\n\n> Executing: $cmd" >> $results_log
 bash -c "$cmd" >> $results_log 2>> $results_log
