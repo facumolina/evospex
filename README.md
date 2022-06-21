@@ -4,7 +4,7 @@ EvoSpex is a search-based tool for inferring postconditions of Java methods. Giv
 
 ## Requirements
 
-* Maven
+* [Apache Maven](https://maven.apache.org/) (tested with version 3.8.5)
 * Java >= 8
 
 ## Installation
