@@ -39,7 +39,7 @@ where "<method_states>" is the folder containing the states produced in the prev
  
 ## Example
 
-As an example, to generate a postcondition assertion for the method add(int,java.lang.Object) of class AvlTreeList, you can perform the two phases as follows:
+As an example, let's consider the method [add(int,java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList, which inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for such method, you can perform the two phases as follows:
 
 ```bash
 ./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
