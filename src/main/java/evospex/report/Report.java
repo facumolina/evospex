@@ -58,13 +58,6 @@ public class Report {
       }
     }*/
     System.out.println("--------------------------------------------");
-    System.out.println();
-    System.out.println("CSV line for experimental purposes: ");
-    System.out.println(
-        seconds + "," + Stats.FITEST_CHROMOSOME.getAmountOfPositiveCounterexamples().intValue()
-            + "," + Stats.FITEST_CHROMOSOME.getAmountOfNegativeCounterexamples().intValue() + ","
-            + assertions.size());
-
   }
 
 }
