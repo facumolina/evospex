@@ -16,6 +16,10 @@ To build and install EvoSpex locally, clone this repository and run the followin
 mvn clean compile assembly:single
 ```
 
+### Docker installation
+
+Coming soon!
+
 ## Using the Tool
 
 Given a Java class containing the target method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. The state generation phase generates _valid_ states characterizing the current behavior of the target method and _invalid_ states representing invalid behavior of the target method. 
