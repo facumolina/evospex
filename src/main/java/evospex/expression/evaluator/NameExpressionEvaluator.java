@@ -102,7 +102,7 @@ public class NameExpressionEvaluator {
    * Compute the set obtained by applying the given field to every element in the collection
    */
   private static Set<Object> get_collection(java.util.Collection collection, String field_to_apply) {
-    Set<Object> mapping = new HashSet<Object>();
+    Set<Object> mapping = new HashSet<>();
     collection.forEach(elem -> {
       try {
         Field field = get_field(elem.getClass(), field_to_apply);

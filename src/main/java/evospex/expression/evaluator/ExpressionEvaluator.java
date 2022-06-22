@@ -37,8 +37,8 @@ public class ExpressionEvaluator {
   /**
    * Check the arguments for evaluation
    */
-  private static void checkEvalArgs(ExprContext strExpr, Object base) {
-    if (strExpr == null || base == null)
+  private static void checkEvalArgs(ExprContext expr, Object base) {
+    if (expr == null || base == null)
       throw new IllegalArgumentException("Neither the expression nor the object can be null.");
   }
 
