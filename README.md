@@ -16,7 +16,7 @@ To build and install EvoSpex locally, clone this repository and run the followin
 mvn clean compile assembly:single
 ```
 
-## Usage
+## Using the Tool
 
 Given a Java class containing the target method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. The state generation phase generates _valid_ states characterizing the current behavior of the target method and _invalid_ states representing invalid behavior of the target method. 
  
@@ -37,7 +37,7 @@ After generating the states, to generate perform the inference phase and generat
 ```
 where <method_states> is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
  
-## Example
+### Example
 
 As an example, let's consider the method [add(int,java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList, which inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for such method, the two phases can be performed as follows:
 
@@ -48,7 +48,7 @@ As an example, let's consider the method [add(int,java.lang.Object)](https://git
 
 Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
 
-## Output
+### Output
 
 EvoSpex reports the postcondition as an assert statement: `assert(...);`. For instance, for the above example, an execution of EvoSpex may return a postcondition such as the following:
 ```java
@@ -64,6 +64,51 @@ assert(
  all n:this.root.*(left+right):n.right!=null implies !(n.size<n.right.size)
 );
 ```
+
+### EvoSpex Optional Command Line Parameters
+
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-73oq">Parameter</th>
+    <th class="tg-73oq">Description</th>
+    <th class="tg-73oq">Example</th>
+    <th class="tg-73oq">Default value</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-73oq">popSize</td>
+    <td class="tg-73oq">Evolutionary algorithm population size</td>
+    <td class="tg-73oq">popSize=1000</td>
+    <td class="tg-73oq">500</td>
+  </tr>
+ <tr>
+    <td class="tg-73oq">gens</td>
+    <td class="tg-73oq">Evolutionary algorithm generations</td>
+    <td class="tg-73oq">gens=500</td>
+    <td class="tg-73oq">100</td>
+  </tr>
+ <tr>
+    <td class="tg-73oq">to</td>
+    <td class="tg-73oq">Evolutionary algorithm timeout (in seconds)</td>
+    <td class="tg-73oq">to=1800</td>
+    <td class="tg-73oq">600</td>
+  </tr>
+ <tr>
+    <td class="tg-73oq">mp</td>
+    <td class="tg-73oq">Mutation probability</td>
+    <td class="tg-73oq">mp=0.2</td>
+    <td class="tg-73oq">0.3</td>
+  </tr>
+ <tr>
+    <td class="tg-73oq">cp</td>
+    <td class="tg-73oq">Crossover probability</td>
+    <td class="tg-73oq">cp=0.6</td>
+    <td class="tg-73oq">0.55</td>
+  </tr>
+</tbody>
+</table>
  
 ## Evaluation
 
