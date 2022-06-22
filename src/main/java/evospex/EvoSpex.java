@@ -112,8 +112,7 @@ public class EvoSpex {
     }
 
     System.out.println("target class: " + targetClass.getName());
-    // TODO find the method that contains the assert(true) statement
-    System.out.println("target method: ...");
+    System.out.println("target method states: "+params.getBaseFolderName());
     EvoSpexGA learner = new EvoSpexGA(targetClass, "", params);
     learner.learnPostCondition();
     return 1;
