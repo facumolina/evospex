@@ -29,10 +29,9 @@ public class ConfigurationProperties {
    * Load the given properties file.
    */
   public static void loadFile(String configurationFile) {
-    InputStream input = null;
     properties = new Properties();
     try {
-      input = new FileInputStream(configurationFile);
+      InputStream input = new FileInputStream(configurationFile);
       // load a properties file
       properties.load(input);
     } catch (IOException e) {

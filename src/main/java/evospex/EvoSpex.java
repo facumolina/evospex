@@ -36,7 +36,6 @@ public class EvoSpex {
         String baseFolder = args[1];
         int numArgs = Integer.parseInt(args[2]);
         int numOutputs = Integer.parseInt(args[3]);
-        ConfigurationProperties.loadFile("alearning.properties");
         EvoSpexParameters params = new EvoSpexParameters();
         if (args.length > 4) {
           for (int i = 4; i < args.length; i++) {
