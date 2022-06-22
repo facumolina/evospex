@@ -67,10 +67,10 @@ public class EvoSpexParameters {
   public EvoSpexParameters() {
 
     // Evolutionary process parameters
-    populationSize = 200;
+    populationSize = 500;
     generations = 30;
     mutationProb = 0.3;
-    crossoverProb = 0.35;
+    crossoverProb = 0.55;
     timeout = 600; // 10 min by default
     sizePenalty = true;
     mcaReward = true;
