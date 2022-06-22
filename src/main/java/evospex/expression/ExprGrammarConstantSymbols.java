@@ -10,5 +10,7 @@ public class ExprGrammarConstantSymbols {
   public static final String MAP_KEY_SET = "keySet";
   public static final String MAP_VALUES = "values";
   public static final String QT_VAR_NAME = "n";
+  public static final String TRUE = "true";
+  public static final String FALSE = "false";
 
 }

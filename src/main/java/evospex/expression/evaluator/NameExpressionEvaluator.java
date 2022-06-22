@@ -59,6 +59,10 @@ public class NameExpressionEvaluator {
       return ExpressionEvaluator.vars.get(QuantifiedExpressionEvaluator.QT_VAR_NAME);
     if (access_field.equals(ExprGrammarConstantSymbols.NULL))
       return null;
+    if (access_field.equals(ExprGrammarConstantSymbols.TRUE))
+      return true;
+    if (access_field.equals(ExprGrammarConstantSymbols.FALSE))
+      return false;
     if (access_field.equals(ExprGrammarConstantSymbols.MAP_KEY_SET) && o instanceof java.util.Map)
       return eval_method(access_field, o);
     if (access_field.equals(ExprGrammarConstantSymbols.MAP_VALUES) && o instanceof java.util.Map)
