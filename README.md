@@ -35,11 +35,11 @@ After generating the states, to generate perform the inference phase and generat
 ```bash
 ./evospex.sh <cp> <class> <method_states>
 ```
-where "<method_states>" is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
+where <method_states> is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
  
 ## Example
 
-As an example, let's consider the method [add(int,java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList, which inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for such method, you can perform the two phases as follows:
+As an example, let's consider the method [add(int,java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList, which inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for such method, the two phases can be performed as follows:
 
 ```bash
 ./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
@@ -49,7 +49,22 @@ As an example, let's consider the method [add(int,java.lang.Object)](https://git
 Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
 
 ## Output
-  
+
+EvoSpex reports the postcondition as an assert statement: `assert(...);`. For instance, for the above example, an execution of EvoSpex may return a postcondition such as the following:
+```java
+assert(
+ this.root.value != null &&
+ this.root != null &&
+ #(this_pre.root.*(left+right))=this.root.size &&
+ #(this.root.*(left+right))=this.root.size+1 &&
+ val in this.root.*(left+right).value &&
+ all n:this.root.*(left+right):n.left!=null implies n.height>n.left.height &&
+ all n:this.root.*(left+right):n.left!=null implies !(n.size<=n.left.size) &&
+ all n:this.root.*(left+right):n.right!=null implies n.height>n.right.height &&
+ all n:this.root.*(left+right):n.right!=null implies !(n.size<n.right.size)
+);
+```
+ 
 ## Evaluation
 
 The evaluation subjects can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4458256.svg)](https://doi.org/10.5281/zenodo.4458256)
