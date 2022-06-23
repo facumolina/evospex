@@ -30,7 +30,7 @@ To perform the state generation phase, run the following command:
 ```bash
 ./state-generation.sh <cp> <class> "<method>"
 ```
-where <cp> is the target subject classpath, <class> is the target class fully quallified name and "<method>" is the target method signature. This phase will produce the `states` folder containing the states for the current target method.
+where ```<cp>``` is the target subject classpath, ```<class>``` is the target class fully quallified name and ```"<method>" is the target method signature. This phase will produce the `states` folder containing the states for the current target method.
 
 ### Postcondition Assertion Inference
 
