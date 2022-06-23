@@ -34,16 +34,16 @@ where ```<cp>``` is the target subject classpath, ```<class>``` is the target cl
 
 ### Postcondition Assertion Inference
 
-After generating the states, to generate perform the inference phase and generate the postcondition assertion run the following command. 
+After generating the states, to perform the inference phase and generate the postcondition assertion, run the following command: 
 
 ```bash
 ./evospex.sh <cp> <class> <method_states>
 ```
-where <method_states> is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
+where ```<method_states>``` is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
  
 ### Example
 
-As an example, let's consider the method [add(int,java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList, which inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for such method, the two phases can be performed as follows:
+As an example, let us consider method [add(int, java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList. This method inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for this method, the two phases can be performed as follows:
 
 ```bash
 ./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
@@ -118,7 +118,7 @@ assert(
 
 The evaluation subjects can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4458256.svg)](https://doi.org/10.5281/zenodo.4458256)
  
-Then, to run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper). 
+To run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper). 
  
 ## Contact
   
