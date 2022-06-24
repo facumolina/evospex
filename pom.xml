@@ -8,6 +8,13 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
+  <repositories>
+    <repository>
+      <id>in-project</id>
+      <name>In Project Repo</name>
+      <url>file://${project.basedir}/lib</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
     	<groupId>org.antlr</groupId> 
@@ -15,7 +22,7 @@
 	<version>4.7.1</version> 
     </dependency>
     <dependency>
-      <groupId>dc.unrc</groupId>
+      <groupId>dc-unrc</groupId>
       <artifactId>canonicalizer</artifactId>
       <version>1.0.1</version>
     </dependency>
