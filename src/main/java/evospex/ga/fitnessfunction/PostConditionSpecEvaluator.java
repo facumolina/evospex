@@ -19,6 +19,7 @@ import org.jgap.IChromosome;
 
 import evospex.target.MethodExecution;
 import evospex.report.Stats;
+import evospex.report.Report;
 
 import evospex.EvoSpexParameters;
 import utils.FitnessValue;
@@ -66,6 +67,7 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
   @Override
   protected double evaluate(IChromosome chromosome) {
     SpecChromosome specChromosome = (SpecChromosome) chromosome;
+    if (Report.pb != null) Report.pb.step();
 
     // If the chromosome has not genes return 0
     if (specChromosome.toString().contains("Alleles:[]")) {
@@ -119,8 +121,6 @@ public class PostConditionSpecEvaluator extends FitnessFunction {
 
     // No counterexamples + The more formulas, the better + The less non_equiv genes, the better
     // double res (1000 - n) + (1 / amountOfGenes) * a + (1 / non_equiv(chrom))
-    // Report.animate("");
-    System.out.print(".");
     if (n == 0 && res > bestFitness) {
       bestFitness = res;
       int currentTime = (int) (System.currentTimeMillis() - itime) / 1000;

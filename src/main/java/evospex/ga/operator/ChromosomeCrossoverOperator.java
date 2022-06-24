@@ -8,6 +8,7 @@ import java.util.Set;
 import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.SpecChromosome;
 import evospex.ga.chromosome.gene.*;
+import me.tongfei.progressbar.ProgressBar;
 import org.jgap.BaseGeneticOperator;
 import org.jgap.Configuration;
 import org.jgap.Gene;
@@ -19,6 +20,7 @@ import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
 import evospex.report.Stats;
+import evospex.report.Report;
 import utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
@@ -150,6 +152,7 @@ public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements 
       }
     }
     Stats.CHROMOSOMES_AFTER_CROSSOVER = a_candidateChromosomes.size();
+    Report.pb = new ProgressBar("Evaluating Postconditions", a_population.size());
     Stats.printCrossoverReport();
     if (buildBigAnd) {
       // Creates one particular individual which is formed by the union of the valid unary

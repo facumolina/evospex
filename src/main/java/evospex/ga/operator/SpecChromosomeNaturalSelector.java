@@ -14,7 +14,7 @@ import org.jgap.NaturalSelector;
 import org.jgap.Population;
 
 import evospex.report.Stats;
-
+import evospex.report.Report;
 /**
  * The SpecChromosomeNaturalSelector implements a NaturalSelector. This selector ensure that
  * the best chromosomes and the best unary chromosomes (those of size one) are preserved in the
@@ -59,6 +59,7 @@ public class SpecChromosomeNaturalSelector extends NaturalSelector {
   @Override
   public void select(int a_howManyToSelect, Population a_from_population,
       Population a_to_population) {
+    Report.pb.stepTo(Stats.CHROMOSOMES_AFTER_CROSSOVER);
     int validToSelect;
     int unaryToSelect;
     m_chromosomes = a_from_population;
@@ -121,11 +122,9 @@ public class SpecChromosomeNaturalSelector extends NaturalSelector {
     // Finally, keep in the population those individuals which amount of positive counterexamples is
     // equal
     // to the maximum possible, since their negation may be useful
-
     Stats.UNARY_VALID_PRESERVED = extraUnaryValid;
     Stats.UNARY_INVALID_PRESERVED = unarySelected;
     Stats.MOVED_TO_NEXT_GEN = a_to_population.size();
-    Stats.printSelectionReport();
   }
 
   /**

@@ -4,6 +4,7 @@ import java.util.List;
 
 import evospex.expression.Expr;
 import evospex.EvoSpexParameters;
+import me.tongfei.progressbar.ProgressBar;
 
 /**
  * Report GA executions
@@ -11,6 +12,8 @@ import evospex.EvoSpexParameters;
  * @author fmolina
  */
 public class Report {
+
+  public static ProgressBar pb;
 
   /**
    * Print initial report

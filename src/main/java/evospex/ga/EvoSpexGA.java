@@ -29,7 +29,6 @@ import evospex.report.Stats;
 import utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
-
 /**
  * This class represents the EvoSpex's Genetic Algorithm.
  * 
@@ -232,6 +231,7 @@ public class EvoSpexGA {
         long initGenTime = System.currentTimeMillis();
         System.out.println("GENERATION " + (i + 1) + "/" + parameters.getNumberOfGenerations());
         population.evolve();
+        Report.pb.close();
         current = conf.getFitnessFunction().getFitnessValue(population.getFittestChromosome());
         foundChromosome = (SpecChromosome) population.getFittestChromosome();
         i++;
@@ -242,7 +242,7 @@ public class EvoSpexGA {
             bestChromosome = (SpecChromosome) foundChromosome.clone();
           }
         }
-
+        Stats.printSelectionReport();
         Stats.FITEST_CHROMOSOME_FV = current;
         Stats.FITEST_CHROMOSOME = foundChromosome;
 
