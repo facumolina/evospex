@@ -57,25 +57,25 @@ echo ""
 mkdir -p $mutator_inputs
 echo "> Going to generate objects via test gen in: $mutator_inputs"
 echo "  > Cleaning up old objects: $mutator_inputs"
-rm $mutator_inputs/*
+rm $mutator_inputs/* || true
 
 echo ""
 mkdir -p $mutator_outputs
 echo "> Going to generate mutated objects in: $mutator_outputs"
 echo "  > Cleaning up old mutated objects: $mutator_outputs"
-rm $mutator_outputs/*
+rm $mutator_outputs/* || true
 
 echo ""
 mkdir -p $mutator_tmp
 echo "> Temporary directory for generation of mutated objects: $mutator_tmp"
 echo "  > Cleaning up old temporary files: $mutator_tmp"
-rm $mutator_tmp/*
+rm $mutator_tmp/* || true
 
 echo ""
 mkdir -p $outdir_tests
 echo "> Going to generate JUnit tests in: $outdir_tests"
 echo "  > Cleaning up old tests: $outdir_tests"
-rm -r $outdir_tests/*
+rm -r $outdir_tests/* || true
 
 # IMPORTANT: Test generation fixed values
 timelimit=60
