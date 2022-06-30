@@ -11,7 +11,7 @@ EvoSpex is a search-based tool for inferring postconditions of Java methods. Giv
 
 ## Installation
 
-To build and install EvoSpex locally, clone this repository and run the following commands:
+To build and install EvoSpex locally, clone this repository and run the following command:
 
 ```bash
 mvn clean compile assembly:single
