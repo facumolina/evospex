@@ -55,27 +55,27 @@ echo "> Dependencies: $deps"
 
 echo ""
 mkdir -p $mutator_inputs
-echo "> Going to generate objects via test gen in: $mutator_inputs"
-echo "  > Cleaning up old objects: $mutator_inputs"
-rm $mutator_inputs/* || true
+echo "> Going to generate states via test generation in: $mutator_inputs"
+echo "  > Cleaning up old states: $mutator_inputs"
+rm $mutator_inputs/* 2> /dev/null
 
 echo ""
 mkdir -p $mutator_outputs
-echo "> Going to generate mutated objects in: $mutator_outputs"
-echo "  > Cleaning up old mutated objects: $mutator_outputs"
-rm $mutator_outputs/* || true
+echo "> Going to generate mutated states in: $mutator_outputs"
+echo "  > Cleaning up old mutated states: $mutator_outputs"
+rm $mutator_outputs/* 2> /dev/null
 
 echo ""
 mkdir -p $mutator_tmp
-echo "> Temporary directory for generation of mutated objects: $mutator_tmp"
+echo "> Temporary directory for generation of mutated states: $mutator_tmp"
 echo "  > Cleaning up old temporary files: $mutator_tmp"
-rm $mutator_tmp/* || true
+rm $mutator_tmp/* 2> /dev/null
 
 echo ""
 mkdir -p $outdir_tests
 echo "> Going to generate JUnit tests in: $outdir_tests"
 echo "  > Cleaning up old tests: $outdir_tests"
-rm -r $outdir_tests/* || true
+rm -r $outdir_tests/* 2> /dev/null
 
 # IMPORTANT: Test generation fixed values
 timelimit=60
@@ -97,7 +97,7 @@ echo ""
 echo "> Randoop finished!"
 
 echo ""
-echo "> Starting generation of negative structures"
+echo "> Starting generation of negative states"
 
 
 #mutator_bin=${mutator_dir}/build/classes/java/main
@@ -117,7 +117,7 @@ echo -e "\n\n> Executing: $cmd" >> $results_log
 bash -c "$cmd" 2>> $results_log
 
 echo ""
-echo "> Negative structures generation finished!"
+echo "> Negative states generation finished!"
 
 popd > /dev/null
 
