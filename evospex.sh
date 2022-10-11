@@ -13,4 +13,4 @@ num_outputs="$( ls -l out*.xml | wc -l )";
 cd $root_dir;
 
 # Run EvoSpex
-java -cp $subject_cp -jar target/evospex.jar $target_class_fqn $method_states $num_args $num_outputs $3 $4 $5 $6 $7 $8
+java -cp $subject_cp:target/evospex.jar evospex.EvoSpex $target_class_fqn $method_states $num_args $num_outputs $3 $4 $5 $6 $7 $8
