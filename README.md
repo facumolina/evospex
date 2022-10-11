@@ -50,7 +50,7 @@ As an example, let us consider method [add(int, java.lang.Object)](https://githu
 
 ```bash
 ./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
-./evospex.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList states/casestudies.motivation.AvlTreeList/add(int,java.lang.Object)/
+./evospex.sh target/evospex.jar casestudies.motivation.AvlTreeList states/casestudies.motivation.AvlTreeList/add\\\(int,java.lang.Object\\\)/
 ```
 
 Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
