@@ -8,7 +8,7 @@ import org.junit.Test;
 import canonicalizer.BFHeapCanonicalizer;
 import config.CanonicalizerConfig;
 import extensions.FieldExtensionsCollector;
-import utils.XStreamDeserializer;
+import evospex.utils.XStreamDeserializer;
 
 public class ReadBEObjects {
 

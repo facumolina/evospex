@@ -10,8 +10,8 @@ import com.thoughtworks.xstream.XStream;
 import canonicalizer.BFHeapCanonicalizer;
 import config.CanonicalizerConfig;
 import extensions.FieldExtensionsCollector;
-import utils.ObjectsTupleReader;
-import utils.XStreamDeserializer;
+import evospex.utils.ObjectsTupleReader;
+import evospex.utils.XStreamDeserializer;
 
 public class ReadBEObjectsNew {
 
