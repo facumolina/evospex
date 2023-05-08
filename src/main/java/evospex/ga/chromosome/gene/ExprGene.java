@@ -11,7 +11,7 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import org.jgap.UnsupportedRepresentationException;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 
 /**
  * This class represents a gene. A gene is the basic structure used to build chromosomes. A gene

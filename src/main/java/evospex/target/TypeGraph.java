@@ -1,8 +1,7 @@
 package evospex.target;
 
-import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedPseudograph;
-import utils.JavaClassesUtils;
+import evospex.utils.JavaClassesUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

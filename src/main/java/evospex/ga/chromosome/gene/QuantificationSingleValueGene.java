@@ -10,7 +10,7 @@ import evospex.ga.operator.ExprGeneMutations;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 
 import java.util.Collection;
 

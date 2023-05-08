@@ -1,20 +1,21 @@
-package utils;
+package evospex.utils;
 
-import java.io.FileOutputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
-public class ObjectsTupleWriter {
+public class ObjectsTupleReader {
 
-	private List<ObjectOutputStream> loos;
+	private List<ObjectInputStream> loos;
 	private XStream xstream;
 	private String folder;
 	
-	public ObjectsTupleWriter(XStream xstream, String folder, String filesPrefix, String filesSuffix, int numFiles) {
+	public ObjectsTupleReader(XStream xstream, String folder, String filesPrefix, String filesSuffix, int numFiles) {
 		this.xstream = xstream;
 		this.folder = folder;
 		openStreams(folder, filesPrefix, filesSuffix, numFiles);
@@ -25,27 +26,32 @@ public class ObjectsTupleWriter {
 		for (int k = 0; k < numFiles; k++) {
 			String currFile = folder + "/" + filesPrefix + String.valueOf(k) + filesSuffix;
 			try {
-				loos.add(xstream.createObjectOutputStream(
-						   new FileOutputStream(currFile)));
+				loos.add(xstream.createObjectInputStream(
+						   new FileInputStream(currFile)));
 			} catch (IOException e) {
 				throw new Error("Cannot open serial file: " + currFile);
 			}
 		}
 	}
 	
-	public void writeTuple(List<Object> t) {
-		for (int k = 0; k < t.size(); k++) {
+	public List<Object> readTuple() {
+		List<Object> res = new ArrayList<>();
+		for (ObjectInputStream oos: loos) {
 			try {
-				loos.get(k).writeObject(t.get(k));
-			} catch (IOException e) {
-				throw new Error("Cannot write objects files in folder: " + folder);
+				Object o = oos.readObject();
+				res.add(o);
+			} catch (EOFException e) {
+				return null;
+			} catch (IOException | ClassNotFoundException e) {
+				throw new Error("Cannot read files in folder: " + folder);
 			}
 		}
+		return res;
 	}
 	
 	
 	public void closeStreams() {
-		for (ObjectOutputStream oos: loos) {
+		for (ObjectInputStream oos: loos) {
 			try {
 				oos.close();
 			} catch (IOException e) {

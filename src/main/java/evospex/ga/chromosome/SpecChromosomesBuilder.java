@@ -1,6 +1,5 @@
 package evospex.ga.chromosome;
 
-import evospex.expression.ExprBuilder;
 import evospex.expression.symbol.ExprName;
 import evospex.ga.chromosome.gene.*;
 import evospex.ga.chromosome.gene.builder.*;
@@ -10,7 +9,7 @@ import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 import evospex.EvoSpexParameters;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 
 import java.util.*;
 

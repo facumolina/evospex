@@ -1,4 +1,4 @@
-package utils;
+package evospex.utils;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

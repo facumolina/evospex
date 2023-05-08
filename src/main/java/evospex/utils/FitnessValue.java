@@ -1,4 +1,4 @@
-package utils;
+package evospex.utils;
 
 /**
  * Fitness Value util used to store the fitness of a Chromosome in order the fitness value

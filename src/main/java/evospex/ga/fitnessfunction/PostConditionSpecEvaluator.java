@@ -22,7 +22,7 @@ import evospex.report.Stats;
 import evospex.report.Report;
 
 import evospex.EvoSpexParameters;
-import utils.FitnessValue;
+import evospex.utils.FitnessValue;
 
 /**
  * Fitness function that computes the fitness value of a postcondition according to the amount of

@@ -4,7 +4,7 @@ import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 
 import java.util.Random;
 

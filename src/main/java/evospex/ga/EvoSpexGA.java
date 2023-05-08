@@ -26,7 +26,7 @@ import evospex.ga.operator.ExprGeneMutationOperator;
 import evospex.ga.operator.SpecChromosomeNaturalSelector;
 import evospex.report.Report;
 import evospex.report.Stats;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
 /**

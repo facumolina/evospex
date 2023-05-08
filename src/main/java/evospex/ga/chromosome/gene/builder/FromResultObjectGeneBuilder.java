@@ -10,8 +10,8 @@ import evospex.ga.chromosome.gene.value.ExprGeneValue;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
-import utils.JavaClassesUtils;
-import utils.TargetInformation;
+import evospex.utils.JavaClassesUtils;
+import evospex.utils.TargetInformation;
 
 import java.util.Collection;
 import java.util.LinkedList;

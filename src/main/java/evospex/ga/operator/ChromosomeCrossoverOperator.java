@@ -21,7 +21,7 @@ import org.jgap.RandomGenerator;
 
 import evospex.report.Stats;
 import evospex.report.Report;
-import utils.TargetInformation;
+import evospex.utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
 public class ChromosomeCrossoverOperator extends BaseGeneticOperator implements Comparable {

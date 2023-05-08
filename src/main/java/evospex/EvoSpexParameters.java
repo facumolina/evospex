@@ -6,8 +6,8 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 
 import evospex.target.MethodExecution;
-import utils.ObjectsTupleReader;
-import utils.XStreamDeserializer;
+import evospex.utils.ObjectsTupleReader;
+import evospex.utils.XStreamDeserializer;
 
 /**
  * This class contains parameters for the inference process.
