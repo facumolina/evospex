@@ -1,5 +1,0 @@
-# Sample runs for test generation using bounded exhuastive tool
-# Usage: ./gen-be-inputs.sh <project_classpath> <main_class> <regex_method> <scope> <deps...>?
-
-# Generate objects for SF110's 2_a4j Artists class, getArtist method and scope 3
-./gen-be-inputs.sh "$EVOSPEX_SF110/2_a4j/build/classes" "net.kencochrane.a4j.beans.Artists" "getArtist\(\)" 3
