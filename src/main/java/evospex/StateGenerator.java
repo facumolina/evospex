@@ -88,6 +88,7 @@ public class StateGenerator {
     boolean instrumented = unitsToInstrument.size() > 0;
     for (InvokeStmt invokeStmt : unitsToInstrument) {
       appendCallSaveInputState(methodBody.getUnits(), invokeStmt);
+      appendCallSaveOutputState(methodBody.getUnits(), invokeStmt);
     }
 
     if (instrumented) {
@@ -104,6 +105,14 @@ public class StateGenerator {
     InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), invokeExpr.getArg(0));
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertBefore(newUnit, invokeStmt);
+  }
+
+  private void appendCallSaveOutputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
+    InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
+    SootMethod saveOutputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeOutput(java.lang.Object)>");
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), invokeExpr.getArg(0));
+    Unit newUnit = Jimple.v().newInvokeStmt(invocation);
+    chain.insertAfter(newUnit, invokeStmt);
   }
 
   /**
