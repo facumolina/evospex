@@ -1,5 +1,6 @@
 package evospex;
 
+import evospex.state.instrumentation.BytecodeUtils;
 import org.junit.Test;
 import soot.*;
 import soot.jimple.InvokeExpr;
@@ -7,6 +8,7 @@ import soot.jimple.InvokeStmt;
 import soot.jimple.Jimple;
 import soot.options.Options;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +85,12 @@ public class StateGenerator {
       }
     }
     // Instrument the units
+    boolean instrumented = unitsToInstrument.size() > 0;
     for (InvokeStmt invokeStmt : unitsToInstrument) {
       appendCallSaveInputState(methodBody.getUnits(), invokeStmt);
+    }
+
+    if (instrumented) {
       System.out.println("=====================================");
       System.out.println("Method: " + method.getName() + " has been instrumented");
       System.out.println(methodBody);
@@ -103,17 +109,17 @@ public class StateGenerator {
   /**
    * Generate the states
    */
-  public void generateStates() throws InstantiationException, IllegalAccessException {
+  public void generateStates() throws InstantiationException, IllegalAccessException, FileNotFoundException, ClassNotFoundException {
     // Get the list of test methods
-    List<Method> testMethods = getRunnableTests();
-    Object testObject = TEST_CLASS.newInstance();
+    Class<?> instrumentedClass = BytecodeUtils.loadAsClass(SOOT_TEST_CLASS);
+    List<Method> testMethods = getRunnableTests(instrumentedClass);
+    Object testObject = instrumentedClass.newInstance();
 
     for (Method testMethod : testMethods) {
       System.out.println("Running test: " + testMethod.getName());
       // Run the test method and collect the created objects
       try {
         Object result = testMethod.invoke(testObject);
-        System.out.println("Result: " + result);
       } catch (Exception e) {
         System.err.println("Error running test: " + testMethod.getName());
         e.printStackTrace();
@@ -121,10 +127,10 @@ public class StateGenerator {
     }
   }
 
-  private List<Method> getRunnableTests() {
+  private List<Method> getRunnableTests(Class<?> clazz) {
     // Use reflection to find all the JUnit tests in the class
     ArrayList<Method> testMethods = new ArrayList<>();
-    for (Method method : TEST_CLASS.getDeclaredMethods()) {
+    for (Method method : clazz.getDeclaredMethods()) {
       if (method.isAnnotationPresent(Test.class)) {
         testMethods.add(method);
       }
@@ -140,7 +146,7 @@ public class StateGenerator {
     StateGenerator sg = new StateGenerator(args[0]);
     try {
       sg.generateStates();
-    } catch (InstantiationException | IllegalAccessException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
