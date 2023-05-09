@@ -77,6 +77,8 @@ public class TypeGraph {
         return Double.class;
       if (c.equals(boolean.class))
         return Boolean.class;
+      if (c.equals(long.class))
+        return Long.class;
       throw new IllegalArgumentException("Don't know how to format class "+c.getSimpleName());
     }
     return c;
