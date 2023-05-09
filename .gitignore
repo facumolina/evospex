@@ -4,7 +4,7 @@ bin/
 output/
 states/
 **/.DS_Store
-
+sootOutput/
 
 # Eclipse stuff
 .project
