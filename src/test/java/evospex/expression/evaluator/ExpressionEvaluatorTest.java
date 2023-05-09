@@ -3,20 +3,12 @@ package evospex.expression.evaluator;
 import casestudies.commonscollections.NodeCachingLinkedList;
 import casestudies.kodkod.IntTreeSet;
 import casestudies.motivation.AvlTreeList;
-import evospex.expression.ExprGrammarLexer;
 import evospex.expression.ExprGrammarParser;
-import evospex.expression.ExprGrammarParser.ParseContext;
-import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.util.ExprUtils;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class ExpressionEvaluatorTest {
