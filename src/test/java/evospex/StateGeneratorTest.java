@@ -4,7 +4,6 @@ import evospex.state.StateSerializer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import java.util.List;
 
 public class StateGeneratorTest {
 
@@ -24,7 +23,7 @@ public class StateGeneratorTest {
       assertEquals(1, StateSerializer.outputsArgs.size()); // There should be 1 list of arguments
       assertEquals(6, StateSerializer.outputsArgs.get(0).size()); // The first and unique list should have 6 arguments
       // Assert for output result
-      //assertEquals(6, StateSerializer.outputsResult.size()); // There should be 6 results
+      assertEquals(6, StateSerializer.outputsResult.size()); // There should be 6 results
     } catch (Exception e) {
       assert false;
     }
