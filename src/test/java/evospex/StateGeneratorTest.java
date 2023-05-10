@@ -12,7 +12,7 @@ public class StateGeneratorTest {
   public void testCollectedObjects() {
     StateGenerator stateGenerator = new StateGenerator("casestudies.motivation.AvlTreeListTest");
     try {
-      stateGenerator.generateStates();
+      stateGenerator.generatePositiveStates();
       List<Object> inputs = StateSerializer.inputs;
       List<Object> outputs = StateSerializer.outputs;
       assertEquals(6, inputs.size());
