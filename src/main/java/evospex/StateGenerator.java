@@ -1,8 +1,10 @@
 package evospex;
 
+import evospex.state.StateSerializer;
 import evospex.state.instrumentation.BytecodeUtils;
 import org.junit.Test;
 import soot.*;
+import soot.jimple.IntConstant;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.Jimple;
@@ -22,6 +24,7 @@ public class StateGenerator {
   private final String targetMethodName;
 
   private SootClass SOOT_TEST_CLASS;
+  private SootMethod SOOT_TARGET_METHOD;
 
   /**
    * Setup all the necessary for Soot
@@ -39,6 +42,7 @@ public class StateGenerator {
    */
   public StateGenerator(String testSuiteClassName) {
     targetMethodName = "add";
+    String targetMethodSignature = "<casestudies.motivation.AvlTreeList: boolean add(java.lang.Object)>";
     // Load the test suite
     try {
       // Load the test class
@@ -49,6 +53,7 @@ public class StateGenerator {
       Scene.v().loadClassAndSupport("evospex.state.StateSerializer");
       SOOT_TEST_CLASS.setApplicationClass();
       Scene.v().loadNecessaryClasses();
+      SOOT_TARGET_METHOD = Scene.v().getMethod(targetMethodSignature);
       // Instrument the invocations to the target method
       instrumentInvocationsToTargetMethod();
     } catch (ClassNotFoundException e) {
@@ -82,16 +87,22 @@ public class StateGenerator {
         }
       }
     }
-    // Instrument the units
-    boolean instrumented = unitsToInstrument.size() > 0;
+    // Check if target method has a return value
+    boolean instrumented = false;
+    if (unitsToInstrument.size() > 0) {
+      boolean hasReturnValue = unitsToInstrument.get(0).getInvokeExpr().getMethod().getReturnType() != VoidType.v();
+      instrumented = true;
+    }
+
     for (InvokeStmt invokeStmt : unitsToInstrument) {
-      appendCallSaveInputState(methodBody.getUnits(), invokeStmt);
-      appendCallSaveOutputState(methodBody.getUnits(), invokeStmt);
+      // Check if the invoke stmt has a return value
+      insertCallsToSaveInputState(methodBody.getUnits(), invokeStmt);
+      insertCallsToSaveOutputState(methodBody.getUnits(), invokeStmt);
     }
 
     if (instrumented) {
       System.out.println("=====================================");
-      System.out.println("Method: " + method.getName() + " has been instrumented");
+      System.out.println("Instrumented test method --> : " + method.getName());
       System.out.println(methodBody);
       System.out.println("=====================================");
     }
@@ -102,22 +113,56 @@ public class StateGenerator {
    * @param chain the unit chain in which the call will be inserted
    * @param invokeStmt the new call will be inserted before this statement
    */
-  private void appendCallSaveInputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
+  private void insertCallsToSaveInputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
     InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
-    SootMethod saveInputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeInput(java.lang.Object)>");
+    SootMethod saveInputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeInput(int,java.lang.Object)>");
+    // Insert the call to serialize the 'this' object
     JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr)invokeExpr;
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), virtualInvokeExpr.getBase());
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), IntConstant.v(0), virtualInvokeExpr.getBase());
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertBefore(newUnit, invokeStmt);
+    // Insert the call to serialize the method arguments
+    for (int i = 0; i < invokeExpr.getArgCount(); i++) {
+      Value arg = invokeExpr.getArg(i);
+      invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), IntConstant.v(i + 1), arg);
+      newUnit = Jimple.v().newInvokeStmt(invocation);
+      chain.insertBefore(newUnit, invokeStmt);
+    }
   }
 
-  private void appendCallSaveOutputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
+  /**
+   * Insert calls to serialize the target method outputs: the 'this' object, the method arguments and the return value (if any)
+   * @param chain the unit chain in which the call will be inserted
+   * @param invokeStmt the new call will be inserted after this statement
+   */
+  private void insertCallsToSaveOutputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
     InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
-    SootMethod saveOutputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeOutput(java.lang.Object)>");
+    SootMethod saveOutputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeOutput(int,java.lang.Object)>");
+    // Insert the call to serialize the 'this' object
     JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr)invokeExpr;
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), virtualInvokeExpr.getBase());
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(0), virtualInvokeExpr.getBase());
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertAfter(newUnit, invokeStmt);
+    // Insert the call to serialize the method arguments
+    for (int i = 0; i < invokeExpr.getArgCount(); i++) {
+      Value arg = invokeExpr.getArg(i);
+      invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(i + 1), arg);
+      newUnit = Jimple.v().newInvokeStmt(invocation);
+      chain.insertAfter(newUnit, invokeStmt);
+    }
+    // Insert the call to serialize the return value (if any)
+    /*if (invokeExpr.getMethod().getReturnType() != VoidType.v()) {
+      invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(invokeExpr.getArgCount() + 1), invokeExpr);
+      newUnit = Jimple.v().newInvokeStmt(invocation);
+      chain.insertAfter(newUnit, invokeStmt);
+    }*/
+  }
+
+  /**
+   * Setup the StateSerializer before performing the instrumentation
+   */
+  private void setupSerializer() {
+    StateSerializer.setup(SOOT_TARGET_METHOD);
   }
 
   /**
@@ -130,6 +175,9 @@ public class StateGenerator {
     Class<?> instrumentedClass = BytecodeUtils.loadAsClass(SOOT_TEST_CLASS);
     List<Method> testMethods = getRunnableTests(instrumentedClass);
     Object testObject = instrumentedClass.newInstance();
+
+    // Setup serializer
+    setupSerializer();
 
     for (Method testMethod : testMethods) {
       System.out.println("Running test: " + testMethod.getName());
