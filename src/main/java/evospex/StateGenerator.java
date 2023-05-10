@@ -6,6 +6,7 @@ import soot.*;
 import soot.jimple.InvokeExpr;
 import soot.jimple.InvokeStmt;
 import soot.jimple.Jimple;
+import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.options.Options;
 
 import java.io.FileNotFoundException;
@@ -102,7 +103,8 @@ public class StateGenerator {
   private void appendCallSaveInputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
     InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
     SootMethod saveInputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeInput(java.lang.Object)>");
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), invokeExpr.getArg(0));
+    JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr)invokeExpr;
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), virtualInvokeExpr.getBase());
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertBefore(newUnit, invokeStmt);
   }
@@ -110,7 +112,8 @@ public class StateGenerator {
   private void appendCallSaveOutputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
     InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
     SootMethod saveOutputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeOutput(java.lang.Object)>");
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), invokeExpr.getArg(0));
+    JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr)invokeExpr;
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), virtualInvokeExpr.getBase());
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertAfter(newUnit, invokeStmt);
   }
