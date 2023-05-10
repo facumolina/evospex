@@ -19,10 +19,8 @@ import java.util.List;
  */
 public class StateGenerator {
 
-  private final String testSuiteClassName;
   private final String targetMethodName;
 
-  private Class<?> TEST_CLASS;
   private SootClass SOOT_TEST_CLASS;
 
   /**
@@ -40,12 +38,11 @@ public class StateGenerator {
    * Constructor
    */
   public StateGenerator(String testSuiteClassName) {
-    this.testSuiteClassName = testSuiteClassName;
     targetMethodName = "add";
     // Load the test suite
     try {
       // Load the test class
-      TEST_CLASS = Class.forName(testSuiteClassName);
+      Class.forName(testSuiteClassName);
       setupSoot();
       // Load the Soot class
       SOOT_TEST_CLASS = Scene.v().loadClassAndSupport(testSuiteClassName);
