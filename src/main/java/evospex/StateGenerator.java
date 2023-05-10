@@ -97,6 +97,11 @@ public class StateGenerator {
     }
   }
 
+  /**
+   * Insert calls to serialize the target method inputs: the 'this' object, and the method arguments
+   * @param chain the unit chain in which the call will be inserted
+   * @param invokeStmt the new call will be inserted before this statement
+   */
   private void appendCallSaveInputState(UnitPatchingChain chain, InvokeStmt invokeStmt) {
     InvokeExpr invokeExpr = invokeStmt.getInvokeExpr();
     SootMethod saveInputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeInput(java.lang.Object)>");
