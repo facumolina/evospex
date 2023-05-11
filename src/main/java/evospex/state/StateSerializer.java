@@ -134,6 +134,12 @@ public class StateSerializer {
         System.out.println("> saved: "+outputsArgsFile);
       }
     }
+    // Save the result object (if any)
+    if (outputsResult.size() > 0) {
+      String outputsResultFile = folder + "/" + OUTPUTS_FILE_BASE_NAME + (arguments + 1) + ".xml";
+      saveObjects(outputsResultFile, outputsResult);
+      System.out.println("> saved: "+outputsResultFile);
+    }
   }
 
   /**
