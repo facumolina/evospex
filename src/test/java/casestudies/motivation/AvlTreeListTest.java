@@ -14,6 +14,8 @@ public class AvlTreeListTest {
     int size = list.size();
     assertTrue(b1);
     assertEquals(1, size);
+    Integer r = list.remove(0);
+    assertEquals(1, r.intValue());
   }
 
   @Test
