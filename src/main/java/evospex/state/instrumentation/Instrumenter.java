@@ -44,15 +44,11 @@ public class Instrumenter {
     SootMethod saveInputStateMethod = Scene.v().getMethod(INPUT_SERIALIZATION_METHOD_SIGNATURE);
     // Insert the call to serialize the 'this' object
     JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr) invokeExpr;
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), IntConstant.v(0), virtualInvokeExpr.getBase());
-    Unit newUnit = Jimple.v().newInvokeStmt(invocation);
-    chain.insertBefore(newUnit, stmt);
+    insertInvocationBefore(chain, saveInputStateMethod, 0, virtualInvokeExpr.getBase(), stmt);
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), IntConstant.v(i + 1), arg);
-      newUnit = Jimple.v().newInvokeStmt(invocation);
-      chain.insertBefore(newUnit, stmt);
+      insertInvocationBefore(chain, saveInputStateMethod, i + 1, arg, stmt);
     }
   }
 
@@ -100,6 +96,21 @@ public class Instrumenter {
         }
       }
     }
+  }
+
+  /**
+   * Insert a call to the given method, which parameters are position and value, right after the given statement in
+   * the given unit chain.
+   * @param chain the unit chain in which the call will be inserted
+   * @param sootMethod the method to call
+   * @param position the position of the value in the state
+   * @param value the value to serialize
+   * @param stmt the new call will be inserted after this statement
+   */
+  private static void insertInvocationBefore(UnitPatchingChain chain, SootMethod sootMethod, int position, Value value, Stmt stmt) {
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(sootMethod.makeRef(), IntConstant.v(position), value);
+    Unit newUnit = Jimple.v().newInvokeStmt(invocation);
+    chain.insertBefore(newUnit, stmt);
   }
 
   /**
