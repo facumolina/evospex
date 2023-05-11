@@ -78,13 +78,11 @@ public class Instrumenter {
         // Check if the return type is primitive
         if (invokeExpr.getMethod().getReturnType() instanceof PrimType) {
           Value invocationResult = assignStmt.getLeftOp();
-          // If it is boolean
-          if (invokeExpr.getMethod().getReturnType() instanceof BooleanType) {
-            // Insert a call that transforms the boolean value to the Boolean object, and assign it to a new local variable
-            AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, invocationResult, stmt);
-            // Insert the call to serialize the return value
-            insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, valueOfAssign.getLeftOp(), valueOfAssign);
-          }
+          Type resultType = invokeExpr.getMethod().getReturnType();
+          // Insert a call that transforms the boolean value to the Boolean object, and assign it to a new local variable
+          AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, resultType, invocationResult, stmt);
+          // Insert the call to serialize the return value
+          insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, valueOfAssign.getLeftOp(), valueOfAssign);
         }
       }
     }
@@ -128,17 +126,82 @@ public class Instrumenter {
    * @param stmt the new call will be inserted after this statement
    * @return the assign statement that wraps the primitive value into an object
    */
-  private static AssignStmt insertInvocationToWrapPrimitiveValue(SootMethod method, UnitPatchingChain chain, Value value, Stmt stmt) {
-    Local local = Jimple.v().newLocal("local0", RefType.v("java.lang.Boolean"));
+  private static AssignStmt insertInvocationToWrapPrimitiveValue(SootMethod method, UnitPatchingChain chain, Type resultType, Value value, Stmt stmt) {
+    Local local = getCorrespondingLocalForPrimitiveType(resultType);
     // Add the local if it does not exist
     if (!method.getActiveBody().getLocals().contains(local)) {
       method.getActiveBody().getLocals().add(local);
     }
-    SootMethod valueOfMethod = Scene.v().getMethod("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
+    SootMethod valueOfMethod = getCorrespondingMethodToWrapPrimitiveValue(resultType);
     InvokeExpr valueOfInvocation = Jimple.v().newStaticInvokeExpr(valueOfMethod.makeRef(), value);
     AssignStmt valueOfAssign = Jimple.v().newAssignStmt(local, valueOfInvocation);
     chain.insertAfter(valueOfAssign, stmt);
     return valueOfAssign;
   }
 
+  /**
+   * Get the corresponding local variable for the given primitive type
+   * @param type the primitive type
+   * @return the corresponding local variable
+   */
+  private static Local getCorrespondingLocalForPrimitiveType(Type type) {
+    if (type instanceof BooleanType) {
+      return Jimple.v().newLocal("local_boolean", RefType.v("java.lang.Boolean"));
+    }
+    if (type instanceof ByteType) {
+      return Jimple.v().newLocal("local_byte", RefType.v("java.lang.Byte"));
+    }
+    if (type instanceof CharType) {
+      return Jimple.v().newLocal("local_character", RefType.v("java.lang.Character"));
+    }
+    if (type instanceof DoubleType) {
+      return Jimple.v().newLocal("local_double", RefType.v("java.lang.Double"));
+    }
+    if (type instanceof FloatType) {
+      return Jimple.v().newLocal("local_float", RefType.v("java.lang.Float"));
+    }
+    if (type instanceof IntType) {
+      return Jimple.v().newLocal("local_int", RefType.v("java.lang.Integer"));
+    }
+    if (type instanceof LongType) {
+      return Jimple.v().newLocal("local_long", RefType.v("java.lang.Long"));
+    }
+    if (type instanceof ShortType) {
+      return Jimple.v().newLocal("local_short", RefType.v("java.lang.Short"));
+    }
+    throw new RuntimeException("Type not supported: " + type);
+  }
+
+  /**
+   * Get the corresponding method to wrap the given primitive value into an object.
+   * @param type the primitive type
+   * @return the corresponding method to call
+   */
+  private static SootMethod getCorrespondingMethodToWrapPrimitiveValue(Type type) {
+    if (type instanceof BooleanType) {
+      return Scene.v().getMethod("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
+    }
+    if (type instanceof ByteType) {
+      return Scene.v().getMethod("<java.lang.Byte: java.lang.Byte valueOf(byte)>");
+    }
+    if (type instanceof CharType) {
+      return Scene.v().getMethod("<java.lang.Character: java.lang.Character valueOf(char)>");
+    }
+    if (type instanceof DoubleType) {
+      return Scene.v().getMethod("<java.lang.Double: java.lang.Double valueOf(double)>");
+    }
+    if (type instanceof FloatType) {
+      return Scene.v().getMethod("<java.lang.Float: java.lang.Float valueOf(float)>");
+    }
+    if (type instanceof IntType) {
+      return Scene.v().getMethod("<java.lang.Integer: java.lang.Integer valueOf(int)>");
+    }
+    if (type instanceof LongType) {
+      return Scene.v().getMethod("<java.lang.Long: java.lang.Long valueOf(long)>");
+    }
+    if (type instanceof ShortType) {
+      return Scene.v().getMethod("<java.lang.Short: java.lang.Short valueOf(short)>");
+    }
+    throw new RuntimeException("Type not supported: " + type);
+  }
 }
