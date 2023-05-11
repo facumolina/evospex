@@ -37,6 +37,17 @@ public class StateSerializer {
   }
 
   /**
+   * Clear all the lists.
+   */
+  public static void clear() {
+    inputsThis.clear();
+    inputsArgs.clear();
+    outputsThis.clear();
+    outputsArgs.clear();
+    outputsResult.clear();
+  }
+
+  /**
    * Serializes a target method input.
    * @param position the position of the input in the method signature: 0 for the 'this' object, 1 for the first parameter, etc.
    * @param input the input to serialize
