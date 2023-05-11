@@ -58,4 +58,26 @@ public class StateGeneratorTest {
       assert false;
     }
   }
+
+  @Test
+  public void testCollectedObjects_AvlTreeAdd_remove() {
+    String targetTestClass = "casestudies.motivation.AvlTreeListTest";
+    String targetMethodSignature = "<casestudies.motivation.AvlTreeList: java.lang.Object remove(int)>";
+    StateGenerator stateGenerator = new StateGenerator(targetTestClass, targetMethodSignature);
+    try {
+      stateGenerator.generatePositiveStates();
+      // Asserts for input this
+      assertEquals(1, StateSerializer.inputsThis.size()); // There should be 3 'this' objects
+      // Assert for input arguments
+      assertEquals(1, StateSerializer.inputsArgs.size()); // There should be 0 list of arguments
+      // Asserts for output this
+      assertEquals(1, StateSerializer.outputsThis.size()); // There should be 3 'this' objects
+      // Assert for output arguments
+      assertEquals(1, StateSerializer.outputsArgs.size()); // There should be 0 list of arguments
+      // Assert for output result
+      assertEquals(1, StateSerializer.outputsResult.size()); // There should be 3 results
+    } catch (Exception e) {
+      assert false;
+    }
+  }
 }

@@ -95,6 +95,9 @@ public class Instrumenter {
           AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, resultType, invocationResult, stmt, true);
           // Insert the call to serialize the return value
           insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, valueOfAssign.getLeftOp(), valueOfAssign);
+        } else {
+          // Insert the call to serialize the return value
+          insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, assignStmt.getLeftOp(), stmt);
         }
       }
     }
