@@ -9,7 +9,9 @@ public class StateGeneratorTest {
 
   @Test
   public void testCollectedObjects() {
-    StateGenerator stateGenerator = new StateGenerator("casestudies.motivation.AvlTreeListTest");
+    String targetTestClass = "casestudies.motivation.AvlTreeListTest";
+    String targetMethodSignature = "<casestudies.motivation.AvlTreeList: boolean add(java.lang.Object)>";
+    StateGenerator stateGenerator = new StateGenerator(targetTestClass, targetMethodSignature);
     try {
       stateGenerator.generatePositiveStates();
       // Asserts for input this

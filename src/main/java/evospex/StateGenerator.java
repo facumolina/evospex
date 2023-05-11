@@ -6,9 +6,6 @@ import evospex.state.instrumentation.Instrumenter;
 import org.junit.Test;
 import soot.*;
 import soot.jimple.*;
-import soot.jimple.internal.JAssignStmt;
-import soot.jimple.internal.JInvokeStmt;
-import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.options.Options;
 
 import java.io.FileNotFoundException;
@@ -21,8 +18,7 @@ import java.util.List;
  */
 public class StateGenerator {
 
-  private final String targetMethodName;
-
+  private final String targetMethodSignature;
   private SootClass SOOT_TEST_CLASS;
   private SootMethod SOOT_TARGET_METHOD;
 
@@ -40,9 +36,8 @@ public class StateGenerator {
   /**
    * Constructor
    */
-  public StateGenerator(String testSuiteClassName) {
-    targetMethodName = "add";
-    String targetMethodSignature = "<casestudies.motivation.AvlTreeList: boolean add(java.lang.Object)>";
+  public StateGenerator(String testSuiteClassName, String targetMethodSignature) {
+    this.targetMethodSignature = targetMethodSignature;
     // Load the test suite
     try {
       // Load the test class
@@ -81,14 +76,14 @@ public class StateGenerator {
     for (Unit unit : methodBody.getUnits()) {
       if (unit instanceof InvokeStmt) {
         InvokeStmt invokeStmt = (InvokeStmt)unit;
-        boolean methodMatch = invokeStmt.getInvokeExpr().getMethod().getName().equals(targetMethodName);
+        boolean methodMatch = invokeStmt.getInvokeExpr().getMethod().getSignature().equals(targetMethodSignature);
         if (methodMatch) {
           unitsToInstrument.add(invokeStmt);
         }
       }
       if (unit instanceof AssignStmt) {
         AssignStmt assignStmt = (AssignStmt)unit;
-        boolean methodMatch = assignStmt.getRightOp() instanceof InvokeExpr && ((InvokeExpr)assignStmt.getRightOp()).getMethod().getName().equals(targetMethodName);
+        boolean methodMatch = assignStmt.getRightOp() instanceof InvokeExpr && ((InvokeExpr)assignStmt.getRightOp()).getMethod().getSignature().equals(targetMethodSignature);
         if (methodMatch) {
           unitsToInstrument.add(assignStmt);
         }
@@ -162,11 +157,11 @@ public class StateGenerator {
   }
 
   public static void main(String[] args) {
-    if (args.length != 1) {
-      System.err.println("Usage: java -cp <cp> evospex.StateGenerator <testSuiteClassName>");
+    if (args.length != 2) {
+      System.err.println("Usage: java -cp <cp> evospex.StateGenerator <testSuiteClassName> <targetMethodSignature>");
       System.exit(1);
     }
-    StateGenerator sg = new StateGenerator(args[0]);
+    StateGenerator sg = new StateGenerator(args[0], args[1]);
     try {
       sg.generatePositiveStates();
       // TODO: generate negative states
