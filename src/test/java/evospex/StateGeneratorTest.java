@@ -18,6 +18,7 @@ public class StateGeneratorTest {
     String targetTestClass = "casestudies.motivation.AvlTreeListTest";
     String targetMethodSignature = "<casestudies.motivation.AvlTreeList: boolean add(java.lang.Object)>";
     StateGenerator stateGenerator = new StateGenerator(targetTestClass, targetMethodSignature);
+    StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
       // Asserts for input this
@@ -42,6 +43,7 @@ public class StateGeneratorTest {
     String targetTestClass = "casestudies.motivation.AvlTreeListTest";
     String targetMethodSignature = "<casestudies.motivation.AvlTreeList: int size()>";
     StateGenerator stateGenerator = new StateGenerator(targetTestClass, targetMethodSignature);
+    StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
       // Asserts for input this
@@ -64,6 +66,7 @@ public class StateGeneratorTest {
     String targetTestClass = "casestudies.motivation.AvlTreeListTest";
     String targetMethodSignature = "<casestudies.motivation.AvlTreeList: java.lang.Object remove(int)>";
     StateGenerator stateGenerator = new StateGenerator(targetTestClass, targetMethodSignature);
+    StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
       // Asserts for input this
