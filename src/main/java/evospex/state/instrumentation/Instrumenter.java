@@ -81,17 +81,9 @@ public class Instrumenter {
           // If it is boolean
           if (invokeExpr.getMethod().getReturnType() instanceof BooleanType) {
             // Insert a call that transforms the boolean value to the Boolean object, and assign it to a new local variable
-            Local local = Jimple.v().newLocal("local0", RefType.v("java.lang.Boolean"));
-            // Add the local if it does not exist
-            if (!method.getActiveBody().getLocals().contains(local)) {
-              method.getActiveBody().getLocals().add(local);
-            }
-            SootMethod valueOfMethod = Scene.v().getMethod("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
-            InvokeExpr valueOfInvocation = Jimple.v().newStaticInvokeExpr(valueOfMethod.makeRef(), invocationResult);
-            AssignStmt valueOfAssign = Jimple.v().newAssignStmt(local, valueOfInvocation);
-            chain.insertAfter(valueOfAssign, stmt);
+            AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, invocationResult, stmt);
             // Insert the call to serialize the return value
-            insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, local, valueOfAssign);
+            insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, valueOfAssign.getLeftOp(), valueOfAssign);
           }
         }
       }
@@ -126,6 +118,27 @@ public class Instrumenter {
     InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(sootMethod.makeRef(), IntConstant.v(position), value);
     Unit newUnit = Jimple.v().newInvokeStmt(invocation);
     chain.insertAfter(newUnit, stmt);
+  }
+
+  /**
+   * Insert a call to wrap a primitive value into an object, right after the given statement in the given unit chain.
+   * @param method the method in which the call will be inserted
+   * @param chain the unit chain in which the call will be inserted
+   * @param value the value to wrap
+   * @param stmt the new call will be inserted after this statement
+   * @return the assign statement that wraps the primitive value into an object
+   */
+  private static AssignStmt insertInvocationToWrapPrimitiveValue(SootMethod method, UnitPatchingChain chain, Value value, Stmt stmt) {
+    Local local = Jimple.v().newLocal("local0", RefType.v("java.lang.Boolean"));
+    // Add the local if it does not exist
+    if (!method.getActiveBody().getLocals().contains(local)) {
+      method.getActiveBody().getLocals().add(local);
+    }
+    SootMethod valueOfMethod = Scene.v().getMethod("<java.lang.Boolean: java.lang.Boolean valueOf(boolean)>");
+    InvokeExpr valueOfInvocation = Jimple.v().newStaticInvokeExpr(valueOfMethod.makeRef(), value);
+    AssignStmt valueOfAssign = Jimple.v().newAssignStmt(local, valueOfInvocation);
+    chain.insertAfter(valueOfAssign, stmt);
+    return valueOfAssign;
   }
 
 }
