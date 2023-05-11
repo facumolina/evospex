@@ -39,7 +39,7 @@ public class Instrumenter {
    * @param chain the unit chain in which the call will be inserted
    * @param stmt the new call will be inserted before this statement
    */
-  public static void insertCallsToSaveInputState(UnitPatchingChain chain, Stmt stmt) {
+  public static void insertCallsToSaveInputState(SootMethod method, UnitPatchingChain chain, Stmt stmt) {
     InvokeExpr invokeExpr = getCorrespondingInvokeExpr(stmt);
     SootMethod saveInputStateMethod = Scene.v().getMethod(INPUT_SERIALIZATION_METHOD_SIGNATURE);
     // Insert the call to serialize the 'this' object
@@ -48,7 +48,13 @@ public class Instrumenter {
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      insertInvocationBefore(chain, saveInputStateMethod, i + 1, arg, stmt);
+      Type argType = arg.getType();
+      if (argType instanceof PrimType) {
+        AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, argType, arg, stmt, false);
+        insertInvocationBefore(chain, saveInputStateMethod, i + 1, valueOfAssign.getLeftOp(), stmt);
+      } else {
+        insertInvocationBefore(chain, saveInputStateMethod, i + 1, arg, stmt);
+      }
     }
   }
 
@@ -66,7 +72,13 @@ public class Instrumenter {
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      insertInvocationAfter(chain, saveOutputStateMethod, i + 1, arg, stmt);
+      Type argType = arg.getType();
+      if (argType instanceof PrimType) {
+        AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, argType, arg, stmt, true);
+        insertInvocationAfter(chain, saveOutputStateMethod, i + 1, valueOfAssign.getLeftOp(), valueOfAssign);
+      } else {
+        insertInvocationAfter(chain, saveOutputStateMethod, i + 1, arg, stmt);
+      }
     }
     // Insert the call to serialize the return value (if any)
     if (invokeExpr.getMethod().getReturnType() != VoidType.v()) {
@@ -80,7 +92,7 @@ public class Instrumenter {
           Value invocationResult = assignStmt.getLeftOp();
           Type resultType = invokeExpr.getMethod().getReturnType();
           // Insert a call that transforms the boolean value to the Boolean object, and assign it to a new local variable
-          AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, resultType, invocationResult, stmt);
+          AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, resultType, invocationResult, stmt, true);
           // Insert the call to serialize the return value
           insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, valueOfAssign.getLeftOp(), valueOfAssign);
         }
@@ -126,7 +138,7 @@ public class Instrumenter {
    * @param stmt the new call will be inserted after this statement
    * @return the assign statement that wraps the primitive value into an object
    */
-  private static AssignStmt insertInvocationToWrapPrimitiveValue(SootMethod method, UnitPatchingChain chain, Type resultType, Value value, Stmt stmt) {
+  private static AssignStmt insertInvocationToWrapPrimitiveValue(SootMethod method, UnitPatchingChain chain, Type resultType, Value value, Stmt stmt, boolean after) {
     Local local = getCorrespondingLocalForPrimitiveType(resultType);
     // Add the local if it does not exist
     if (!method.getActiveBody().getLocals().contains(local)) {
@@ -135,7 +147,11 @@ public class Instrumenter {
     SootMethod valueOfMethod = getCorrespondingMethodToWrapPrimitiveValue(resultType);
     InvokeExpr valueOfInvocation = Jimple.v().newStaticInvokeExpr(valueOfMethod.makeRef(), value);
     AssignStmt valueOfAssign = Jimple.v().newAssignStmt(local, valueOfInvocation);
-    chain.insertAfter(valueOfAssign, stmt);
+    if (after) {
+      chain.insertAfter(valueOfAssign, stmt);
+    } else {
+      chain.insertBefore(valueOfAssign, stmt);
+    }
     return valueOfAssign;
   }
 

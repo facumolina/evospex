@@ -94,7 +94,7 @@ public class StateGenerator {
 
     for (Stmt stmt : unitsToInstrument) {
       // Check if the invoke stmt has a return value
-      Instrumenter.insertCallsToSaveInputState(methodBody.getUnits(), stmt);
+      Instrumenter.insertCallsToSaveInputState(method, methodBody.getUnits(), stmt);
       Instrumenter.insertCallsToSaveOutputState(method, methodBody.getUnits(), stmt);
     }
 
