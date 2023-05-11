@@ -12,6 +12,14 @@ import soot.jimple.internal.JVirtualInvokeExpr;
  */
 public class Instrumenter {
 
+  private static final String INPUT_SERIALIZATION_METHOD_SIGNATURE = "<evospex.state.StateSerializer: void serializeInput(int,java.lang.Object)>";
+  private static final String OUTPUT_SERIALIZATION_METHOD_SIGNATURE = "<evospex.state.StateSerializer: void serializeOutput(int,java.lang.Object)>";
+
+  /**
+   * Get the corresponding invoke expression from a statement
+   * @param stmt the statement
+   * @return the corresponding invoke expression
+   */
   private static InvokeExpr getCorrespondingInvokeExpr(Stmt stmt) {
     InvokeExpr invokeExpr;
     if (stmt instanceof JInvokeStmt) {
@@ -33,7 +41,7 @@ public class Instrumenter {
    */
   public static void insertCallsToSaveInputState(UnitPatchingChain chain, Stmt stmt) {
     InvokeExpr invokeExpr = getCorrespondingInvokeExpr(stmt);
-    SootMethod saveInputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeInput(int,java.lang.Object)>");
+    SootMethod saveInputStateMethod = Scene.v().getMethod(INPUT_SERIALIZATION_METHOD_SIGNATURE);
     // Insert the call to serialize the 'this' object
     JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr) invokeExpr;
     InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveInputStateMethod.makeRef(), IntConstant.v(0), virtualInvokeExpr.getBase());
@@ -55,18 +63,14 @@ public class Instrumenter {
    */
   public static void insertCallsToSaveOutputState(SootMethod method, UnitPatchingChain chain, Stmt stmt) {
     InvokeExpr invokeExpr = getCorrespondingInvokeExpr(stmt);
-    SootMethod saveOutputStateMethod = Scene.v().getMethod("<evospex.state.StateSerializer: void serializeOutput(int,java.lang.Object)>");
+    SootMethod saveOutputStateMethod = Scene.v().getMethod(OUTPUT_SERIALIZATION_METHOD_SIGNATURE);
     // Insert the call to serialize the 'this' object
     JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr) invokeExpr;
-    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(0), virtualInvokeExpr.getBase());
-    Unit newUnit = Jimple.v().newInvokeStmt(invocation);
-    chain.insertAfter(newUnit, stmt);
+    insertInvocationAfter(chain, saveOutputStateMethod, 0, virtualInvokeExpr.getBase(), stmt);
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(i + 1), arg);
-      newUnit = Jimple.v().newInvokeStmt(invocation);
-      chain.insertAfter(newUnit, stmt);
+      insertInvocationAfter(chain, saveOutputStateMethod, i + 1, arg, stmt);
     }
     // Insert the call to serialize the return value (if any)
     if (invokeExpr.getMethod().getReturnType() != VoidType.v()) {
@@ -91,13 +95,26 @@ public class Instrumenter {
             AssignStmt valueOfAssign = Jimple.v().newAssignStmt(local, valueOfInvocation);
             chain.insertAfter(valueOfAssign, stmt);
             // Insert the call to serialize the return value
-            invocation = Jimple.v().newStaticInvokeExpr(saveOutputStateMethod.makeRef(), IntConstant.v(invokeExpr.getArgCount() + 1), local);
-            newUnit = Jimple.v().newInvokeStmt(invocation);
-            chain.insertAfter(newUnit, valueOfAssign);
+            insertInvocationAfter(chain, saveOutputStateMethod, invokeExpr.getArgCount() + 1, local, valueOfAssign);
           }
         }
       }
     }
+  }
+
+  /**
+   * Insert a call to the given method, which parameters are position and value, right after the given statement in
+   * the given unit chain.
+   * @param chain the unit chain in which the call will be inserted
+   * @param sootMethod the method to call
+   * @param position the position of the value in the state
+   * @param value the value to serialize
+   * @param stmt the new call will be inserted after this statement
+   */
+  private static void insertInvocationAfter(UnitPatchingChain chain, SootMethod sootMethod, int position, Value value, Stmt stmt) {
+    InvokeExpr invocation = Jimple.v().newStaticInvokeExpr(sootMethod.makeRef(), IntConstant.v(position), value);
+    Unit newUnit = Jimple.v().newInvokeStmt(invocation);
+    chain.insertAfter(newUnit, stmt);
   }
 
 }
