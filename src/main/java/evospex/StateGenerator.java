@@ -50,7 +50,18 @@ public class StateGenerator {
       Scene.v().loadClassAndSupport("evospex.state.StateSerializer");
       SOOT_TEST_CLASS.setApplicationClass();
       Scene.v().loadNecessaryClasses();
-      SOOT_TARGET_METHOD = Scene.v().getMethod(targetMethodSignature);
+      try {
+        SOOT_TARGET_METHOD = Scene.v().getMethod(targetMethodSignature);
+      } catch (RuntimeException e) {
+        System.err.println("unable to find method: " + targetMethodSignature);
+        // Get the class name from the signature
+        String className = targetMethodSignature.substring(1, targetMethodSignature.indexOf(":"));
+        System.err.println("possible methods for class " + className + ":");
+        for (SootMethod method : Scene.v().getSootClass(className).getMethods()) {
+          System.err.println("  " + method.getSignature());
+        }
+        System.exit(1);
+      }
       // Show some info
       System.out.println("target class: "+SOOT_TEST_CLASS.getName());
       System.out.println("target method: "+SOOT_TARGET_METHOD.getSignature());
