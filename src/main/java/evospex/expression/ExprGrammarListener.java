@@ -157,4 +157,14 @@ public interface ExprGrammarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNumber(ExprGrammarParser.NumberContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ExprGrammarParser#string}.
+	 * @param ctx the parse tree
+	 */
+	void enterString(ExprGrammarParser.StringContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ExprGrammarParser#string}.
+	 * @param ctx the parse tree
+	 */
+	void exitString(ExprGrammarParser.StringContext ctx);
 }

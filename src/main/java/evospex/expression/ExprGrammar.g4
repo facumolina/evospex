@@ -17,6 +17,7 @@ expr:
   | set_expr
   | name
   | number
+  | string
   ;
 
 qt_expr:
@@ -119,6 +120,8 @@ number:
   | UNSIGNED_NUMBER
   ;
 
-
+string:
+  '@' ID_CHAR* '@'
+  ;
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines

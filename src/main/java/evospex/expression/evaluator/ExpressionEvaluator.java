@@ -13,6 +13,7 @@ import evospex.expression.ExprGrammarParser.Set_exprContext;
 import evospex.expression.ExprGrammarParser.Compare_opContext;
 import evospex.expression.ExprGrammarParser.Unary_opContext;
 import evospex.expression.ExprGrammarParser.NameContext;
+import evospex.expression.ExprGrammarParser.StringContext;
 
 import evospex.expression.symbol.ExprName;
 
@@ -119,6 +120,13 @@ public class ExpressionEvaluator {
     if (set_exprs != null && set_exprs.size()>0) {
       // The expression is a set
       return SetExpressionEvaluator.eval(set_exprs.get(0));
+    }
+
+    StringContext str = ectx.string();
+    if (str!=null)  {
+      // The expression is a string, then the evaluation is the string itself removing the quotes
+      String wholeStr = ectx.getText();
+      return wholeStr.substring(1, wholeStr.length()-1);
     }
 
     try {
