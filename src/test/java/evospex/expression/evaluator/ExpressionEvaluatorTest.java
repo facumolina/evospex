@@ -59,6 +59,15 @@ public class ExpressionEvaluatorTest {
   }
 
   @Test
+  public void testAvl0() {
+    casestudies.motivation.AvlTreeList<java.lang.Comparable<java.lang.String>> avl = new casestudies.motivation.AvlTreeList<java.lang.Comparable<java.lang.String>>();
+    boolean boolean12 = avl.add((java.lang.Comparable<java.lang.String>) "str4");
+    boolean boolean13 = avl.add((java.lang.Comparable<java.lang.String>) "str1");
+    boolean boolean14 = avl.add((java.lang.Comparable<java.lang.String>) "str9");
+    assert (evalStrExpr("@str1@ in this.root.*(left+right).value",avl));
+  }
+
+  @Test
   public void testNCLLSetMembership0() {
     NodeCachingLinkedList<Integer> ncll = new NodeCachingLinkedList<>();
     assert (!evalStrExpr("4 in this.header.*(next).value",ncll));
