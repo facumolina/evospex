@@ -66,10 +66,10 @@ public class TreeList<E> extends AbstractList<E> {
   // LinkedList = 270;7360;3350;55860;290720;2910;55200;
 
   /** The root node in the AVL tree */
-  public AVLNode<E> root;
+  private AVLNode<E> root;
 
   /** The current size of the list */
-  public int size;
+  private int size;
 
   // -----------------------------------------------------------------------
   /**
@@ -340,19 +340,19 @@ public class TreeList<E> extends AbstractList<E> {
    */
   public static class AVLNode<E> {
     /** The left child node or the predecessor if {@link #leftIsPrevious}. */
-    public AVLNode<E> left;
+    private AVLNode<E> left;
     /** Flag indicating that left reference is not a subtree but the predecessor. */
-    public boolean leftIsPrevious;
+    private boolean leftIsPrevious;
     /** The right child node or the successor if {@link #rightIsNext}. */
-    public AVLNode<E> right;
+    private AVLNode<E> right;
     /** Flag indicating that right reference is not a subtree but the successor. */
-    public boolean rightIsNext;
+    private boolean rightIsNext;
     /** How many levels of left/right are below this one. */
-    public int height;
+    private int height;
     /** The relative position, root holds absolute position. */
-    public int relativePosition;
+    private int relativePosition;
     /** The stored element. */
-    public E value;
+    private E value;
 
     /**
      * Constructs a new node with a relative position.
