@@ -64,6 +64,9 @@ public class StateSerializer {
     outputsThis.clear();
     outputsArgs.clear();
     outputsResult.clear();
+    mutatedThis.clear();
+    mutatedResults.clear();
+    mutationsApplied.clear();
   }
 
   /**
