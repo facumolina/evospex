@@ -5,6 +5,7 @@ import soot.SootMethod;
 
 import java.io.File;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class StateSerializer {
 
   public static List<Object> mutatedThis = new ArrayList<>();
   public static List<Object> mutatedResults = new ArrayList<>();
+  public static List<String> mutationsApplied = new ArrayList<>();
 
   // Some auxiliary variables
   private static int arguments = 0;
@@ -40,6 +42,8 @@ public class StateSerializer {
   private static final String BASE_OUTPUT_FOLDER = "states";
   private static final String INPUTS_FILE_BASE_NAME = "in";
   private static final String OUTPUTS_FILE_BASE_NAME = "out";
+  private static final String MUTATED_FILE_BASE_NAME = "mut";
+  private static final String MUTATIONS_APPLIED_FILE_BASE_NAME = "mutations";
 
   /**
    * Setup the serializer from the target method.
@@ -111,13 +115,16 @@ public class StateSerializer {
    * @param position the position of the mutated object in the method signature: 0 for the 'this' object, 1 to n for the parameters, and n+1 for the result.
    * @param mutatedObject the mutated object to serialize.
    */
-  public static void serializeMutatedObject(int position, Object mutatedObject) {
+  public static void serializeMutatedObject(int position, Object mutatedObject, String mutationApplied) {
     System.out.println("--> Serializing mutated object");
     Object toPreserve = xstream.fromXML(xstream.toXML(mutatedObject));
     if (position == 0) {
       mutatedThis.add(toPreserve);
     } else {
       mutatedResults.add(toPreserve);
+    }
+    if (mutationApplied != null) {
+      mutationsApplied.add(mutationApplied);
     }
   }
 
@@ -158,6 +165,19 @@ public class StateSerializer {
       saveObjects(outputsResultFile, outputsResult);
       System.out.println("> saved: "+outputsResultFile);
     }
+    // Save mutated objects
+    String mutatedThisFile = folder + "/" + MUTATED_FILE_BASE_NAME + "0.xml";
+    saveObjects(mutatedThisFile, mutatedThis);
+    System.out.println("> saved: "+mutatedThisFile);
+    if (outputsResult.size() > 0) {
+      String mutatedResultsFile = folder + "/" + MUTATED_FILE_BASE_NAME + (arguments + 1) + ".xml";
+      saveObjects(mutatedResultsFile, mutatedResults);
+      System.out.println("> saved: " + mutatedResultsFile);
+    }
+    // Save mutations applied
+    String mutationsAppliedFile = folder + "/" + MUTATIONS_APPLIED_FILE_BASE_NAME + "0.txt";
+    saveMutationsApplied(mutationsAppliedFile, mutationsApplied);
+    System.out.println("> saved: "+mutationsAppliedFile);
   }
 
   /**
@@ -176,6 +196,26 @@ public class StateSerializer {
       System.out.println("Error saving " + fileName);
     }
   }
+
+  /**
+   * Save the mutations applied in the given file name
+   * @param fileName the file name
+   * @param mutationsApplied the mutations applied
+   */
+  private static void saveMutationsApplied(String fileName, List<String> mutationsApplied) {
+    try {
+      File f = new File(fileName);
+      f.getParentFile().mkdirs();
+      PrintWriter pw = new PrintWriter(f);
+      for (String mutationApplied : mutationsApplied) {
+        pw.println(mutationApplied);
+      }
+      pw.close();
+    } catch (Exception e) {
+      System.out.println("Error saving " + fileName);
+    }
+  }
+
   /**
    * Format folder name for a target method.
    * @param targetMethodSignature the target method signature.

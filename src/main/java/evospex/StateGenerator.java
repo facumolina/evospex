@@ -147,10 +147,10 @@ public class StateGenerator {
       // Get the positive output state
       Object mutatedOutput = StateMutator.mutateState(outputStates, i);
       // Save it to serialized states
-      StateSerializer.serializeMutatedObject(0,mutatedOutput);
+      StateSerializer.serializeMutatedObject(0,mutatedOutput, StateMutator.getLastMutation());
       if (resultsExist) {
         Object outputResultState = outputResultStates.get(i);
-        StateSerializer.serializeMutatedObject(1, outputResultState);
+        StateSerializer.serializeMutatedObject(1, outputResultState, null);
       }
     }
   }
