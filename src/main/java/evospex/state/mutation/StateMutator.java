@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
  */
 public class StateMutator {
 
+  private static String lastMutation = "";
+
   /**
    * Mutate the ith state from the given list of states.
    * @param states is the list of states
@@ -26,8 +28,17 @@ public class StateMutator {
     // Choose a random position from the set
     Random rnd = new Random();
     int randomPosition = rnd.nextInt(positions.size()+1);
+    // Update the last mutation
+    lastMutation = "Mutation: object in position " + position + " replaced by the one in position " + randomPosition;
     // Get the state from the random position
     return states.get(randomPosition);
+  }
+
+  /**
+   * Get the last applied mutation
+   */
+  public static String getLastMutation() {
+    return lastMutation;
   }
 
 }
