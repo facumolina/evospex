@@ -27,6 +27,9 @@ public class StateSerializer {
   public static List<List<Object>> outputsArgs = new ArrayList<>();
   public static List<Object> outputsResult = new ArrayList<>();
 
+  public static List<Object> mutatedThis = new ArrayList<>();
+  public static List<Object> mutatedResults = new ArrayList<>();
+
   // Some auxiliary variables
   private static int arguments = 0;
 
@@ -100,6 +103,21 @@ public class StateSerializer {
         }
         outputsArgs.get(position - 1).add(toPreserve);
       }
+    }
+  }
+
+  /**
+   * Serializes a mutated object.
+   * @param position the position of the mutated object in the method signature: 0 for the 'this' object, 1 to n for the parameters, and n+1 for the result.
+   * @param mutatedObject the mutated object to serialize.
+   */
+  public static void serializeMutatedObject(int position, Object mutatedObject) {
+    System.out.println("--> Serializing mutated object");
+    Object toPreserve = xstream.fromXML(xstream.toXML(mutatedObject));
+    if (position == 0) {
+      mutatedThis.add(toPreserve);
+    } else {
+      mutatedResults.add(toPreserve);
     }
   }
 
