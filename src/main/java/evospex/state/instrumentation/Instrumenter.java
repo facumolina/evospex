@@ -16,9 +16,9 @@ public class Instrumenter {
   private static final String OUTPUT_SERIALIZATION_METHOD_SIGNATURE = "<evospex.state.StateSerializer: void serializeOutput(int,java.lang.Object)>";
 
   /**
-   * Get the corresponding invoke expression from a statement
+   * Get the corresponding InvokeExpr expression from a statement
    * @param stmt the statement
-   * @return the corresponding invoke expression
+   * @return the corresponding InvokeExpr expression
    */
   private static InvokeExpr getCorrespondingInvokeExpr(Stmt stmt) {
     InvokeExpr invokeExpr;

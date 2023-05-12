@@ -22,6 +22,7 @@ public class StateGenerator {
   private final String targetMethodSignature;
   private SootClass SOOT_TEST_CLASS;
   private SootMethod SOOT_TARGET_METHOD;
+  private int instrumentations = 0;
 
   /**
    * Setup all the necessary for Soot
@@ -50,6 +51,10 @@ public class StateGenerator {
       SOOT_TEST_CLASS.setApplicationClass();
       Scene.v().loadNecessaryClasses();
       SOOT_TARGET_METHOD = Scene.v().getMethod(targetMethodSignature);
+      // Show some info
+      System.out.println("target class: "+SOOT_TEST_CLASS.getName());
+      System.out.println("target method: "+SOOT_TARGET_METHOD.getSignature());
+      System.out.println();
       // Instrument the invocations to the target method
       instrumentInvocationsToTargetMethod();
     } catch (ClassNotFoundException e) {
@@ -62,9 +67,12 @@ public class StateGenerator {
    * Instrument all the invocations to the target method within the test class
    */
   private void instrumentInvocationsToTargetMethod() {
+    System.out.println("--> target method invocations instrumentation and execution");
     for (SootMethod method : SOOT_TEST_CLASS.getMethods()) {
       performInstrumentation(method);
     }
+    System.out.println("invocations instrumented: "+instrumentations);
+    System.out.println();
   }
 
   /**
@@ -90,21 +98,14 @@ public class StateGenerator {
         }
       }
     }
-    // Check if target method has a return value
-    boolean instrumented = unitsToInstrument.size() > 0;
 
+    // Instrument the invocations
     for (Stmt stmt : unitsToInstrument) {
-      // Check if the invoke stmt has a return value
+      instrumentations++;
       Instrumenter.insertCallsToSaveInputState(method, methodBody.getUnits(), stmt);
       Instrumenter.insertCallsToSaveOutputState(method, methodBody.getUnits(), stmt);
     }
 
-    if (instrumented) {
-      System.out.println("=====================================");
-      System.out.println("Instrumented test method --> : " + method.getName());
-      System.out.println(methodBody);
-      System.out.println("=====================================");
-    }
   }
 
   /**
@@ -114,20 +115,27 @@ public class StateGenerator {
    */
   public void generatePositiveStates() throws InstantiationException, IllegalAccessException, FileNotFoundException, ClassNotFoundException {
     // Get the list of test methods
+    System.out.println("--> positive states generation");
     Class<?> instrumentedClass = BytecodeUtils.loadAsClass(SOOT_TEST_CLASS);
     List<Method> testMethods = getRunnableTests(instrumentedClass);
     Object testObject = instrumentedClass.newInstance();
-
+    int testsExecuted = 0;
+    int errors = 0;
     for (Method testMethod : testMethods) {
-      System.out.println("Running test: " + testMethod.getName());
-      // Run the test method and collect the created objects
+      // Run the test method and let the instrumentation collect the created objects
       try {
         Object result = testMethod.invoke(testObject);
+        testsExecuted++;
       } catch (Exception e) {
         System.err.println("Error running test: " + testMethod.getName());
         e.printStackTrace();
+        errors++;
       }
     }
+    System.out.println("tests executed: " + testsExecuted);
+    System.out.println("errors: " + errors);
+    System.out.println("states generated: " + StateSerializer.outputsThis.size());
+    System.out.println();
   }
 
   /**
@@ -137,6 +145,7 @@ public class StateGenerator {
    */
   public void generateNegativeStates() {
     // Load the positive states
+    System.out.println("--> negative states generation");
     List<Object> outputStates = StateSerializer.outputsThis;
     int mutationsToPerform = outputStates.size();
     List<Object> outputResultStates = StateSerializer.outputsResult;
@@ -153,6 +162,9 @@ public class StateGenerator {
         StateSerializer.serializeMutatedObject(1, outputResultState, null);
       }
     }
+    System.out.println("mutations: " + mutationsToPerform);
+    System.out.println("states generated: " + StateSerializer.mutatedThis.size());
+    System.out.println();
   }
 
   /**
@@ -180,11 +192,16 @@ public class StateGenerator {
     return SOOT_TARGET_METHOD;
   }
 
+  /**
+   * Main method
+   * @param args the command line arguments: <testSuiteClassName> <targetMethodSignature>
+   */
   public static void main(String[] args) {
     if (args.length != 2) {
       System.err.println("Usage: java -cp <cp> evospex.StateGenerator <testSuiteClassName> <targetMethodSignature>");
       System.exit(1);
     }
+    System.out.println("> State Generation");
     StateGenerator sg = new StateGenerator(args[0], args[1]);
     StateSerializer.setup(sg.getTargetMethod());
     try {
@@ -196,6 +213,7 @@ public class StateGenerator {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    System.out.println("Done!");
   }
 
 }

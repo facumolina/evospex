@@ -75,9 +75,6 @@ public class StateSerializer {
    * @param input the input to serialize
    */
   public static void serializeInput(int position, Object input) {
-    System.out.println("--> Serializing input");
-    System.out.println("position: " + position);
-    System.out.println("object: " + input);
     Object toPreserve = xstream.fromXML(xstream.toXML(input));
     if (position == 0) {
       inputsThis.add(toPreserve);
@@ -95,9 +92,6 @@ public class StateSerializer {
    * @param output the output to serialize.
    */
   public static void serializeOutput(int position, Object output) {
-    System.out.println("--> Serializing output");
-    System.out.println("position: " + position);
-    System.out.println("object: "+output);
     Object toPreserve = xstream.fromXML(xstream.toXML(output));
     if (position == 0) {
       outputsThis.add(toPreserve);
@@ -119,7 +113,6 @@ public class StateSerializer {
    * @param mutatedObject the mutated object to serialize.
    */
   public static void serializeMutatedObject(int position, Object mutatedObject, String mutationApplied) {
-    System.out.println("--> Serializing mutated object");
     Object toPreserve = xstream.fromXML(xstream.toXML(mutatedObject));
     if (position == 0) {
       mutatedThis.add(toPreserve);
@@ -135,52 +128,53 @@ public class StateSerializer {
    * Saves the serialization to a file.
    */
   public static void saveSerialization() {
-    System.out.println("--> Saving serialization");
+    System.out.println("--> saving serialization");
     String folder = formatFolderName(targetMethodSignature);
-    System.out.println("> output folder: " + folder);
+    System.out.println("output folder: " + folder);
     // Save inputs objects
     String inputsThisFile = folder + "/" + INPUTS_FILE_BASE_NAME + "0.xml";
     saveObjects(inputsThisFile, inputsThis);
-    System.out.println("> saved: "+inputsThisFile);
+    System.out.println("inputs this object: " + inputsThis.size() + " - file: "+inputsThisFile);
     // Save the input arguments objects (if any)
     if (inputsArgs.size() > 0) {
       for (int i = 0; i < inputsArgs.size(); i++) {
         String inputsArgsFile = folder + "/" + INPUTS_FILE_BASE_NAME + (i + 1) + ".xml";
         saveObjects(inputsArgsFile, inputsArgs.get(i));
-        System.out.println("> saved: "+inputsArgsFile);
+        System.out.println("inputs arg " + (i + 1) + ": " + inputsArgs.get(i).size() + " - file: "+inputsArgsFile);
       }
     }
     // Save outputs objects
     String outputsThisFile = folder + "/" + OUTPUTS_FILE_BASE_NAME + "0.xml";
     saveObjects(outputsThisFile, outputsThis);
-    System.out.println("> saved: "+outputsThisFile);
+    System.out.println("outputs this object: " + outputsThis.size() + " - file: "+outputsThisFile);
     // Save the output arguments objects (if any)
     if (outputsArgs.size() > 0) {
       for (int i = 0; i < outputsArgs.size(); i++) {
         String outputsArgsFile = folder + "/" + OUTPUTS_FILE_BASE_NAME + (i + 1) + ".xml";
         saveObjects(outputsArgsFile, outputsArgs.get(i));
-        System.out.println("> saved: "+outputsArgsFile);
+        System.out.println("outputs arg " + (i + 1) + ": " + outputsArgs.get(i).size() + " - file: "+outputsArgsFile);
       }
     }
     // Save the result object (if any)
     if (outputsResult.size() > 0) {
       String outputsResultFile = folder + "/" + OUTPUTS_FILE_BASE_NAME + (arguments + 1) + ".xml";
       saveObjects(outputsResultFile, outputsResult);
-      System.out.println("> saved: "+outputsResultFile);
+      System.out.println("outputs result: " + outputsResult.size() + " - file: "+outputsResultFile);
     }
     // Save mutated objects
     String mutatedThisFile = folder + "/" + MUTATED_FILE_BASE_NAME + "0.xml";
     saveObjects(mutatedThisFile, mutatedThis);
-    System.out.println("> saved: "+mutatedThisFile);
+    System.out.println("mutated this object: " + mutatedThis.size() + " - file: "+mutatedThisFile);
     if (outputsResult.size() > 0) {
       String mutatedResultsFile = folder + "/" + MUTATED_FILE_BASE_NAME + (arguments + 1) + ".xml";
       saveObjects(mutatedResultsFile, mutatedResults);
-      System.out.println("> saved: " + mutatedResultsFile);
+      System.out.println("mutated result: " + mutatedResults.size() + " - file: "+mutatedResultsFile);
     }
     // Save mutations applied
     String mutationsAppliedFile = folder + "/" + MUTATIONS_APPLIED_FILE_BASE_NAME + "0.txt";
     saveMutationsApplied(mutationsAppliedFile, mutationsApplied);
-    System.out.println("> saved: "+mutationsAppliedFile);
+    System.out.println("mutations applied: " + mutationsApplied.size() + " - file: "+mutationsAppliedFile);
+    System.out.println();
   }
 
   /**

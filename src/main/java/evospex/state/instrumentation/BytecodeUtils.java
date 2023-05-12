@@ -58,8 +58,7 @@ public class BytecodeUtils {
    */
   public static byte[] getClassBytecodeAndSaveToFile(SootClass sootClass) throws FileNotFoundException {
     String fileName = SourceLocator.v().getFileNameFor(sootClass, Options.output_format_class);
-    //fileName = fileName.replace("sootOutput", Properties.TEST_CLASSES_PATH);
-    System.out.println("Saving class to " + fileName);
+    System.out.println("instrumented class: " + fileName);
     File f = new File(fileName);
     f.getParentFile().mkdirs();
     OutputStream streamOut = new JasminOutputStream(new FileOutputStream(f, false));
