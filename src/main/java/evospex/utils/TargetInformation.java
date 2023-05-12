@@ -328,9 +328,9 @@ public class TargetInformation {
    */
   public List<Expr> getSetsOfType(Class<?> type) {
     List<Expr> exprSets = setsByType.get(type);
-    if (exprSets==null)
-      return new LinkedList<>();
-    List<Expr> sets = new LinkedList<>(exprSets);
+    List<Expr> sets = new LinkedList<>();
+    if (exprSets!=null)
+      sets = new LinkedList<>(exprSets);
     // Additionally, sets of objects should be returned, since they are possible sets for any given type
     if (setsByType.containsKey(Object.class))
       sets.addAll(setsByType.get(Object.class));
