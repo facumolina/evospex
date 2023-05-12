@@ -141,6 +141,15 @@ public class StateGenerator {
         System.err.println("Error running test: " + testMethod.getName());
         e.printStackTrace();
         errors++;
+        int inputStatesSaved = StateSerializer.inputsThis.size();
+        int outputStatesSaved = StateSerializer.outputsThis.size();
+        if (inputStatesSaved > outputStatesSaved) {
+          // The target method invocation didn't ended well, so the last input state is not valid and needs to be removed
+          StateSerializer.inputsThis.remove(inputStatesSaved - 1);
+          for (List<Object> args : StateSerializer.inputsArgs) {
+            args.remove(args.size() - 1);
+          }
+        }
       }
     }
     System.out.println("tests executed: " + testsExecuted);
