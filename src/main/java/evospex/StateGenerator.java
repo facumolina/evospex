@@ -188,8 +188,11 @@ public class StateGenerator {
     StateGenerator sg = new StateGenerator(args[0], args[1]);
     StateSerializer.setup(sg.getTargetMethod());
     try {
+      // Generate the states
       sg.generatePositiveStates();
       sg.generateNegativeStates();
+      // Save the serialized states
+      StateSerializer.saveSerialization();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
