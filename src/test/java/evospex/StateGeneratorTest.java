@@ -21,6 +21,7 @@ public class StateGeneratorTest {
     StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
+      stateGenerator.generateNegativeStates();
       // Asserts for input this
       assertEquals(6, StateSerializer.inputsThis.size()); // There should be 6 'this' objects
       // Assert for input arguments
@@ -33,6 +34,10 @@ public class StateGeneratorTest {
       assertEquals(6, StateSerializer.outputsArgs.get(0).size()); // The first and unique list should have 6 arguments
       // Assert for output result
       assertEquals(6, StateSerializer.outputsResult.size()); // There should be 6 results
+      // Assert for mutated objects
+      assertEquals(6, StateSerializer.mutatedThis.size()); // There should be 6 mutated objects
+      // Assert for mutated results
+      assertEquals(6, StateSerializer.mutatedResults.size()); // There should be 6 mutated results
     } catch (Exception e) {
       assert false;
     }
@@ -46,6 +51,7 @@ public class StateGeneratorTest {
     StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
+      stateGenerator.generateNegativeStates();
       // Asserts for input this
       assertEquals(3, StateSerializer.inputsThis.size()); // There should be 3 'this' objects
       // Assert for input arguments
@@ -56,6 +62,10 @@ public class StateGeneratorTest {
       assertEquals(0, StateSerializer.outputsArgs.size()); // There should be 0 list of arguments
       // Assert for output result
       assertEquals(3, StateSerializer.outputsResult.size()); // There should be 3 results
+      // Assert for mutated this
+      assertEquals(3, StateSerializer.mutatedThis.size()); // There should be 3 mutated objects
+      // Assert for mutated results
+      assertEquals(3, StateSerializer.mutatedResults.size()); // There should be 3 mutated results
     } catch (Exception e) {
       assert false;
     }
@@ -69,6 +79,7 @@ public class StateGeneratorTest {
     StateSerializer.setup(stateGenerator.getTargetMethod());
     try {
       stateGenerator.generatePositiveStates();
+      stateGenerator.generateNegativeStates();
       // Asserts for input this
       assertEquals(1, StateSerializer.inputsThis.size()); // There should be 3 'this' objects
       // Assert for input arguments
@@ -79,6 +90,10 @@ public class StateGeneratorTest {
       assertEquals(1, StateSerializer.outputsArgs.size()); // There should be 0 list of arguments
       // Assert for output result
       assertEquals(1, StateSerializer.outputsResult.size()); // There should be 3 results
+      // Assert for mutated this
+      assertEquals(1, StateSerializer.mutatedThis.size()); // There should be 3 mutated objects
+      // Assert for mutated results
+      assertEquals(1, StateSerializer.mutatedResults.size()); // There should be 3 mutated results
     } catch (Exception e) {
       assert false;
     }
