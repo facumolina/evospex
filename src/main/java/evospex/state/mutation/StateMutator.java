@@ -25,7 +25,7 @@ public class StateMutator {
     positions.remove(position);
     // Choose a random position from the set
     Random rnd = new Random();
-    int randomPosition = rnd.nextInt(positions.size());
+    int randomPosition = rnd.nextInt(positions.size()+1);
     // Get the state from the random position
     return states.get(randomPosition);
   }
