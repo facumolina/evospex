@@ -141,7 +141,13 @@ public class FromDoubleClosuredExpressionsGeneBuilder extends GeneBuilder {
         genes.add(new QuantificationDoubleValueGene(conf, geneValue, targetInfo));
       } else if (Boolean.class.isAssignableFrom(joineableExpr.type())) {
         // Values are booleans
-        throw new UnsupportedOperationException("Handle boolean value properly");
+        // all n: e.*(f+g) : (n.f != null) => n.r op n.f.r
+        geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 1);
+        genes.add(new QuantificationDoubleValueGene(conf, geneValue, targetInfo));
+        // all n: e.*(f+g) : (n.g != Null) => n.r op n.g.r
+        geneValue = GeneValueBuilderUtils.doubleQtTwoVarValuesComparison(doubleClosuredExpr, joineableExpr, ExprOperator.ALL, 2);
+        genes.add(new QuantificationDoubleValueGene(conf, geneValue, targetInfo));
+        // TODO Handle boolean value properly
       } else {
         // Values are objects
         // all n: e.*(f+g) : (n.r != null)
