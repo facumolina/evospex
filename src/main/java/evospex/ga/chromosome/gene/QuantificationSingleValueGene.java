@@ -15,7 +15,7 @@ import evospex.utils.TargetInformation;
 import java.util.Collection;
 
 /**
- * This class represents a QuantificationSingleValueGene. A quantification single value  gene is a gene which value is
+ * This class represents a QuantificationSingleValueGene. A quantification single value gene is a gene which value is
  * a quantified expression qt n : decl : body, where the body is a predicate over a single value (n, n.f, n.e, etc).
  *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
@@ -44,6 +44,8 @@ public class QuantificationSingleValueGene extends ExprGene {
         newBodyStr = body.expr().get(0).getText();
       }
       Expr newExpr = ExprBuilder.qtExpr(ExprOperator.ALL, ExprBuilder.toExpr(set.getText(), Collection.class), newBodyStr);
+      newExpr.setClassOfElemsInSet(expr.classOfElemsInSet());
+      newExpr.setClassOfValues(expr.classOfValues());
       value.setExpression(newExpr, false);
       return this;
     } else if (ExprGeneMutations.REPLACE_OP.equals(mutationToApply)) {
