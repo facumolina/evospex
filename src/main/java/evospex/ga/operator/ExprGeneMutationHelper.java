@@ -1,6 +1,8 @@
 package evospex.ga.operator;
 
+import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.expression.ExprGrammarParser;
 import evospex.ga.chromosome.gene.ExprGene;
 import evospex.ga.chromosome.gene.type.ExprGeneType;
 import evospex.ga.chromosome.gene.value.ExprGeneValue;
@@ -22,6 +24,8 @@ public class ExprGeneMutationHelper {
   public static List<String> getApplicableMutations(ExprGene gene) {
     ExprGeneType type = gene.getValue().getGeneType();
     LinkedList<String> applicableMutations = new LinkedList<>();
+
+    Expr expr = gene.getValue().getExpression();
 
     if (gene.isPartOfSolution()) {
       // When the gene is part of a solution then just consider the mutation true
@@ -78,12 +82,13 @@ public class ExprGeneMutationHelper {
         addTrueMutation = true;
         break;
       case FORALL_VAR_VALUE:
-        applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
         applicableMutations.add(ExprGeneMutations.NEGATE_BODY);
+        if (allowsValueReplacement(expr)) {
+          applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
+        }
         if (Number.class.isAssignableFrom(gene.getValue().getExpression().classOfValues())) {
           applicableMutations.add(ExprGeneMutations.REPLACE_OP);
         }
-        // applicableMutations.add(DynAlloySpecLearnerMutations.TO_SOME);
         addTrueMutation = true;
         break;
       case FORALL_VAR_VAR:
@@ -92,7 +97,9 @@ public class ExprGeneMutationHelper {
         addTrueMutation = true;
         break;
       case FORALL_VAR_VALUE_VAR_VALUE:
-        applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
+        if (allowsValueReplacement(expr)) {
+          applicableMutations.add(ExprGeneMutations.REPLACE_VALUE);
+        }
         applicableMutations.add(ExprGeneMutations.NEGATE_RIGHT_EQUALITY);
         if (Number.class.isAssignableFrom(gene.getValue().getExpression().classOfValues())) {
           applicableMutations.add(ExprGeneMutations.REPLACE_OP);
@@ -160,6 +167,19 @@ public class ExprGeneMutationHelper {
       applicableMutations.add(ExprGeneMutations.TO_TRUE);
 
     return applicableMutations;
+  }
+
+  /**
+   * Allows value replacement if expr is a qantification expression including a comparison in the body.
+   * @param expr is the expression to be checked.
+   * @return true if the expression allows value replacement, false otherwise.
+   */
+  private static boolean allowsValueReplacement(Expr expr) {
+    ExprGrammarParser.Qt_exprContext qt_expr = expr.exprCtx().qt_expr();
+    ExprGrammarParser.ExprContext body = null;
+    if (qt_expr != null)
+      body = qt_expr.expr();
+    return body != null && body.compare_op() != null;
   }
 
   /**
