@@ -15,7 +15,7 @@ import evospex.utils.TargetInformation;
 import java.util.Collection;
 
 /**
- * This class represents a QuantificationDoubleValueGene. A quantification dpuble value gene is a gene which value is
+ * This class represents a QuantificationDoubleValueGene. A quantification double value gene is a gene which value is
  * a quantified expression qt n : decl : body, where the body is a predicate over two values (n.v=v0 OP n.g.v=v0).
  *
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
