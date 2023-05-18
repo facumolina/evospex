@@ -174,7 +174,7 @@ public class StateGenerator {
     // Generate a negative state from each positive state
     for (int i = 0; i < mutationsToPerform; i++) {
       // Get the positive output state
-      Object mutatedOutput = StateMutator.mutateState(outputStates, i);
+      Object mutatedOutput = StateMutator.mutateState(SOOT_TARGET_METHOD, outputStates, i);
       // Save it to serialized states
       StateSerializer.serializeMutatedObject(0,mutatedOutput, StateMutator.getLastMutation());
       if (resultsExist) {
