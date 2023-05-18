@@ -92,7 +92,6 @@ public class TargetInformation {
   /**
    * Build the initial expressions by traversing the type graph
    * @param considerPreState determines if the pre states must be considered when building expressions
-   * Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
    */
   private void buildInitialExpressions(boolean considerPreState) {
     joinedExpressions = new LinkedList<>();
