@@ -139,8 +139,7 @@ public class StateGenerator {
         Object result = testMethod.invoke(testObject);
         testsExecuted++;
       } catch (Exception e) {
-        System.err.println("Error running test: " + testMethod.getName());
-        e.printStackTrace();
+        System.err.println("error running test " + testMethod.getName() + ": "+e.getMessage());
         errors++;
         int inputStatesSaved = StateSerializer.inputsThis.size();
         int outputStatesSaved = StateSerializer.outputsThis.size();
@@ -173,6 +172,8 @@ public class StateGenerator {
     boolean resultsExist = outputResultStates.size() > 0;
 
     // Generate a negative state from each positive state
+    int swaps = 0;
+    int fieldMutations = 0;
     for (int i = 0; i < mutationsToPerform; i++) {
       // Get the positive output state
       Object mutatedOutput = StateMutator.mutateState(SOOT_TARGET_METHOD, outputStates, i);
@@ -182,8 +183,16 @@ public class StateGenerator {
         Object outputResultState = outputResultStates.get(i);
         StateSerializer.serializeMutatedObject(1, outputResultState, null);
       }
+      String lastMutation = StateMutator.getLastMutation();
+      if (lastMutation.contains("[Swap Mutation]")) {
+        swaps++;
+      } else if (lastMutation.contains("[Field Mutation]")) {
+        fieldMutations++;
+      }
     }
     System.out.println("mutations: " + mutationsToPerform);
+    System.out.println("swaps: " + swaps);
+    System.out.println("field mutations: " + fieldMutations);
     System.out.println("states generated: " + StateSerializer.mutatedThis.size());
     System.out.println();
   }

@@ -17,8 +17,9 @@ public class FieldMutator {
    * Mutate the given field (denoted by a 'chained' expression) on the given object.
    * @param expr is the expression that denotes the field
    * @param object is the object to mutate
+   * @return the new value of the field
    */
-  public static void mutateField(Expr expr, Object object) {
+  public static Object mutateField(Expr expr, Object object) {
     if (expr == null) throw new IllegalArgumentException("Expression cannot be null");
     if (object == null) throw new IllegalArgumentException("Object to mutate cannot be null");
     NameContext nameCtx = expr.exprCtx().name();
@@ -29,8 +30,7 @@ public class FieldMutator {
       String fieldName = nextField.ID().getText();
       if (nextField.name()==null) {
         // This is the last field to evaluate
-        mutateField(fieldName, current, expr);
-        return;
+        return mutateField(fieldName, current, expr);
       } else {
         // This is not the last field to evaluate, thus we need to get the next field
         nextField = nextField.name();
@@ -44,17 +44,14 @@ public class FieldMutator {
    * @param fieldName is the name of the field to mutate
    * @param object is the object to mutate
    * @param expr is the expression that denotes the field
+   * @return the new value of the field
    */
-  public static void mutateField(String fieldName, Object object, Expr expr) {
+  public static Object mutateField(String fieldName, Object object, Expr expr) {
     if (fieldName == null) throw new IllegalArgumentException("Field name cannot be null");
     if (object == null) throw new IllegalArgumentException("Object to mutate cannot be null");
     if (expr == null) throw new IllegalArgumentException("Expression cannot be null");
 
-
-    System.out.println("Mutating field " + fieldName + " of type " + expr.type());
     Object newValue = getNewValue(expr.type(), object);
-    System.out.println("new value: " + newValue);
-
     Class<?> clazz = object.getClass();
     List<Field> fields = getAllFields(new ArrayList<>(),clazz);
     for (Field field : fields) {
@@ -67,8 +64,8 @@ public class FieldMutator {
         }
       }
     }
+    return newValue;
   }
-
 
   private static Object getNewValue(Class<?> type, Object currentObject) {
     if (type.equals(Integer.class)) {
