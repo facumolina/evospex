@@ -25,17 +25,17 @@ Coming soon!
 
 ## Using the Tool
 
-Given a Java class containing the target method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. The state generation phase generates _valid_ states characterizing the current behavior of the target method and _invalid_ states representing invalid behavior of the target method. 
+Given a Java class containing the target method and a test suite with execution of the method, the use of EvoSpex requires two phases. A state generation phase and an inference phase. The state generation phase generates _valid_ states characterizing the current behavior of the target method and _invalid_ states representing invalid behavior of the target method. 
  
 ### States Generation
 
 To perform the state generation phase, run the following command:
 ```bash
-./state-generation.sh <cp> <class> "<method>"
+./evospex.sh --genStates <cp> <test_suite> "<method>"
 ```
-where ```<cp>``` is the target subject classpath, ```<class>``` is the target class fully quallified name and ```"<method>"``` is the target method signature. This phase will produce the `states` folder containing the states for the current target method.
+where ```<cp>``` is the target subject classpath, ```<test_suite>``` is the target test suite fully quallified name and ```"<method>"``` is the target method signature. This phase will produce, in the `states` folder, the files containing the states for the current target method.
 
-### Postcondition Assertion Inference
+### Postcondition Inference
 
 After generating the states, to perform the inference phase and generate the postcondition assertion, run the following command: 
 
