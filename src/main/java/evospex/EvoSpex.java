@@ -81,26 +81,6 @@ public class EvoSpex {
    * 
    * @throws InvalidConfigurationException
    */
-  public static int processClass(String className, String baseFolder, int numArgs, int numOutputs)
-      throws Exception {
-    String filePath = "src/test/resources/specs/" + className + ".als";
-    System.out.println("Starting learning process for: " + filePath);
-    EvoSpexParameters params = new EvoSpexParameters();
-    params.setBaseFolderName(baseFolder);
-    params.setArgumentsNumber(numArgs);
-    params.setOutputsNumber(numOutputs);
-    params.setPopulationSize(200);
-    params.setBuildBigAndChromosome(false);
-    //EvoSpexGA learner = new EvoSpexGA(filePath, "", params);
-    //learner.learnPostCondition();
-    return 1;
-  }
-
-  /**
-   * Process the given file and attempt to learn the postcondition of the given method
-   * 
-   * @throws InvalidConfigurationException
-   */
   public static int processClass(String targetClassName, EvoSpexParameters params) throws Exception {
     System.out.println("EvoSpex 1.0.0");
     Class<?> targetClass = getTargetClass(targetClassName);
