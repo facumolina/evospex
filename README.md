@@ -17,6 +17,7 @@ To build and install EvoSpex locally, clone this repository and run the followin
 
 ```bash
 mvn clean compile assembly:single
+mvn test-compile
 ```
 
 ### Docker installation
@@ -40,35 +41,28 @@ where ```<cp>``` is the target subject classpath, ```<test_suite>``` is the targ
 After generating the states, to perform the inference phase and generate the postcondition assertion, run the following command: 
 
 ```bash
-./evospex.sh <cp> <class> <method_states>
+./evospex.sh --infer <cp> <class> <method_states>
 ```
 where ```<method_states>``` is the folder containing the states produced in the previous phase. The execution will report information of each generation of the evolutionary process (mutations performed, crossovers performed, best fitness value, etc). At the end, the candidate postcondition is reported in the form of an assertion.
  
 ### Example
 
-As an example, let us consider method [add(int, java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/casestudies/motivation/AvlTreeList.java#L86) of class AvlTreeList. This method inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for this method, the two phases can be performed as follows:
+As an example, let us consider method [add(int, java.lang.Object)](https://github.com/facumolina/evospex/blob/main/src/examples/java/casestudies/commonscollections/TreeList.java#L227) of class TreeList, took from the [Apache Commons Collections](https://github.com/apache/commons-collections) repository. This method inserts an element in a specific position on an avl-tree based implementation of lists. To generate a postcondition assertion for this method, and using as input the test suite [TreeListRegressionTest0](https://github.com/facumolina/evospex/blob/main/src/test/java/casestudies/commonscollections/TreeListRegressionTest0.java), automatically generated with [Randoop](https://randoop.github.io/randoop/) the two phases can be performed as follows:
 
 ```bash
-./state-generation.sh <working_dir>/target/evospex.jar casestudies.motivation.AvlTreeList "add(int,java.lang.Object)"
-./evospex.sh target/evospex.jar casestudies.motivation.AvlTreeList states/casestudies.motivation.AvlTreeList/add\\\(int,java.lang.Object\\\)/
+./evospex.sh --genStates target/test-classes/ casestudies.commonscollections.TreeListRegressionTest0 "<casestudies.commonscollections.TreeList: void add(int,java.lang.Object)>"
+./evospex.sh --infer target/evospex.jar casestudies.commonscollections.TreeList states/casestudies.commonscollections.TreeList/_void_add\(int,java.lang.Object\)/
 ```
-
-Note: you can list all the possible target methods of a class by running the script `./state-generation/list-method-regexes-randoop.sh <cp> <class>`. 
 
 ### Output
 
 EvoSpex reports the postcondition as an assert statement: `assert(...);`. For instance, for the above example, an execution of EvoSpex may return a postcondition such as the following:
 ```java
 assert(
- this.root.value != null &&
- this.root != null &&
- #(this_pre.root.*(left+right))=this.root.size &&
- #(this.root.*(left+right))=this.root.size+1 &&
- val in this.root.*(left+right).value &&
- all n:this.root.*(left+right):n.left!=null implies n.height>n.left.height &&
- all n:this.root.*(left+right):n.left!=null implies !(n.size<=n.left.size) &&
- all n:this.root.*(left+right):n.right!=null implies n.height>n.right.height &&
- all n:this.root.*(left+right):n.right!=null implies !(n.size<n.right.size)
+  this.size = \old(this.size) + 1 &&
+  #(old(this).root.*(left+right))=this.size-1 &&
+  index in this.root.*(left).height &&
+  obj in this.root.*(left+right).value
 );
 ```
 
@@ -121,9 +115,8 @@ assert(
 
 The evaluation subjects can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4458256.svg)](https://doi.org/10.5281/zenodo.4458256)
  
-To run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper). 
- 
+To run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper).
+
 ## Contact
   
 If you experience any issues, please submit an issue or contact us at fmolina@dc.exa.unrc.edu.ar!
-
