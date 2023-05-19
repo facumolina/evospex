@@ -12,6 +12,7 @@ import soot.options.Options;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -219,6 +220,7 @@ public class StateGenerator {
   public static void main(String[] args) {
     if (args.length != 2) {
       System.err.println("Usage: java -cp <cp> evospex.StateGenerator <testSuiteClassName> <targetMethodSignature>");
+      System.err.println("provided " + args.length + " args: "+ Arrays.toString(args));
       System.exit(1);
     }
     System.out.println("> State Generation");
