@@ -10,7 +10,7 @@
 # 1. State generation: ./evospex.sh --genStates <classpath> <test_suite> <method>
 # 2. Postcondition inference: ./evospex.sh --infer <classpath> <class> <method_states>
 root_dir=$PWD;
-evospex_jar=$root_dir/target/evospex.jar;
+evospex_jar=$root_dir/target/evospex-1.0.0.jar;
 if [ "$1" = "--genStates" ]; then
     # State generation
     subject_cp=$2;

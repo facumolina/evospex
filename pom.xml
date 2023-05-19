@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>mfis</groupId>
   <artifactId>evospex</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>EvoSpex</name>
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -89,7 +89,7 @@
         <descriptorRefs>
           <descriptorRef>jar-with-dependencies</descriptorRef>
         </descriptorRefs>
-	<finalName>evospex</finalName>
+	<finalName>evospex-${version}</finalName>
 	<appendAssemblyId>false</appendAssemblyId>
       </configuration>
     </plugin>
