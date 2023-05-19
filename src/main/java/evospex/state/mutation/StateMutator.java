@@ -77,8 +77,8 @@ public class StateMutator {
     int random = rnd.nextInt(exprs.size());
     Expr expr = exprs.get(random);
     // Choose a random value for the expression
-    System.out.println("Field to mutate: " + expr);
-    FieldMutator.mutateField(expr, copy);
+    Object value = FieldMutator.mutateField(expr, copy);
+    lastMutation = "[Field Mutation] " + expr.exprCtx().getText() + " --> " + value;
     return object;
   }
 
@@ -111,7 +111,7 @@ public class StateMutator {
     Random rnd = new Random();
     int randomPosition = rnd.nextInt(positions.size()+1);
     // Update the last mutation
-    lastMutation = "Mutation: object in position " + position + " replaced by the one in position " + randomPosition;
+    lastMutation = "[Swap Mutation] Object in position " + position + " replaced by the one in position " + randomPosition;
     // Get the state from the random position
     return states.get(randomPosition);
   }
