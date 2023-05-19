@@ -59,9 +59,10 @@ As an example, let us consider method [add(int, java.lang.Object)](https://githu
 EvoSpex reports the postcondition as an assert statement: `assert(...);`. For instance, for the above example, an execution of EvoSpex may return a postcondition such as the following:
 ```java
 assert(
-  obj in this.root.*(left+right).value &&
+  this.size = \old(this.size) + 1 &&
   #(old(this).root.*(left+right))=this.size-1 &&
-  index in this.root.*(left).height
+  index in this.root.*(left).height &&
+  obj in this.root.*(left+right).value
 );
 ```
 
