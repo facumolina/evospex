@@ -114,9 +114,8 @@ assert(
 
 The evaluation subjects can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4458256.svg)](https://doi.org/10.5281/zenodo.4458256)
  
-To run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper). 
- 
+To run EvoSpex on all the subjects you can follow the instructions in this [page](https://github.com/facumolina/evospex-ae#reproducing-the-experiments-in-the-paper).
+
 ## Contact
   
 If you experience any issues, please submit an issue or contact us at fmolina@dc.exa.unrc.edu.ar!
-
