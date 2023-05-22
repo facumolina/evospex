@@ -4,7 +4,7 @@
 
 EvoSpex is a search-based tool for inferring postconditions of Java methods. Given a Java method and a test suite with executions of the method, EvoSpex uses evolutionary computation to automatically infer a postcondition assertion capturing the method's current behavior. EvoSpex relies on a state generation technique to generate program states caracterizing current behavior as well as potentially invalid behavior, and then produces an assertion distinguishing between these program states. The assertions that EvoSpex produce belong to a JML-like specification language. Contributions to this repo are welcome!
 
-Check out our [demo video](https://youtu.be/5uJPVjbL4yo)!
+Check out our [demo video](https://youtu.be/-yAofyWZduQ)!
 
 ## Requirements
 
