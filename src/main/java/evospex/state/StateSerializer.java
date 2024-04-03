@@ -100,7 +100,9 @@ public class StateSerializer {
         outputsResult.add(toPreserve);
       } else {
         if (outputsArgs.size() < position) {
-          outputsArgs.add(new ArrayList<>());
+          // Fill with empty lists
+          while (outputsArgs.size() < position)
+            outputsArgs.add(new ArrayList<>());
         }
         outputsArgs.get(position - 1).add(toPreserve);
       }
