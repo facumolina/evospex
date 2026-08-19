@@ -3,9 +3,7 @@ package evospex.state.instrumentation;
 import soot.SootClass;
 import soot.SourceLocator;
 import soot.baf.BafASMBackend;
-import soot.jimple.JasminClass;
 import soot.options.Options;
-import soot.util.JasminOutputStream;
 
 import java.io.*;
 
@@ -61,13 +59,13 @@ public class BytecodeUtils {
     System.out.println("instrumented class: " + fileName);
     File f = new File(fileName);
     f.getParentFile().mkdirs();
-    OutputStream streamOut = new JasminOutputStream(new FileOutputStream(f, false));
-    PrintWriter writerOut = new PrintWriter(new OutputStreamWriter(streamOut));
-    JasminClass jasminClass = new soot.jimple.JasminClass(sootClass);
-    jasminClass.print(writerOut);
-    writerOut.flush();
-    writerOut.close();
-    return getClassBytecode(sootClass);
+    byte[] classBytes = getClassBytecode(sootClass);
+    try (OutputStream streamOut = new FileOutputStream(f, false)) {
+      streamOut.write(classBytes);
+    } catch (IOException e) {
+      throw new FileNotFoundException(e.getMessage());
+    }
+    return classBytes;
   }
 
 }
