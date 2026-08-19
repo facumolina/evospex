@@ -41,6 +41,7 @@ public class StateMutator {
   public static Object mutateState(SootMethod method, List<Object> states, int position) {
     boolean fieldMutationAllowed = false;
     Object toMutate = states.get(position);
+    xstream.allowTypes(new Class[] {toMutate.getClass()});
 
     // If the object to mutate is an instance of the target class, then the field mutation is allowed
     if (toMutate.getClass().getName().equals(method.getDeclaringClass().getName())) {
@@ -79,7 +80,7 @@ public class StateMutator {
     // Choose a random value for the expression
     Object value = FieldMutator.mutateField(expr, copy);
     lastMutation = "[Field Mutation] " + expr.exprCtx().getText() + " --> " + value;
-    return object;
+    return copy;
   }
 
   /**
@@ -103,13 +104,13 @@ public class StateMutator {
    * Mutate the ith state from the given list of states by performing a 'swap' with a another random state.
    */
   private static Object performSwap(List<Object> states, int position) {
-    // Create a random set of integers from 0 to states.size() - 1
-    // and remove the position from the set
-    Set<Integer> positions = IntStream.rangeClosed(0, states.size()-1).boxed().collect(Collectors.toSet());
-    positions.remove(position);
-    // Choose a random position from the set
+    // Create a list of integers from 0 to states.size() - 1
+    // and remove the position from the list
+    List<Integer> positions = IntStream.rangeClosed(0, states.size()-1).boxed().collect(Collectors.toList());
+    positions.remove(Integer.valueOf(position));
+    // Choose a random position from the remaining ones
     Random rnd = new Random();
-    int randomPosition = rnd.nextInt(positions.size()+1);
+    int randomPosition = positions.get(rnd.nextInt(positions.size()));
     // Update the last mutation
     lastMutation = "[Swap Mutation] Object in position " + position + " replaced by the one in position " + randomPosition;
     // Get the state from the random position

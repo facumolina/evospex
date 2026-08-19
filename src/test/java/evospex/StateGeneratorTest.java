@@ -38,6 +38,8 @@ public class StateGeneratorTest {
       assertEquals(6, StateSerializer.mutatedThis.size()); // There should be 6 mutated objects
       // Assert for mutated results
       assertEquals(6, StateSerializer.mutatedResults.size()); // There should be 6 mutated results
+      // Save serialization
+      StateSerializer.saveSerialization();
     } catch (Exception e) {
       assert false;
     }

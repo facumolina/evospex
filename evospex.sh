@@ -18,6 +18,7 @@ if [ "$1" = "--genStates" ]; then
     test_suite=$3;
     method='"'$4'"';
     cmd=$(echo 'java -cp '$full_cp' evospex.StateGenerator '$test_suite' '$method)
+    echo $cmd
     eval $cmd
     exit 0
 fi
