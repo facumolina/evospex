@@ -75,6 +75,7 @@ public class StateSerializer {
    * @param input the input to serialize
    */
   public static void serializeInput(int position, Object input) {
+    xstream.allowTypes(new Class[] {input.getClass()});
     Object toPreserve = xstream.fromXML(xstream.toXML(input));
     if (position == 0) {
       inputsThis.add(toPreserve);
