@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>mfis</groupId>
   <artifactId>evospex</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>EvoSpex</name>
   <properties>
     <maven.compiler.source>17</maven.compiler.source>

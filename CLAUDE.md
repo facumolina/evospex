@@ -12,7 +12,7 @@ observed behavior, distinguishing valid ("positive") states from mutated ("negat
 ## Build & test
 
 ```bash
-# Build the jar (target/evospex-1.0.0.jar) used by evospex.sh
+# Build the jar (target/evospex-1.0.1.jar) used by evospex.sh
 mvn clean compile assembly:single
 mvn test-compile
 

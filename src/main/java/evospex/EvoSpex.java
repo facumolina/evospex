@@ -82,7 +82,7 @@ public class EvoSpex {
    * @throws InvalidConfigurationException
    */
   public static int processClass(String targetClassName, EvoSpexParameters params) throws Exception {
-    System.out.println("EvoSpex 1.0.0");
+    System.out.println("EvoSpex 1.0.1");
     Class<?> targetClass = getTargetClass(targetClassName);
 
     if (targetClass==null) {
