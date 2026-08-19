@@ -17,7 +17,8 @@ if [ "$1" = "--genStates" ]; then
     full_cp=$evospex_jar:$subject_cp;
     test_suite=$3;
     method='"'$4'"';
-    cmd=$(echo 'java -cp '$full_cp' evospex.StateGenerator '$test_suite' '$method)
+    cmd=$(echo 'java --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -cp '$full_cp' evospex.StateGenerator '$test_suite' '$method)
+    echo $cmd
     eval $cmd
     exit 0
 fi
@@ -32,7 +33,7 @@ if [ "$1" = "--infer" ]; then
     num_args="$( ls -l in*.xml | wc -l )";
     num_outputs="$( ls -l out*.xml | wc -l )";
     cd $root_dir
-    java -cp $full_cp evospex.EvoSpex $target_class_fqn $method_states $num_args $num_outputs $5 $6 $7 $8
+    java --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -cp $full_cp evospex.EvoSpex $target_class_fqn $method_states $num_args $num_outputs $5 $6 $7 $8
     exit 0
 fi
 

@@ -11,6 +11,9 @@ import evospex.target.TypeGraph;
 import evospex.target.TypeGraphEdge;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedPseudograph;
+import soot.*;
+import soot.jimple.*;
+import soot.options.Options;
 
 /**
  * This class keeps some useful information regarding the target class and method.
@@ -107,6 +110,105 @@ public class TargetInformation {
     }
 
     buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS), cut, scope);
+    extractIntExpressionsFromCode(cut);
+  }
+
+  /**
+   * Extract integer arithmetic expressions from the target class bytecode using Soot.
+   * Discovered expressions are added to joinedExpressionsOfTypeInt and allIntExpressions.
+   */
+  private void extractIntExpressionsFromCode(Class<?> targetClass) {
+    try {
+      G.reset();
+      Options.v().set_prepend_classpath(true);
+      Options.v().set_allow_phantom_refs(true);
+      Options.v().set_soot_classpath(System.getProperty("java.class.path"));
+      SootClass sootClass = Scene.v().loadClassAndSupport(targetClass.getName());
+      sootClass.setApplicationClass();
+      Scene.v().loadNecessaryClasses();
+      Set<String> knownExprStrings = new HashSet<>();
+      joinedExpressionsOfTypeInt.forEach(e -> knownExprStrings.add(e.toString()));
+      for (SootMethod method : sootClass.getMethods()) {
+        if (!method.isConcrete()) continue;
+        try {
+          extractIntExpressionsFromBody(method.retrieveActiveBody(), knownExprStrings);
+        } catch (Exception ignored) {}
+      }
+    } catch (Exception e) {
+      System.err.println("Warning: could not extract int expressions via Soot: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Extract integer arithmetic expressions from a single Soot method body.
+   */
+  private void extractIntExpressionsFromBody(Body body, Set<String> knownExprStrings) {
+    Map<String, String> localToExpr = new HashMap<>();
+    // First pass: map locals to this-rooted expression strings via field accesses
+    for (Unit unit : body.getUnits()) {
+      if (unit instanceof IdentityStmt) {
+        IdentityStmt id = (IdentityStmt) unit;
+        if (id.getRightOp() instanceof ThisRef) {
+          localToExpr.put(id.getLeftOp().toString(), ExprName.THIS);
+        }
+      } else if (unit instanceof AssignStmt) {
+        AssignStmt assign = (AssignStmt) unit;
+        if (!(assign.getLeftOp() instanceof Local)) continue;
+        String lhs = assign.getLeftOp().toString();
+        Value rhs = assign.getRightOp();
+        if (rhs instanceof InstanceFieldRef) {
+          InstanceFieldRef fr = (InstanceFieldRef) rhs;
+          String base = fr.getBase().toString();
+          if (localToExpr.containsKey(base)) {
+            localToExpr.put(lhs, localToExpr.get(base) + "." + fr.getField().getName());
+          }
+        }
+      }
+    }
+    // Second pass: find binary arithmetic expressions of int type
+    for (Unit unit : body.getUnits()) {
+      if (!(unit instanceof AssignStmt)) continue;
+      Value rhs = ((AssignStmt) unit).getRightOp();
+      if (!(rhs instanceof BinopExpr)) continue;
+      BinopExpr binop = (BinopExpr) rhs;
+      if (!(binop.getType() instanceof IntType)) continue;
+      String symbol = arithmeticSymbol(binop);
+      if (symbol == null) continue;
+      String op1 = resolveToExprStr(binop.getOp1(), localToExpr);
+      String op2 = resolveToExprStr(binop.getOp2(), localToExpr);
+      if (op1 == null || op2 == null) continue;
+      String exprStr = op1 + " " + symbol + " " + op2;
+      if (knownExprStrings.add(exprStr)) {
+        try {
+          Expr newExpr = ExprBuilder.toExpr(exprStr, int.class);
+          joinedExpressionsOfTypeInt.add(newExpr);
+          allIntExpressions.add(newExpr);
+        } catch (Exception ignored) {}
+      }
+    }
+  }
+
+  /**
+   * Resolves a Soot Value to an EvoSpex expression string, or returns null if not resolvable.
+   */
+  private String resolveToExprStr(Value v, Map<String, String> localToExpr) {
+    if (v instanceof Local && localToExpr.containsKey(v.toString()))
+      return localToExpr.get(v.toString());
+    if (v instanceof IntConstant)
+      return String.valueOf(((IntConstant) v).value);
+    return null;
+  }
+
+  /**
+   * Returns the arithmetic symbol for a BinopExpr, or null if not an arithmetic operator.
+   */
+  private String arithmeticSymbol(BinopExpr expr) {
+    if (expr instanceof AddExpr) return "+";
+    if (expr instanceof SubExpr) return "-";
+    if (expr instanceof MulExpr) return "*";
+    if (expr instanceof DivExpr) return "/";
+    if (expr instanceof RemExpr) return "%";
+    return null;
   }
 
   /**
