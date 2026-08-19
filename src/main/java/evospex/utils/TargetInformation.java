@@ -111,10 +111,6 @@ public class TargetInformation {
 
     buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS), cut, scope);
     extractIntExpressionsFromCode(cut);
-
-    // Print all extracted int expressions
-    System.out.println("Extracted int expressions:");
-    allIntExpressions.forEach(e -> System.out.println("  "+e));
   }
 
   /**
