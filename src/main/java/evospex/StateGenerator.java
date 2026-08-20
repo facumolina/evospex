@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * StateGenerator class: allows to serialize states from a given JUnit suite
@@ -171,28 +172,43 @@ public class StateGenerator {
     List<Object> outputResultStates = StateSerializer.outputsResult;
     boolean resultsExist = outputResultStates.size() > 0;
 
-    // Generate a negative state from each positive state
+    // Generate a negative state from each positive state by mutating exactly one of 'this' or
+    // 'result' - never both - so a negative example differs from its positive counterpart in a
+    // single, unambiguous place.
     int swaps = 0;
     int fieldMutations = 0;
+    int resultMutations = 0;
+    Random rnd = new Random();
     for (int i = 0; i < mutationsToPerform; i++) {
-      // Get the positive output state
-      Object mutatedOutput = StateMutator.mutateState(SOOT_TARGET_METHOD, outputStates, i);
-      // Save it to serialized states
-      StateSerializer.serializeMutatedObject(0,mutatedOutput, StateMutator.getLastMutation());
-      if (resultsExist) {
-        Object outputResultState = outputResultStates.get(i);
-        StateSerializer.serializeMutatedObject(1, outputResultState, null);
-      }
-      String lastMutation = StateMutator.getLastMutation();
-      if (lastMutation.contains("[Swap Mutation]")) {
-        swaps++;
-      } else if (lastMutation.contains("[Field Mutation]")) {
-        fieldMutations++;
+      Object thisState = outputStates.get(i);
+      boolean fieldsAvailable = StateMutator.hasEvaluableFields(SOOT_TARGET_METHOD, thisState);
+      boolean mutateResultChannel = resultsExist && (!fieldsAvailable || rnd.nextBoolean());
+
+      if (mutateResultChannel) {
+        // Mutate only the result; keep 'this' unchanged.
+        StateSerializer.serializeMutatedObject(0, thisState, null);
+        Object mutatedResult = StateMutator.mutateState(SOOT_TARGET_METHOD, outputResultStates, i);
+        StateSerializer.serializeMutatedObject(1, mutatedResult, StateMutator.getLastMutation());
+        resultMutations++;
+      } else {
+        // Mutate only 'this' (field or swap); keep result unchanged.
+        Object mutatedOutput = StateMutator.mutateState(SOOT_TARGET_METHOD, outputStates, i);
+        String thisMutationDesc = StateMutator.getLastMutation();
+        StateSerializer.serializeMutatedObject(0, mutatedOutput, thisMutationDesc);
+        if (resultsExist) {
+          StateSerializer.serializeMutatedObject(1, outputResultStates.get(i), null);
+        }
+        if (thisMutationDesc.contains("[Swap Mutation]")) {
+          swaps++;
+        } else if (thisMutationDesc.contains("[Field Mutation]")) {
+          fieldMutations++;
+        }
       }
     }
     System.out.println("mutations: " + mutationsToPerform);
     System.out.println("swaps: " + swaps);
     System.out.println("field mutations: " + fieldMutations);
+    System.out.println("result mutations: " + resultMutations);
     System.out.println("states generated: " + StateSerializer.mutatedThis.size());
     System.out.println();
   }

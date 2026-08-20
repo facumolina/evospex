@@ -32,6 +32,18 @@ public class StateMutator {
   }
 
   /**
+   * Returns true if the given 'this' state is an instance of the target class and has at least
+   * one evaluable field expression that a field mutation could act on.
+   * @param method is the target method
+   * @param thisState is the 'this' state to check
+   */
+  public static boolean hasEvaluableFields(SootMethod method, Object thisState) {
+    if (!thisState.getClass().getName().equals(method.getDeclaringClass().getName())) return false;
+    if (targetInformation == null) setup(thisState.getClass());
+    return !getEvaluableExpressions(thisState).isEmpty();
+  }
+
+  /**
    * Mutate the ith state from the given list of states.
    * @param method is the target method
    * @param states is the list of states
