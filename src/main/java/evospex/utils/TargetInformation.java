@@ -111,6 +111,11 @@ public class TargetInformation {
 
     buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS), cut, scope);
     extractIntExpressionsFromCode(cut);
+
+    System.out.println("--> int expressions collected (used to build genes): " + allIntExpressions.size());
+    for (Expr expr : allIntExpressions) {
+      System.out.println("  " + expr);
+    }
   }
 
   /**
@@ -547,8 +552,9 @@ public class TargetInformation {
     if (!methodVarsByType.containsKey(type))
       methodVarsByType.put(type, new HashSet<>());
     if (methodVarsByType.get(type).add(varName)) {
-      //if (typeName.contains("Integer"))
-        //allIntExpressions.add(ExprVar.make(null, varName));
+      if (type.equals(Integer.class) || type.equals(int.class)) {
+        allIntExpressions.add(ExprBuilder.toExpr(varName, type));
+      }
     }
   }
 
