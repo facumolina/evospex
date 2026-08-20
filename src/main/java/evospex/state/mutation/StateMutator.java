@@ -43,9 +43,13 @@ public class StateMutator {
     Object toMutate = states.get(position);
     xstream.allowTypes(new Class[] {toMutate.getClass()});
 
-    // If the object to mutate is an instance of the target class, then the field mutation is allowed
+    // If the object to mutate is an instance of the target class, then the field mutation is
+    // allowed - but only if the target class actually has evaluable field expressions to
+    // mutate (e.g. a stateless/fieldless class has none, and performFieldMutation would fail
+    // trying to pick a random one).
     if (toMutate.getClass().getName().equals(method.getDeclaringClass().getName())) {
-      fieldMutationAllowed = true;
+      if (targetInformation == null) setup(toMutate.getClass());
+      fieldMutationAllowed = !getEvaluableExpressions(toMutate).isEmpty();
     }
     boolean swapPossible = states.size() > 1;
     if (fieldMutationAllowed) {
