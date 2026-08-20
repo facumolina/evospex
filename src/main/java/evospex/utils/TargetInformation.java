@@ -111,7 +111,14 @@ public class TargetInformation {
 
     buildInitialExpressionsRec(relationsForEvaluation.get(ExprName.THIS), cut, scope);
     extractIntExpressionsFromCode(cut);
+  }
 
+  /**
+   * Log the int expressions collected so far. Method arguments and the result are only added to
+   * allIntExpressions once genes have been built from an example (see addVariableForType), so
+   * this should be called after that has happened to report an accurate count.
+   */
+  public void logCollectedIntExpressions() {
     System.out.println("--> int expressions collected (used to build genes): " + allIntExpressions.size());
     for (Expr expr : allIntExpressions) {
       System.out.println("  " + expr);

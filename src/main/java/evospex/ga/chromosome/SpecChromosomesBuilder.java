@@ -96,6 +96,8 @@ public class SpecChromosomesBuilder {
       targetInfo.addVariableForType(Integer.class, ExprName.RESULT);
     }
 
+    targetInfo.logCollectedIntExpressions();
+
     return chromosomes;
   }
 
