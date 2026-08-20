@@ -216,7 +216,7 @@ public class EvoSpexGA {
       System.out.println();
       Stats.printGlobalCounters();
 
-      Report.finalReport();
+      Report.finalReport(parameters);
 
     } else {
       // Normal Evolutionary Search
@@ -254,7 +254,7 @@ public class EvoSpexGA {
         Stats.printGlobalCounters();
       }
 
-      Report.finalReport();
+      Report.finalReport(parameters);
     }
   }
 

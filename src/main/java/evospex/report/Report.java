@@ -1,5 +1,7 @@
 package evospex.report;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.List;
 
 import evospex.expression.Expr;
@@ -36,7 +38,7 @@ public class Report {
   /**
    * Print final report
    */
-  public static void finalReport() {
+  public static void finalReport(EvoSpexParameters parameters) {
     System.out.println();
     System.out.println("------------- Execution finished -----------");
     long seconds = (Stats.FITNESS_CALCULATION_TIME / 1000);
@@ -61,6 +63,29 @@ public class Report {
       }
     }*/
     System.out.println("--------------------------------------------");
+    saveAssertions(parameters.getBaseFolderName(), assertions);
+  }
+
+  /**
+   * Save the inferred assertions to an assertions.txt file, one per line, in the output/
+   * folder mirroring the states/ folder the states were read from.
+   */
+  private static void saveAssertions(String baseFolderName, List<Expr> assertions) {
+    String outputDir = baseFolderName.startsWith("states/")
+        ? "output/" + baseFolderName.substring("states/".length())
+        : "output/" + baseFolderName;
+    try {
+      File f = new File(outputDir, "assertions.txt");
+      f.getParentFile().mkdirs();
+      PrintWriter pw = new PrintWriter(f);
+      for (Expr expr : assertions) {
+        pw.println(expr);
+      }
+      pw.close();
+      System.out.println("assertions saved: " + f.getPath());
+    } catch (Exception e) {
+      System.out.println("Error saving assertions to " + outputDir);
+    }
   }
 
 }
