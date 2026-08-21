@@ -1,5 +1,6 @@
 package evospex.utils;
 
+import evospex.expression.Expr;
 import evospex.expression.symbol.ExprName;
 import soot.G;
 import soot.Local;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +24,26 @@ import java.util.stream.Collectors;
  * @author Facundo Molina <fmolina@dc.exa.unrc.edu.ar>
  */
 public class ParameterNameResolver {
+
+  /**
+   * The most recently resolved arg-name map, shared globally for the duration of a run so that
+   * any code rendering an expression for display (e.g. SpecChromosome.printGenes(), called deep
+   * inside the fitness function) can substitute real parameter names without needing this map
+   * threaded through its call chain. Defaults to empty (no-op substitution) until resolved.
+   */
+  public static Map<String, String> ARG_NAMES = Collections.emptyMap();
+
+  /**
+   * Renders an expression for display, substituting real parameter names for EvoSpex's internal
+   * "arg0", "arg1", ... labels wherever ARG_NAMES has a mapping.
+   */
+  public static String render(Expr expr) {
+    String text = expr.toString();
+    for (Map.Entry<String, String> e : ARG_NAMES.entrySet()) {
+      text = text.replaceAll("\\b" + e.getKey() + "\\b", Matcher.quoteReplacement(e.getValue()));
+    }
+    return text;
+  }
 
   /**
    * Returns a map from "arg0", "arg1", ... to the real parameter name, or an empty map if the

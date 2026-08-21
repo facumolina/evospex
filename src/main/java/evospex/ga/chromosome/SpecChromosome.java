@@ -5,6 +5,7 @@ import java.util.*;
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
 import evospex.ga.chromosome.gene.ExprGene;
+import evospex.utils.ParameterNameResolver;
 import org.jgap.BaseChromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessEvaluator;
@@ -703,7 +704,8 @@ public class SpecChromosome extends BaseChromosome {
         } else {
           ExprGene exprGene = (ExprGene) getGene(i);
           if (!exprGene.getValue().getExpression().equals(ExprBuilder.TRUE)) {
-            System.out.println("\t\t" + getGene(i).toString());
+            String renderedExpr = ParameterNameResolver.render(exprGene.getValue().getExpression());
+            System.out.println("\t\t" + renderedExpr + " - " + exprGene.getClass().getSimpleName());
           }
         }
       }

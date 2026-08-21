@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import evospex.ConfigurationProperties;
@@ -190,7 +189,7 @@ public class EvoSpexGA {
         parameters);
 
     // Real parameter names for the final report/output, if they can be resolved
-    Map<String, String> argNames = ParameterNameResolver.resolveArgNames(targetClass, parameters.getBaseFolderName());
+    ParameterNameResolver.ARG_NAMES = ParameterNameResolver.resolveArgNames(targetClass, parameters.getBaseFolderName());
 
     Genotype population = Genotype.randomInitialGenotype(conf);
     population.getPopulation().setChromosomes(initialPopulation);
@@ -221,7 +220,7 @@ public class EvoSpexGA {
       System.out.println();
       Stats.printGlobalCounters();
 
-      Report.finalReport(parameters, argNames);
+      Report.finalReport(parameters);
 
     } else {
       // Normal Evolutionary Search
@@ -259,7 +258,7 @@ public class EvoSpexGA {
         Stats.printGlobalCounters();
       }
 
-      Report.finalReport(parameters, argNames);
+      Report.finalReport(parameters);
     }
   }
 
