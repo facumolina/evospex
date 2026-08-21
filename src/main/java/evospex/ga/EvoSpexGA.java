@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import evospex.ConfigurationProperties;
@@ -26,6 +27,7 @@ import evospex.ga.operator.ExprGeneMutationOperator;
 import evospex.ga.operator.SpecChromosomeNaturalSelector;
 import evospex.report.Report;
 import evospex.report.Stats;
+import evospex.utils.ParameterNameResolver;
 import evospex.utils.TargetInformation;
 import evospex.EvoSpexParameters;
 
@@ -187,6 +189,9 @@ public class EvoSpexGA {
     Report.initialReport(initialPopulation.get(0).getGenes().length, initialPopulation.size(),
         parameters);
 
+    // Real parameter names for the final report/output, if they can be resolved
+    Map<String, String> argNames = ParameterNameResolver.resolveArgNames(targetClass, parameters.getBaseFolderName());
+
     Genotype population = Genotype.randomInitialGenotype(conf);
     population.getPopulation().setChromosomes(initialPopulation);
 
@@ -216,7 +221,7 @@ public class EvoSpexGA {
       System.out.println();
       Stats.printGlobalCounters();
 
-      Report.finalReport(parameters);
+      Report.finalReport(parameters, argNames);
 
     } else {
       // Normal Evolutionary Search
@@ -254,7 +259,7 @@ public class EvoSpexGA {
         Stats.printGlobalCounters();
       }
 
-      Report.finalReport(parameters);
+      Report.finalReport(parameters, argNames);
     }
   }
 

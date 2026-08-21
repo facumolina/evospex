@@ -3,6 +3,8 @@ package evospex.report;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 import evospex.expression.Expr;
 import evospex.EvoSpexParameters;
@@ -37,8 +39,11 @@ public class Report {
 
   /**
    * Print final report
+   * @param argNames maps EvoSpex's internal "arg0", "arg1", ... labels to the target method's
+   *                 real parameter names, for display purposes only; may be empty if they
+   *                 couldn't be resolved, in which case the internal labels are shown as-is.
    */
-  public static void finalReport(EvoSpexParameters parameters) {
+  public static void finalReport(EvoSpexParameters parameters, Map<String, String> argNames) {
     System.out.println();
     System.out.println("------------- Execution finished -----------");
     long seconds = (Stats.FITNESS_CALCULATION_TIME / 1000);
@@ -50,9 +55,9 @@ public class Report {
     List<Expr> assertions = Stats.FITEST_CHROMOSOME.toExprList();
     System.out.println("\tassert(");
     for (int i = 0; i < assertions.size() - 1; i++) {
-      System.out.println("\t" + assertions.get(i) + " &&");
+      System.out.println("\t" + render(assertions.get(i), argNames) + " &&");
     }
-    System.out.println("\t" + assertions.get(assertions.size() - 1));
+    System.out.println("\t" + render(assertions.get(assertions.size() - 1), argNames));
     System.out.println("\t);");
     System.out.println();
     /*System.out.println("Discovered valid assertions:");
@@ -63,14 +68,26 @@ public class Report {
       }
     }*/
     System.out.println("--------------------------------------------");
-    saveAssertions(parameters.getBaseFolderName(), assertions);
+    saveAssertions(parameters.getBaseFolderName(), assertions, argNames);
+  }
+
+  /**
+   * Renders an expression for display, substituting real parameter names for EvoSpex's internal
+   * "arg0", "arg1", ... labels wherever a mapping is available.
+   */
+  private static String render(Expr expr, Map<String, String> argNames) {
+    String text = expr.toString();
+    for (Map.Entry<String, String> e : argNames.entrySet()) {
+      text = text.replaceAll("\\b" + e.getKey() + "\\b", Matcher.quoteReplacement(e.getValue()));
+    }
+    return text;
   }
 
   /**
    * Save the inferred assertions to an assertions.txt file, one per line, in the output/
    * folder mirroring the states/ folder the states were read from.
    */
-  private static void saveAssertions(String baseFolderName, List<Expr> assertions) {
+  private static void saveAssertions(String baseFolderName, List<Expr> assertions, Map<String, String> argNames) {
     String outputDir = baseFolderName.startsWith("states/")
         ? "output/" + baseFolderName.substring("states/".length())
         : "output/" + baseFolderName;
@@ -79,7 +96,7 @@ public class Report {
       f.getParentFile().mkdirs();
       PrintWriter pw = new PrintWriter(f);
       for (Expr expr : assertions) {
-        pw.println(expr);
+        pw.println(render(expr, argNames));
       }
       pw.close();
       System.out.println("assertions saved: " + f.getPath());
