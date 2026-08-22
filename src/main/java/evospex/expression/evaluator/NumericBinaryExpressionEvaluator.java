@@ -23,10 +23,26 @@ public class NumericBinaryExpressionEvaluator {
   }
 
   private static Number eval(Object o1, String op, Object o2) {
-    assert (o1 instanceof Number);
-    assert (o2 instanceof Number);
-    Number n1 = (Number) o1;
-    Number n2 = (Number) o2;
+    // A heterogeneously-typed Object parameter (e.g. push(Object)) can hold a non-Number value
+    // (a reference type, or null) on some recorded examples. `assert` is a no-op here (Java
+    // assertions are disabled by default at runtime, unlike in the injected subject code, which
+    // always runs with them on), so this was previously falling through to an unchecked cast
+    // below and crashing with ClassCastException instead of being treated as a non-evaluable
+    // candidate for this example (the same graceful-skip mechanism already used for
+    // division-by-zero, see NonEvaluableExpressionException below).
+    if (!(o1 instanceof Number) || !(o2 instanceof Number))
+      throw new NonEvaluableExpressionException("Non-numeric operand");
+    Number n1 = widen((Number) o1);
+    Number n2 = widen((Number) o2);
+    // An expression can combine two independently-sampled examples of a heterogeneously-typed
+    // Object parameter (e.g. push(Object), fed Integer/Long/Float/Double/... across different
+    // recorded calls) - their boxed types don't always match. Rather than crash with a
+    // ClassCastException from blindly casting n2 to n1's type below, defer to the same
+    // "this example doesn't support this candidate expression" mechanism already used for
+    // division-by-zero (NonEvaluableExpressionException, caught by the GA's fitness evaluator).
+    if (n1.getClass() != n2.getClass())
+      throw new NonEvaluableExpressionException("Mismatched numeric types: "
+          + n1.getClass().getSimpleName() + " vs " + n2.getClass().getSimpleName());
     switch (op) {
     case ExprOperator.PLUS:
       return evalPlus(n1, n2);
@@ -134,6 +150,18 @@ public class NumericBinaryExpressionEvaluator {
     if (n instanceof Double && (Double)n==0)
       return true;
     return false;
+  }
+
+  /**
+   * Java always promotes byte/short to int for arithmetic (there's no such thing as "byte
+   * arithmetic" in the language) - the eval*() methods below only handle Integer/Long/Float/
+   * Double, so a Byte/Short observation (e.g. push((Object)(byte)100)) needs the same promotion
+   * here, rather than hitting their "Unsupported numeric type" fallback.
+   */
+  static Number widen(Number n) {
+    if (n instanceof Byte || n instanceof Short)
+      return n.intValue();
+    return n;
   }
 
 }

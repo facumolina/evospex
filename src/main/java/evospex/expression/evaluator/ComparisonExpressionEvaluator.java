@@ -48,37 +48,48 @@ public class ComparisonExpressionEvaluator {
       else
         return !set_o2_not_in.contains(o1);
     case ExprOperator.LT:
-      assert isNumber(o1);
-      assert isNumber(o2);
-      Number n1_lt = (Number) o1;
-      Number n2_lt = (Number) o2;
+      requireBothNumbers(o1, o2);
+      Number n1_lt = NumericBinaryExpressionEvaluator.widen((Number) o1);
+      Number n2_lt = NumericBinaryExpressionEvaluator.widen((Number) o2);
       return evalLT(n1_lt, n2_lt);
     case ExprOperator.GT:
-      assert isNumber(o1);
-      assert isNumber(o2);
-      Number n1_gt = (Number) o1;
-      Number n2_gt = (Number) o2;
+      requireBothNumbers(o1, o2);
+      Number n1_gt = NumericBinaryExpressionEvaluator.widen((Number) o1);
+      Number n2_gt = NumericBinaryExpressionEvaluator.widen((Number) o2);
       return evalGT(n1_gt, n2_gt);
     case ExprOperator.LTE:
-      assert isNumber(o1);
-      assert isNumber(o2);
-      Number n1_lte = (Number) o1;
-      Number n2_lte = (Number) o2;
+      requireBothNumbers(o1, o2);
+      Number n1_lte = NumericBinaryExpressionEvaluator.widen((Number) o1);
+      Number n2_lte = NumericBinaryExpressionEvaluator.widen((Number) o2);
       return evalLTE(n1_lte, n2_lte);
     case ExprOperator.GTE:
-      assert isNumber(o1);
-      assert isNumber(o2);
-      Number n1_gte = (Number) o1;
-      Number n2_gte = (Number) o2;
+      requireBothNumbers(o1, o2);
+      Number n1_gte = NumericBinaryExpressionEvaluator.widen((Number) o1);
+      Number n2_gte = NumericBinaryExpressionEvaluator.widen((Number) o2);
       return evalGTE(n1_gte, n2_gte);
     }
     return false;
   }
 
   /**
+   * Guards against comparing two independently-sampled examples of a heterogeneously-typed
+   * Object parameter (e.g. push(Object), fed Integer/Long/Float/Double/... across different
+   * recorded calls) whose boxed types don't match - defers to the same "this example doesn't
+   * support this candidate expression" mechanism already used for division-by-zero
+   * (NonEvaluableExpressionException, caught by the GA's fitness evaluator), rather than
+   * crashing with a ClassCastException from blindly casting n2 to n1's type below.
+   */
+  private static void requireSameNumericType(Number n1, Number n2) {
+    if (n1.getClass() != n2.getClass())
+      throw new NonEvaluableExpressionException("Mismatched numeric types: "
+          + n1.getClass().getSimpleName() + " vs " + n2.getClass().getSimpleName());
+  }
+
+  /**
    * Evaluate LT operator
    */
   private static boolean evalLT(Number n1, Number n2) {
+    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 < (Integer) n2;
     if (n1 instanceof Long)
@@ -95,6 +106,7 @@ public class ComparisonExpressionEvaluator {
    * Evaluate GT operator
    */
   private static boolean evalGT(Number n1, Number n2) {
+    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 > (Integer) n2;
     if (n1 instanceof Long)
@@ -111,6 +123,7 @@ public class ComparisonExpressionEvaluator {
    * Evaluate LTE operator
    */
   private static boolean evalLTE(Number n1, Number n2) {
+    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 <= (Integer) n2;
     if (n1 instanceof Long)
@@ -127,6 +140,7 @@ public class ComparisonExpressionEvaluator {
    * Evaluate GTE operator
    */
   private static boolean evalGTE(Number n1, Number n2) {
+    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 >= (Integer) n2;
     if (n1 instanceof Long)
@@ -144,5 +158,19 @@ public class ComparisonExpressionEvaluator {
    */
   private static boolean isNumber(Object o) {
     return (o != null && o instanceof Number);
+  }
+
+  /**
+   * A heterogeneously-typed Object parameter (e.g. push(Object)) can hold a non-Number value (a
+   * reference type, or null) on some recorded examples. The former `assert isNumber(...)` checks
+   * here were no-ops at runtime (Java assertions are disabled by default, unlike in the injected
+   * subject code, which always runs with them on), silently falling through to an unchecked
+   * (Number) cast and crashing with ClassCastException. Throw the same
+   * NonEvaluableExpressionException already used for division-by-zero instead, so the GA's
+   * fitness evaluator treats this example as simply not supporting this candidate expression.
+   */
+  private static void requireBothNumbers(Object o1, Object o2) {
+    if (!isNumber(o1) || !isNumber(o2))
+      throw new NonEvaluableExpressionException("Non-numeric operand");
   }
 }
