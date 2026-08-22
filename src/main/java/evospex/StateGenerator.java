@@ -142,14 +142,20 @@ public class StateGenerator {
       } catch (Exception e) {
         System.err.println("error running test " + testMethod.getName() + ": "+e.getMessage());
         errors++;
-        int inputStatesSaved = StateSerializer.inputsThis.size();
-        int outputStatesSaved = StateSerializer.outputsThis.size();
-        if (inputStatesSaved > outputStatesSaved) {
-          // The target method invocation didn't ended well, so the last input state is not valid and needs to be removed
-          StateSerializer.inputsThis.remove(inputStatesSaved - 1);
-          for (List<Object> args : StateSerializer.inputsArgs) {
-            args.remove(args.size() - 1);
-          }
+      }
+      // Any target-method invocation whose exception was caught - either by this generated
+      // test itself (e.g. Randoop's own try/catch around an expected exception) or by
+      // propagating out of testMethod.invoke() above - records an input with no matching
+      // output, since insertCallsToSaveOutputState's instrumentation (inserted directly after
+      // the invocation) is skipped by exceptional control flow. Discard any such orphaned
+      // inputs so in*.xml/out*.xml stay positionally aligned for EvoSpexParameters' tuple
+      // reader. A while loop (rather than a single removal) handles a test method that
+      // internally catches more than one such exception.
+      while (StateSerializer.inputsThis.size() > StateSerializer.outputsThis.size()) {
+        int last = StateSerializer.inputsThis.size() - 1;
+        StateSerializer.inputsThis.remove(last);
+        for (List<Object> args : StateSerializer.inputsArgs) {
+          args.remove(args.size() - 1);
         }
       }
     }

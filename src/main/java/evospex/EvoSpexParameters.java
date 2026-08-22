@@ -501,6 +501,8 @@ public class EvoSpexParameters {
           throw new Error("There are more inputs than outputs");
         break;
       }
+      if (outObjs == null)
+        throw new Error("There are more outputs expected than were recorded (input/output state count mismatch)");
       Object i = inObjs.get(0);
       Object p = outObjs.get(0);
       Object r = null;

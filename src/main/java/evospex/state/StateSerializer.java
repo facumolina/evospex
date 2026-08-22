@@ -75,7 +75,15 @@ public class StateSerializer {
    * @param input the input to serialize
    */
   public static void serializeInput(int position, Object input) {
-    xstream.allowTypes(new Class[] {input.getClass()});
+    // A reference-typed argument (or 'this', though that can never itself be null) can
+    // legitimately be null at the call site (e.g. push(null)) - input.getClass() would NPE
+    // before the call even happens, silently orphaning the *other* positions already recorded
+    // for this same invocation (e.g. position 0/'this') in a way the post-invocation
+    // reconciliation in StateGenerator can't correctly repair, since it assumes all positions
+    // of a call either all succeed or all fail together.
+    if (input != null) {
+      xstream.allowTypes(new Class[] {input.getClass()});
+    }
     Object toPreserve = xstream.fromXML(xstream.toXML(input));
     if (position == 0) {
       inputsThis.add(toPreserve);
