@@ -46,9 +46,16 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.EQUALITY);
       genes.add(new EqualityGene(conf, newValue, targetInfo));
     } else if (Number.class.isAssignableFrom(resultExample.getClass())) {
-      // The result is a numeric type, thus compare it with expressions of the same type
+      // The result is a numeric type, thus compare it with expressions of the same type.
+      // addVariableForType registers Integer/int-typed results into the int-expression pool
+      // (allIntExpressions, read via getIntEvaluableExpressions()) - not into joinedExpressions
+      // (field-chain expressions, read via getEvaluableExpressionsOfType()), which is empty for
+      // a target class with no fields (e.g. a static-method-only utility class). Query the pool
+      // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer handling.
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      List<Expr> exprsOfType = targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
+      List<Expr> exprsOfType = (resultExample instanceof Integer)
+          ? targetInfo.getIntEvaluableExpressions()
+          : targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);

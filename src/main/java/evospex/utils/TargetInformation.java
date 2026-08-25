@@ -227,7 +227,13 @@ public class TargetInformation {
    * Build all the initial expressions recursively
    */
   private void buildInitialExpressionsRec(Expr currExpr, Class<?> vertex, int k) {
-    if (!currExpr.toString().equals(ExprName.THIS)) {
+    // The bare 'this' identity expression is excluded here (only its field-chains are useful
+    // gene candidates) - 'this_pre' needs the same treatment, but the check below only compared
+    // against ExprName.THIS, so the bare 'this_pre' root (considerPreState's very first call)
+    // always slipped through. For a static target method (no receiver) 'this_pre' is null, and
+    // evaluating this now-included bare candidate against it crashed evalAnyExpr's own
+    // null-object check - excluding it here is correct for any target class, not just that case.
+    if (!currExpr.toString().equals(ExprName.THIS) && !currExpr.toString().equals(ExprName.THIS_PRE)) {
       joinedExpressions.add(currExpr);
       if (vertex.equals(Integer.class) || vertex.equals(int.class)) {
         joinedExpressionsOfTypeInt.add(currExpr);

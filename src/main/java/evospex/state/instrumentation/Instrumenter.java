@@ -4,6 +4,7 @@ import soot.*;
 import soot.jimple.*;
 import soot.jimple.internal.JAssignStmt;
 import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JStaticInvokeExpr;
 import soot.jimple.internal.JVirtualInvokeExpr;
 
 /**
@@ -42,9 +43,15 @@ public class Instrumenter {
   public static void insertCallsToSaveInputState(SootMethod method, UnitPatchingChain chain, Stmt stmt) {
     InvokeExpr invokeExpr = getCorrespondingInvokeExpr(stmt);
     SootMethod saveInputStateMethod = Scene.v().getMethod(INPUT_SERIALIZATION_METHOD_SIGNATURE);
-    // Insert the call to serialize the 'this' object
-    JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr) invokeExpr;
-    insertInvocationBefore(chain, saveInputStateMethod, 0, virtualInvokeExpr.getBase(), stmt);
+    // Insert the call to serialize the 'this' object - a static target method has no receiver
+    // to serialize, so record a null placeholder for it instead of crashing on the
+    // JVirtualInvokeExpr cast below. This keeps the position numbering (0='this', 1..N=args,
+    // N+1=result) and the resulting in*.xml/out*.xml file counts identical either way -
+    // StateSerializer.serializeInput/EvoSpexParameters/spec-inference-evospex.sh all already
+    // tolerate/expect exactly one entry per invocation regardless of its value.
+    Value receiver = (invokeExpr instanceof JStaticInvokeExpr)
+        ? NullConstant.v() : ((JVirtualInvokeExpr) invokeExpr).getBase();
+    insertInvocationBefore(chain, saveInputStateMethod, 0, receiver, stmt);
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
@@ -66,9 +73,11 @@ public class Instrumenter {
   public static void insertCallsToSaveOutputState(SootMethod method, UnitPatchingChain chain, Stmt stmt) {
     InvokeExpr invokeExpr = getCorrespondingInvokeExpr(stmt);
     SootMethod saveOutputStateMethod = Scene.v().getMethod(OUTPUT_SERIALIZATION_METHOD_SIGNATURE);
-    // Insert the call to serialize the 'this' object
-    JVirtualInvokeExpr virtualInvokeExpr = (JVirtualInvokeExpr) invokeExpr;
-    insertInvocationAfter(chain, saveOutputStateMethod, 0, virtualInvokeExpr.getBase(), stmt);
+    // Insert the call to serialize the 'this' object - see the matching comment in
+    // insertCallsToSaveInputState above (a static target method has no receiver).
+    Value receiver = (invokeExpr instanceof JStaticInvokeExpr)
+        ? NullConstant.v() : ((JVirtualInvokeExpr) invokeExpr).getBase();
+    insertInvocationAfter(chain, saveOutputStateMethod, 0, receiver, stmt);
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);

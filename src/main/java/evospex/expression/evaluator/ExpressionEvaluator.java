@@ -47,7 +47,12 @@ public class ExpressionEvaluator {
    * Evaluate the given expression using the provided set of vars
    */
   public static boolean eval(ExprContext expr, Map<String, Object> variables) {
-    checkEvalArgs(expr, variables.get(ExprName.THIS));
+    // Unlike evalAnyExpr below (which evaluates a specific, known-non-null object), this entry
+    // point evaluates an arbitrary candidate expression that may not reference 'this' at all -
+    // e.g. for a static target method (no receiver), variables.get(ExprName.THIS) is always
+    // null, but plenty of candidate expressions (over args/result) never touch it.
+    if (expr == null)
+      throw new IllegalArgumentException("The expression cannot be null.");
     vars = variables;
     return (Boolean) eval(expr);
   }

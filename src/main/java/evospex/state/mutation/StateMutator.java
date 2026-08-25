@@ -38,6 +38,7 @@ public class StateMutator {
    * @param thisState is the 'this' state to check
    */
   public static boolean hasEvaluableFields(SootMethod method, Object thisState) {
+    if (thisState == null) return false;  // static target method - no receiver to have fields on
     if (!thisState.getClass().getName().equals(method.getDeclaringClass().getName())) return false;
     if (targetInformation == null) setup(thisState.getClass());
     return !getEvaluableExpressions(thisState).isEmpty();
