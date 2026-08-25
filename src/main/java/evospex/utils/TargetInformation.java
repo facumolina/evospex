@@ -260,9 +260,19 @@ public class TargetInformation {
         String adjacentExprStr = edge.getLabel();
 
         if (Collection.class.isAssignableFrom(targetVertex)) {
-          // Collection-typed fields (e.g. List<Composite> children) aren't yet supported as
-          // graph-traversal targets (see createCollections() below, also unimplemented) - skip
-          // this edge rather than crashing, so the target class's other fields remain usable.
+          // Collection-typed fields aren't graph-traversal targets (their own fields can't be
+          // reached this way, and createCollections() below is unimplemented), but the field
+          // itself is a legitimate "set of <element type>" - register it via the same
+          // setsByType mechanism already used for closured/reachability sets, so
+          // FromArgumentsGeneBuilder's createGenesFromArgumentAndSets can propose membership
+          // genes (e.g. "r in this._var49") for it. Map fields are a separate, still-
+          // unimplemented gap (see FromMapsGeneBuilder).
+          Class<?> elemType = resolveCollectionElementType(vertex, adjacentExprStr);
+          if (elemType != null) {
+            Expr setExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
+            setExpr.setClassOfElemsInSet(elemType);
+            createSets(setExpr, elemType);
+          }
           continue;
         }
 
@@ -299,6 +309,30 @@ public class TargetInformation {
   }
 
   /**
+   * Recovers a Collection field's element type via its generic signature (TypeGraph erases
+   * generics when building the type graph, e.g. ArrayList<R> becomes a raw ArrayList.class
+   * vertex, so the element type has to be recovered separately here). Walks up the class
+   * hierarchy in case the field is inherited. Returns null (leaving the field unregistered as
+   * a set, same as before this method existed) for a raw/non-parameterized Collection type.
+   */
+  private static Class<?> resolveCollectionElementType(Class<?> declaringClass, String fieldName) {
+    for (Class<?> c = declaringClass; c != null && c != Object.class; c = c.getSuperclass()) {
+      try {
+        java.lang.reflect.Type genericType = c.getDeclaredField(fieldName).getGenericType();
+        if (genericType instanceof java.lang.reflect.ParameterizedType) {
+          java.lang.reflect.Type[] args = ((java.lang.reflect.ParameterizedType) genericType).getActualTypeArguments();
+          if (args.length == 1 && args[0] instanceof Class)
+            return (Class<?>) args[0];
+        }
+        return null;
+      } catch (NoSuchFieldException ignored) {
+        // keep walking up the hierarchy
+      }
+    }
+    return null;
+  }
+
+  /**
    * Create sets a given closured expression
    */
   private void createSets(Expr closured, Class<?> elemsType) {
@@ -307,7 +341,10 @@ public class TargetInformation {
       setsByType.put(elemsType, new LinkedList<>());
     setsByType.get(elemsType).add(closured);
     // If the class is not a primitive type, create the sets which closured expression is the base
-    if (!elemsType.isPrimitive()) {
+    // (elemsType may not be a graph vertex at all - e.g. a Collection field's element type,
+    // recovered via reflection rather than graph traversal - in which case there's nothing
+    // further to expand, just the registration above).
+    if (!elemsType.isPrimitive() && typeGraph.containsVertex(elemsType)) {
       Set<TypeGraphEdge> outgoingEdges = typeGraph.getOutgoingEdges(elemsType);
       for (TypeGraphEdge edge : outgoingEdges) {
         Class<?> v = typeGraph.getTargetVertex(edge);

@@ -92,6 +92,18 @@ public class TypeGraph {
   }
 
   /**
+   * Returns true iff the given class is a vertex in this type graph. A class reachable only
+   * through a Collection-typed field's erased generic parameter (e.g. the R in
+   * List&lt;R&gt;) is never added as a vertex, since buildGraph never explores into a
+   * Collection field's own (JDK-internal) fields - callers that recover such a type via
+   * reflection separately (see TargetInformation.resolveCollectionElementType) should check
+   * this before calling getOutgoingEdges, which throws for an absent vertex.
+   */
+  public boolean containsVertex(Class<?> vertexClass) {
+    return graph.containsVertex(vertexClass);
+  }
+
+  /**
    * Get the target vertex of the given edge
    */
   public Class<?> getTargetVertex(TypeGraphEdge edge) {
