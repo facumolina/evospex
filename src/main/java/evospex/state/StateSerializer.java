@@ -222,7 +222,16 @@ public class StateSerializer {
    */
   public static String formatFolderName(String targetMethodSignature) {
     String formattedFolderName = targetMethodSignature.replace("<", "").replace(">", "").replace(":", "").replace(" ", "_");
-    formattedFolderName = formattedFolderName.replace(targetClassName,"");
+    // Strip only the leading class-name prefix (redundant with the "<targetClassName>/" path
+    // segment added below) - a blanket replace(targetClassName, "") would also strip it from
+    // anywhere else it happens to appear, e.g. a self-referential parameter type
+    // (addChild(Composite c) -> "..._addChild(eiffel.Composite)"), silently discarding that
+    // parameter's type and collapsing the signature to "..._addChild()". That empty parameter
+    // list then makes ParameterNameResolver.parseFolderSegment/resolveArgNames unable to match
+    // the method at all, leaving EvoSpex's internal "arg0" label unresolved in the output.
+    if (formattedFolderName.startsWith(targetClassName)) {
+      formattedFolderName = formattedFolderName.substring(targetClassName.length());
+    }
     return BASE_OUTPUT_FOLDER + "/" + targetClassName + "/" + formattedFolderName;
   }
 
