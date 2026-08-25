@@ -259,12 +259,16 @@ public class TargetInformation {
         Class<?> targetVertex = typeGraph.getTargetVertex(edge);
         String adjacentExprStr = edge.getLabel();
 
+        if (Collection.class.isAssignableFrom(targetVertex)) {
+          // Collection-typed fields (e.g. List<Composite> children) aren't yet supported as
+          // graph-traversal targets (see createCollections() below, also unimplemented) - skip
+          // this edge rather than crashing, so the target class's other fields remain usable.
+          continue;
+        }
+
         if (!joineableExpressionsByType.containsKey(vertex))
           joineableExpressionsByType.put(vertex, new HashSet<>());
         joineableExpressionsByType.get(vertex).add(ExprBuilder.toExpr(adjacentExprStr, targetVertex));
-
-        if (Collection.class.isAssignableFrom(targetVertex))
-          throw new UnsupportedOperationException("Handle collections properly");
 
         Expr newExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
         buildInitialExpressionsRec(newExpr, targetVertex, k - 1);
