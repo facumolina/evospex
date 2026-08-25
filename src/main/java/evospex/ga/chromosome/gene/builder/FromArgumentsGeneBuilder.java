@@ -63,6 +63,12 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
           ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
           genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
         }
+      } else if (argValue instanceof Double) {
+        // Same as the Integer case above, but comparing against the double-expression pool.
+        for (Expr expr : targetInfo.getDoubleEvaluableExpressions()) {
+          ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
+          genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
+        }
       } else {
         // The value is a reference
         List<Expr> evaluable = targetInfo.getEvaluableExpressionsOfType(argValue.getClass());

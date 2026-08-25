@@ -51,10 +51,11 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // (allIntExpressions, read via getIntEvaluableExpressions()) - not into joinedExpressions
       // (field-chain expressions, read via getEvaluableExpressionsOfType()), which is empty for
       // a target class with no fields (e.g. a static-method-only utility class). Query the pool
-      // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer handling.
+      // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer/Double
+      // handling (Double-typed results land in allDoubleExpressions the same way).
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
-      List<Expr> exprsOfType = (resultExample instanceof Integer)
-          ? targetInfo.getIntEvaluableExpressions()
+      List<Expr> exprsOfType = (resultExample instanceof Integer) ? targetInfo.getIntEvaluableExpressions()
+          : (resultExample instanceof Double) ? targetInfo.getDoubleEvaluableExpressions()
           : targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);

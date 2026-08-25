@@ -33,6 +33,8 @@ public class TargetInformation {
   private List<Expr> joinedExpressions; // Contains expressions of the form e.f
   private List<Expr> joinedExpressionsOfTypeInt;// Contains int/Integer expressions build from target
   private List<Expr> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
+  private List<Expr> joinedExpressionsOfTypeDouble;// Contains double/Double expressions build from target
+  private List<Expr> allDoubleExpressions; // Contains all double/Double expressions (target and vars and results)
   private List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
   private Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
@@ -66,6 +68,7 @@ public class TargetInformation {
     relationsForEvaluation.put(ExprName.THIS, ExprBuilder.toExpr(ExprName.THIS, targetClass));
     relationsForEvaluation.put(ExprName.THIS_PRE, ExprBuilder.toExpr(ExprName.THIS_PRE, targetClass));
     allIntExpressions = new LinkedList<>();
+    allDoubleExpressions = new LinkedList<>();
     scope = 3;
 
     buildBaseExpressions(cut, new HashSet<>());
@@ -99,6 +102,7 @@ public class TargetInformation {
   private void buildInitialExpressions(boolean considerPreState) {
     joinedExpressions = new LinkedList<>();
     joinedExpressionsOfTypeInt = new LinkedList<>();
+    joinedExpressionsOfTypeDouble = new LinkedList<>();
     simpleClosuredExpressions = new LinkedList<>();
     doubleClosuredExpressions = new LinkedList<>();
     joineableExpressionsByType = new HashMap<>();
@@ -114,13 +118,18 @@ public class TargetInformation {
   }
 
   /**
-   * Log the int expressions collected so far. Method arguments and the result are only added to
-   * allIntExpressions once genes have been built from an example (see addVariableForType), so
-   * this should be called after that has happened to report an accurate count.
+   * Log the int/double expressions collected so far. Method arguments and the result are only
+   * added to allIntExpressions/allDoubleExpressions once genes have been built from an example
+   * (see addVariableForType), so this should be called after that has happened to report an
+   * accurate count.
    */
   public void logCollectedIntExpressions() {
     System.out.println("--> int expressions collected (used to build genes): " + allIntExpressions.size());
     for (Expr expr : allIntExpressions) {
+      System.out.println("  " + expr);
+    }
+    System.out.println("--> double expressions collected (used to build genes): " + allDoubleExpressions.size());
+    for (Expr expr : allDoubleExpressions) {
       System.out.println("  " + expr);
     }
   }
@@ -238,6 +247,9 @@ public class TargetInformation {
       if (vertex.equals(Integer.class) || vertex.equals(int.class)) {
         joinedExpressionsOfTypeInt.add(currExpr);
         allIntExpressions.add(currExpr);
+      } else if (vertex.equals(Double.class) || vertex.equals(double.class)) {
+        joinedExpressionsOfTypeDouble.add(currExpr);
+        allDoubleExpressions.add(currExpr);
       }
     }
     if (k > 0) {
@@ -318,6 +330,13 @@ public class TargetInformation {
   }
 
   /**
+   * Get double evaluable expressions
+   */
+  public List<Expr> getDoubleEvaluableExpressions() {
+    return allDoubleExpressions;
+  }
+
+  /**
    * Get the evaluable expressions of the given type
    */
   public List<Expr> getEvaluableExpressionsOfType(Class<?> type) {
@@ -375,6 +394,11 @@ public class TargetInformation {
    * Get all the joined expressions of type int
    */
   public List<Expr> getJoinedExpressionsOfTypeInt() { return joinedExpressionsOfTypeInt; }
+
+  /**
+   * Get all the joined expressions of type double
+   */
+  public List<Expr> getJoinedExpressionsOfTypeDouble() { return joinedExpressionsOfTypeDouble; }
 
   /**
    * Get all the simple closured expressions
@@ -536,6 +560,17 @@ public class TargetInformation {
   }
 
   /**
+   * Returns some possible expression of type double
+   */
+  public Expr getRandomDoubleExpr() {
+    Random random = new Random();
+    if (allDoubleExpressions.isEmpty())
+      return ExprBuilder.ZERO;
+    int randomNumber = random.nextInt(allDoubleExpressions.size());
+    return (Expr) allDoubleExpressions.toArray()[randomNumber];
+  }
+
+  /**
    * Returns a non-null return type for the given type.
    */
   public Class<?> getReturnType(ExprContext expr) {
@@ -567,6 +602,8 @@ public class TargetInformation {
     if (methodVarsByType.get(type).add(varName)) {
       if (type.equals(Integer.class) || type.equals(int.class)) {
         allIntExpressions.add(ExprBuilder.toExpr(varName, type));
+      } else if (type.equals(Double.class) || type.equals(double.class)) {
+        allDoubleExpressions.add(ExprBuilder.toExpr(varName, type));
       }
     }
   }
