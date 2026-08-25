@@ -54,13 +54,17 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer/Double
       // handling (Double-typed results land in allDoubleExpressions the same way).
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
+      // operandType is passed through to NumericComparisonGene so its ADD_EXPR/SUB_EXPR/etc.
+      // mutations later draw from the matching pool (see NumericComparisonGene.operandType).
+      Class<?> operandType = (resultExample instanceof Integer) ? Integer.class
+          : (resultExample instanceof Double) ? Double.class : resultExample.getClass();
       List<Expr> exprsOfType = (resultExample instanceof Integer) ? targetInfo.getIntEvaluableExpressions()
           : (resultExample instanceof Double) ? targetInfo.getDoubleEvaluableExpressions()
           : targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);
         ExprGeneValue newValue = new ExprGeneValue(geneExpr, ExprGeneType.NUMERIC_COMPARISON);
-        genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
+        genes.add(new NumericComparisonGene(conf, newValue, targetInfo, operandType));
       }
       if (targetInfo.hasSets()) {
         List<Expr> sets = targetInfo.getSets();

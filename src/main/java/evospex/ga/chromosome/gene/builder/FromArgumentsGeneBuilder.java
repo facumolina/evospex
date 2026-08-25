@@ -65,9 +65,11 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
         }
       } else if (argValue instanceof Double) {
         // Same as the Integer case above, but comparing against the double-expression pool.
+        // Double.class is passed through so ADD_EXPR/SUB_EXPR/etc. mutations later draw from
+        // the double pool too (see NumericComparisonGene.operandType).
         for (Expr expr : targetInfo.getDoubleEvaluableExpressions()) {
           ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
-          genes.add(new NumericComparisonGene(conf, newValue, targetInfo));
+          genes.add(new NumericComparisonGene(conf, newValue, targetInfo, Double.class));
         }
       } else {
         // The value is a reference

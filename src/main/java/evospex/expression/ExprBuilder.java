@@ -27,6 +27,10 @@ public class ExprBuilder {
   public static final Expr NULL = toExpr(ExprName.NULL, Object.class);
   public static final Expr ZERO = toExpr(ExprName.ZERO, Number.class);
   public static final Expr ONE = toExpr(ExprName.ONE, Number.class);
+  // A double-typed literal 1, for ADD_ONE/SUB_ONE mutations on double-typed
+  // NumericComparisonGenes - ONE above parses as an Integer at evaluation time, which would
+  // trip NumericBinaryExpressionEvaluator's mismatched-numeric-type guard against a double operand.
+  public static final Expr ONE_DOUBLE = toExpr("1.0", Double.class);
   private static Expr RESULT;
 
   /**
