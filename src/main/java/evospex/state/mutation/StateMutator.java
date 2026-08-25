@@ -53,15 +53,24 @@ public class StateMutator {
   public static Object mutateState(SootMethod method, List<Object> states, int position) {
     boolean fieldMutationAllowed = false;
     Object toMutate = states.get(position);
-    xstream.allowTypes(new Class[] {toMutate.getClass()});
 
-    // If the object to mutate is an instance of the target class, then the field mutation is
-    // allowed - but only if the target class actually has evaluable field expressions to
-    // mutate (e.g. a stateless/fieldless class has none, and performFieldMutation would fail
-    // trying to pick a random one).
-    if (toMutate.getClass().getName().equals(method.getDeclaringClass().getName())) {
-      if (targetInformation == null) setup(toMutate.getClass());
-      fieldMutationAllowed = !getEvaluableExpressions(toMutate).isEmpty();
+    // The value to mutate can be null - e.g. a method whose result type is a reference type
+    // and can return null (top()/topAndPop() do, on an empty stack, or when null was itself
+    // pushed earlier). Field mutation is never possible on null, so skip type
+    // registration/field-mutation eligibility entirely and fall through to the swap-or-
+    // return-unchanged handling below, the same as for a fieldless class - rather than
+    // crashing on toMutate.getClass().
+    if (toMutate != null) {
+      xstream.allowTypes(new Class[] {toMutate.getClass()});
+
+      // If the object to mutate is an instance of the target class, then the field mutation is
+      // allowed - but only if the target class actually has evaluable field expressions to
+      // mutate (e.g. a stateless/fieldless class has none, and performFieldMutation would fail
+      // trying to pick a random one).
+      if (toMutate.getClass().getName().equals(method.getDeclaringClass().getName())) {
+        if (targetInformation == null) setup(toMutate.getClass());
+        fieldMutationAllowed = !getEvaluableExpressions(toMutate).isEmpty();
+      }
     }
     boolean swapPossible = states.size() > 1;
     if (fieldMutationAllowed) {
