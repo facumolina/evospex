@@ -4,6 +4,7 @@ import java.util.*;
 
 import evospex.expression.Expr;
 import evospex.expression.ExprBuilder;
+import evospex.expression.ExprGrammarConstantSymbols;
 import evospex.expression.ExprGrammarParser.ExprContext;
 import evospex.expression.symbol.ExprName;
 import evospex.expression.symbol.ExprOperator;
@@ -265,13 +266,33 @@ public class TargetInformation {
           // itself is a legitimate "set of <element type>" - register it via the same
           // setsByType mechanism already used for closured/reachability sets, so
           // FromArgumentsGeneBuilder's createGenesFromArgumentAndSets can propose membership
-          // genes (e.g. "r in this._var49") for it. Map fields are a separate, still-
-          // unimplemented gap (see FromMapsGeneBuilder).
+          // genes (e.g. "r in this._var49") for it.
           Class<?> elemType = resolveCollectionElementType(vertex, adjacentExprStr);
           if (elemType != null) {
             Expr setExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
             setExpr.setClassOfElemsInSet(elemType);
             createSets(setExpr, elemType);
+          }
+          continue;
+        }
+
+        if (Map.class.isAssignableFrom(targetVertex)) {
+          // A Map field isn't a graph-traversal target either (same reasoning as Collection
+          // above - nothing downstream can use a bare Map value directly), but its key set and
+          // value collection are each a legitimate "set of <type>" - register both via the same
+          // setsByType mechanism, so membership genes like "x in this._var721.keySet" become
+          // available. NameExpressionEvaluator already special-cases the bare "keySet"/"values"
+          // identifiers to mean the corresponding Map accessor method when evaluating an
+          // expression whose base is a Map.
+          Class<?>[] keyValueTypes = resolveMapTypeArguments(vertex, adjacentExprStr);
+          if (keyValueTypes != null) {
+            Expr mapExpr = ExprBuilder.join(currExpr, ExprBuilder.toExpr(adjacentExprStr, targetVertex));
+            Expr keySetExpr = ExprBuilder.join(mapExpr, ExprBuilder.toExpr(ExprGrammarConstantSymbols.MAP_KEY_SET, keyValueTypes[0]));
+            keySetExpr.setClassOfElemsInSet(keyValueTypes[0]);
+            createSets(keySetExpr, keyValueTypes[0]);
+            Expr valuesExpr = ExprBuilder.join(mapExpr, ExprBuilder.toExpr(ExprGrammarConstantSymbols.MAP_VALUES, keyValueTypes[1]));
+            valuesExpr.setClassOfElemsInSet(keyValueTypes[1]);
+            createSets(valuesExpr, keyValueTypes[1]);
           }
           continue;
         }
@@ -323,6 +344,30 @@ public class TargetInformation {
           java.lang.reflect.Type[] args = ((java.lang.reflect.ParameterizedType) genericType).getActualTypeArguments();
           if (args.length == 1 && args[0] instanceof Class)
             return (Class<?>) args[0];
+        }
+        return null;
+      } catch (NoSuchFieldException ignored) {
+        // keep walking up the hierarchy
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Recovers a Map field's key/value types via its generic signature, the same way
+   * resolveCollectionElementType does for a single-type-arg Collection (a Map's
+   * ParameterizedType carries two type arguments instead of one). Returns null (leaving the
+   * field unregistered, same as an unresolvable Collection) for a raw/non-parameterized Map
+   * type.
+   */
+  private static Class<?>[] resolveMapTypeArguments(Class<?> declaringClass, String fieldName) {
+    for (Class<?> c = declaringClass; c != null && c != Object.class; c = c.getSuperclass()) {
+      try {
+        java.lang.reflect.Type genericType = c.getDeclaredField(fieldName).getGenericType();
+        if (genericType instanceof java.lang.reflect.ParameterizedType) {
+          java.lang.reflect.Type[] args = ((java.lang.reflect.ParameterizedType) genericType).getActualTypeArguments();
+          if (args.length == 2 && args[0] instanceof Class && args[1] instanceof Class)
+            return new Class<?>[] { (Class<?>) args[0], (Class<?>) args[1] };
         }
         return null;
       } catch (NoSuchFieldException ignored) {

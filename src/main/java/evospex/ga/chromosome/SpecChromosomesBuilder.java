@@ -55,7 +55,6 @@ public class SpecChromosomesBuilder {
 
     geneBuilders.add(new FromResultObjectGeneBuilder(conf, targetInfo, parameters));
     geneBuilders.add(new FromArgumentsGeneBuilder(conf, targetInfo, parameters));
-    geneBuilders.add(new FromMapsGeneBuilder(conf, targetInfo, parameters));
   }
 
   /**

@@ -49,6 +49,11 @@ public class InclusionGene extends ExprGene {
       return this;
     } else if (ExprGeneMutations.REPLACE_INCLUDED.equals(mutationToApply)) {
       Set<String> sameTypeVars = targetInfo.getVariablesOfType(expr.classOfElemsInSet());
+      // No method-level variable of this element type exists (e.g. a Map's value-set element
+      // type with no same-typed method argument/local) - same "nothing to replace with" case
+      // the REPLACE_SET branch below already guards for; leave the gene unchanged.
+      if (sameTypeVars == null || sameTypeVars.isEmpty())
+        return this;
       Random random = new Random();
       int randomNumber = random.nextInt(sameTypeVars.size());
       String newVarName = (String) sameTypeVars.toArray()[randomNumber];
