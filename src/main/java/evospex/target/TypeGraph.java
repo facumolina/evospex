@@ -54,8 +54,13 @@ public class TypeGraph {
           }
         }
         for (Class<?> cls : to_visit) {
-          // Visit fields only for non-primitive types for now
-          if (!cls.isPrimitive() && !JavaClassesUtils.isNumber(cls))
+          // Visit fields only for non-primitive types for now, and never for a JDK primitive
+          // wrapper (Integer/Boolean/etc.): its own field (e.g. Boolean.value) is a private
+          // internal implementation detail, not a real structural field of the target class -
+          // reflecting into it creates a self-loop edge (a wrapper field always formats back to
+          // the same wrapper class, see formatClass) and spurious multi-hop expression
+          // candidates like `this.someBooleanField.value` with no Java-level accessor.
+          if (!cls.isPrimitive() && !JavaClassesUtils.isPrimitiveWrapper(cls))
             buildGraph(cls, visited);
         }
       }

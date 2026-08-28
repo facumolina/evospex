@@ -54,4 +54,26 @@ public class JavaClassesUtils {
     return Number.class.isAssignableFrom(cl);
   }
 
+  // Every JDK primitive wrapper: each holds its value in a single private field (e.g.
+  // java.lang.Boolean.value) and has no other structure worth reflecting into - see
+  // isPrimitiveWrapper.
+  private static final Set<Class<?>> PRIMITIVE_WRAPPERS = Set.of(
+      Boolean.class, Character.class, Byte.class, Short.class,
+      Integer.class, Long.class, Float.class, Double.class);
+
+  /**
+   * Check if the given class is a JDK primitive wrapper (Boolean, Character, Byte, Short,
+   * Integer, Long, Float or Double). Used to stop TypeGraph from reflecting into a wrapper's own
+   * private internal field (e.g. Boolean.value) as if it were a meaningful structural field of
+   * the target class - doing so produces a self-loop in the type graph and spurious expression
+   * candidates like `this.someBooleanField.value` that reference a field with no Java-level
+   * accessor.
+   * @param cl is the given class
+   * @return true iff cl is a primitive wrapper class
+   */
+  public static boolean isPrimitiveWrapper(Class<?> cl) {
+    if (cl == null) throw new IllegalArgumentException();
+    return PRIMITIVE_WRAPPERS.contains(cl);
+  }
+
 }
