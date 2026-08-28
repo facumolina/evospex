@@ -36,6 +36,39 @@ public class Instrumenter {
   }
 
   /**
+   * The type an argument's value should be boxed as: the callee's declared parameter type when that
+   * is safe, otherwise the argument expression's own type.
+   *
+   * Jimple has no boolean (or byte/char/short) constant - a literal `true` at a call site is an
+   * IntConstant whose getType() is int - so boxing by the call-site type alone stores a boolean
+   * argument as an Integer. Everything downstream then treats it as a number: EvoSpexParameters
+   * deserializes it as Integer, FromArgumentsGeneBuilder takes its `instanceof Integer` branch and
+   * registers the argument into TargetInformation's int-expression pool, and the GA happily builds
+   * int arithmetic over it (e.g. `x > result-1` for compare(boolean,boolean)) - specs that evaluate
+   * fine over the recorded states but are not valid Java once injected into the subject.
+   *
+   * The substitution is limited to the int family (boolean/byte/char/short/int), where both types
+   * share one bytecode representation and no conversion is needed - Boolean.valueOf applied to an
+   * IntConstant is exactly what javac emits for Boolean.valueOf(true). A genuine widening (an int
+   * value passed to a long/float/double parameter) would need an explicit i2l/i2f/i2d, so those
+   * keep the argument's own type. Note the return-value path below never had this problem: it
+   * already reads the type off the callee, via getReturnType().
+   */
+  private static Type boxingTypeFor(Type declaredType, Type argType) {
+    if (isIntFamily(declaredType) && isIntFamily(argType))
+      return declaredType;
+    return argType;
+  }
+
+  /**
+   * Whether the given type is one of the primitives the JVM represents as an int.
+   */
+  private static boolean isIntFamily(Type type) {
+    return type instanceof BooleanType || type instanceof ByteType || type instanceof CharType
+        || type instanceof ShortType || type instanceof IntType;
+  }
+
+  /**
    * Insert calls to serialize the target method inputs: the 'this' object, and the method arguments
    * @param chain the unit chain in which the call will be inserted
    * @param stmt the new call will be inserted before this statement
@@ -55,7 +88,7 @@ public class Instrumenter {
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      Type argType = arg.getType();
+      Type argType = boxingTypeFor(invokeExpr.getMethod().getParameterType(i), arg.getType());
       if (argType instanceof PrimType) {
         AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, argType, arg, stmt, false);
         insertInvocationBefore(chain, saveInputStateMethod, i + 1, valueOfAssign.getLeftOp(), stmt);
@@ -81,7 +114,7 @@ public class Instrumenter {
     // Insert the call to serialize the method arguments
     for (int i = 0; i < invokeExpr.getArgCount(); i++) {
       Value arg = invokeExpr.getArg(i);
-      Type argType = arg.getType();
+      Type argType = boxingTypeFor(invokeExpr.getMethod().getParameterType(i), arg.getType());
       if (argType instanceof PrimType) {
         AssignStmt valueOfAssign = insertInvocationToWrapPrimitiveValue(method, chain, argType, arg, stmt, true);
         insertInvocationAfter(chain, saveOutputStateMethod, i + 1, valueOfAssign.getLeftOp(), valueOfAssign);
