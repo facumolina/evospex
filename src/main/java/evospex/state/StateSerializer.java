@@ -35,8 +35,21 @@ public class StateSerializer {
   // Some auxiliary variables
   private static int arguments = 0;
 
-  // Actual serializer
+  // Actual serializer. XStream 1.4.x denies all types by default, so the permission has to be
+  // granted up front and for every type: state is deep-copied with fromXML(toXML(o)), and the
+  // *reading* side resolves a collection element's class by name (erasure leaves no declared
+  // type to fall back on), which goes through XStream's SecurityMapper. Registering only the
+  // copied object's own class - as this did - is not enough: a class reachable solely as a
+  // collection element, e.g. cozy.MinFinder's ArrayList<MinFinder$T>, is rejected with
+  // ForbiddenClassException, which surfaces as the enclosing test simply "erroring" and its
+  // states being dropped. Same policy as EvoSpexParameters, ObjectsLoader and
+  // XStreamDeserializer, which all already allow ".*" - these objects come from the subject
+  // under test and are round-tripped in-process, never read from an untrusted source.
   private static final XStream xstream = new XStream();
+
+  static {
+    xstream.allowTypesByRegExp(new String[] { ".*" });
+  }
 
   // Serialization
   private static final String BASE_OUTPUT_FOLDER = "states";
@@ -76,14 +89,9 @@ public class StateSerializer {
    */
   public static void serializeInput(int position, Object input) {
     // A reference-typed argument (or 'this', though that can never itself be null) can
-    // legitimately be null at the call site (e.g. push(null)) - input.getClass() would NPE
-    // before the call even happens, silently orphaning the *other* positions already recorded
-    // for this same invocation (e.g. position 0/'this') in a way the post-invocation
-    // reconciliation in StateGenerator can't correctly repair, since it assumes all positions
-    // of a call either all succeed or all fail together.
-    if (input != null) {
-      xstream.allowTypes(new Class[] {input.getClass()});
-    }
+    // legitimately be null at the call site (e.g. push(null)); the ".*" permission granted on
+    // the xstream instance above covers every type reachable from the object graph, so there
+    // is nothing to register per call and nothing to guard against here.
     Object toPreserve = xstream.fromXML(xstream.toXML(input));
     if (position == 0) {
       inputsThis.add(toPreserve);

@@ -140,7 +140,11 @@ public class StateGenerator {
         Object result = testMethod.invoke(testObject);
         testsExecuted++;
       } catch (Exception e) {
-        System.err.println("error running test " + testMethod.getName() + ": "+e.getMessage());
+        // Report the cause, not the exception itself: Method.invoke wraps whatever the test threw
+        // in an InvocationTargetException whose getMessage() is always null, which reports every
+        // distinct failure as an uninformative "error running test X: null".
+        Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+        System.err.println("error running test " + testMethod.getName() + ": " + cause);
         errors++;
       }
       // Any target-method invocation whose exception was caught - either by this generated

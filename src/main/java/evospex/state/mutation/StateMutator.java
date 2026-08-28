@@ -21,7 +21,14 @@ public class StateMutator {
 
   private static TargetInformation targetInformation;
 
+  // Allow every type up front: XStream 1.4.x denies by default, and registering only the copied
+  // object's own class misses any class reachable solely as a collection element (whose class is
+  // resolved by name through SecurityMapper). See the matching note in StateSerializer.
   private static XStream xstream = new XStream();
+
+  static {
+    xstream.allowTypesByRegExp(new String[] { ".*" });
+  }
 
   /**
    * Setup the mutator from the target class.
@@ -57,13 +64,10 @@ public class StateMutator {
 
     // The value to mutate can be null - e.g. a method whose result type is a reference type
     // and can return null (top()/topAndPop() do, on an empty stack, or when null was itself
-    // pushed earlier). Field mutation is never possible on null, so skip type
-    // registration/field-mutation eligibility entirely and fall through to the swap-or-
-    // return-unchanged handling below, the same as for a fieldless class - rather than
-    // crashing on toMutate.getClass().
+    // pushed earlier). Field mutation is never possible on null, so skip the field-mutation
+    // eligibility check entirely and fall through to the swap-or-return-unchanged handling
+    // below, the same as for a fieldless class - rather than crashing on toMutate.getClass().
     if (toMutate != null) {
-      xstream.allowTypes(new Class[] {toMutate.getClass()});
-
       // If the object to mutate is an instance of the target class, then the field mutation is
       // allowed - but only if the target class actually has evaluable field expressions to
       // mutate (e.g. a stateless/fieldless class has none, and performFieldMutation would fail
