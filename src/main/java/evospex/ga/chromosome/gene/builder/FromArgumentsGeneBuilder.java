@@ -71,6 +71,14 @@ public class FromArgumentsGeneBuilder extends GeneBuilder {
           ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
           genes.add(new NumericComparisonGene(conf, newValue, targetInfo, Double.class));
         }
+      } else if (argValue instanceof Long) {
+        // Same as the Integer/Double cases above, but comparing against the long-expression
+        // pool. Long.class is passed through so ADD_EXPR/SUB_EXPR/etc. mutations later draw
+        // from the long pool too (see NumericComparisonGene.operandType).
+        for (Expr expr : targetInfo.getLongEvaluableExpressions()) {
+          ExprGeneValue newValue = new ExprGeneValue(ExprBuilder.eq(argExpr, expr), ExprGeneType.NUMERIC_COMPARISON);
+          genes.add(new NumericComparisonGene(conf, newValue, targetInfo, Long.class));
+        }
       } else {
         // The value is a reference
         List<Expr> evaluable = targetInfo.getEvaluableExpressionsOfType(argValue.getClass());

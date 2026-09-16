@@ -36,6 +36,8 @@ public class TargetInformation {
   private List<Expr> allIntExpressions; // Contains all int/Integer expressions (target and vars and results)
   private List<Expr> joinedExpressionsOfTypeDouble;// Contains double/Double expressions build from target
   private List<Expr> allDoubleExpressions; // Contains all double/Double expressions (target and vars and results)
+  private List<Expr> joinedExpressionsOfTypeLong;// Contains long/Long expressions build from target
+  private List<Expr> allLongExpressions; // Contains all long/Long expressions (target and vars and results)
   private List<Expr> simpleClosuredExpressions; // Contains expressions of the form e.*f
   private List<Expr> doubleClosuredExpressions; // Contains expressions of the from e.*(f+g)
   private Map<Class<?>, Set<Expr>> joineableExpressionsByType; // Joineable expressions for each type
@@ -70,6 +72,7 @@ public class TargetInformation {
     relationsForEvaluation.put(ExprName.THIS_PRE, ExprBuilder.toExpr(ExprName.THIS_PRE, targetClass));
     allIntExpressions = new LinkedList<>();
     allDoubleExpressions = new LinkedList<>();
+    allLongExpressions = new LinkedList<>();
     scope = 3;
 
     buildBaseExpressions(cut, new HashSet<>());
@@ -104,6 +107,7 @@ public class TargetInformation {
     joinedExpressions = new LinkedList<>();
     joinedExpressionsOfTypeInt = new LinkedList<>();
     joinedExpressionsOfTypeDouble = new LinkedList<>();
+    joinedExpressionsOfTypeLong = new LinkedList<>();
     simpleClosuredExpressions = new LinkedList<>();
     doubleClosuredExpressions = new LinkedList<>();
     joineableExpressionsByType = new HashMap<>();
@@ -131,6 +135,10 @@ public class TargetInformation {
     }
     System.out.println("--> double expressions collected (used to build genes): " + allDoubleExpressions.size());
     for (Expr expr : allDoubleExpressions) {
+      System.out.println("  " + expr);
+    }
+    System.out.println("--> long expressions collected (used to build genes): " + allLongExpressions.size());
+    for (Expr expr : allLongExpressions) {
       System.out.println("  " + expr);
     }
   }
@@ -251,6 +259,9 @@ public class TargetInformation {
       } else if (vertex.equals(Double.class) || vertex.equals(double.class)) {
         joinedExpressionsOfTypeDouble.add(currExpr);
         allDoubleExpressions.add(currExpr);
+      } else if (vertex.equals(Long.class) || vertex.equals(long.class)) {
+        joinedExpressionsOfTypeLong.add(currExpr);
+        allLongExpressions.add(currExpr);
       }
     }
     if (k > 0) {
@@ -420,6 +431,13 @@ public class TargetInformation {
    */
   public List<Expr> getDoubleEvaluableExpressions() {
     return allDoubleExpressions;
+  }
+
+  /**
+   * Get long evaluable expressions
+   */
+  public List<Expr> getLongEvaluableExpressions() {
+    return allLongExpressions;
   }
 
   /**
@@ -657,6 +675,17 @@ public class TargetInformation {
   }
 
   /**
+   * Returns some possible expression of type long
+   */
+  public Expr getRandomLongExpr() {
+    Random random = new Random();
+    if (allLongExpressions.isEmpty())
+      return ExprBuilder.ZERO;
+    int randomNumber = random.nextInt(allLongExpressions.size());
+    return (Expr) allLongExpressions.toArray()[randomNumber];
+  }
+
+  /**
    * Returns a non-null return type for the given type.
    */
   public Class<?> getReturnType(ExprContext expr) {
@@ -690,6 +719,8 @@ public class TargetInformation {
         allIntExpressions.add(ExprBuilder.toExpr(varName, type));
       } else if (type.equals(Double.class) || type.equals(double.class)) {
         allDoubleExpressions.add(ExprBuilder.toExpr(varName, type));
+      } else if (type.equals(Long.class) || type.equals(long.class)) {
+        allLongExpressions.add(ExprBuilder.toExpr(varName, type));
       }
     }
   }

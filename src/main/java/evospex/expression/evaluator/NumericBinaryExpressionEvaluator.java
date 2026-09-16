@@ -34,15 +34,11 @@ public class NumericBinaryExpressionEvaluator {
       throw new NonEvaluableExpressionException("Non-numeric operand");
     Number n1 = widen((Number) o1);
     Number n2 = widen((Number) o2);
-    // An expression can combine two independently-sampled examples of a heterogeneously-typed
-    // Object parameter (e.g. push(Object), fed Integer/Long/Float/Double/... across different
-    // recorded calls) - their boxed types don't always match. Rather than crash with a
-    // ClassCastException from blindly casting n2 to n1's type below, defer to the same
-    // "this example doesn't support this candidate expression" mechanism already used for
-    // division-by-zero (NonEvaluableExpressionException, caught by the GA's fitness evaluator).
-    if (n1.getClass() != n2.getClass())
-      throw new NonEvaluableExpressionException("Mismatched numeric types: "
-          + n1.getClass().getSimpleName() + " vs " + n2.getClass().getSimpleName());
+    if (n1.getClass() != n2.getClass()) {
+      Number[] promoted = promote(n1, n2);
+      n1 = promoted[0];
+      n2 = promoted[1];
+    }
     switch (op) {
     case ExprOperator.PLUS:
       return evalPlus(n1, n2);
@@ -162,6 +158,33 @@ public class NumericBinaryExpressionEvaluator {
     if (n instanceof Byte || n instanceof Short)
       return n.intValue();
     return n;
+  }
+
+  /**
+   * Applies Java's binary numeric promotion (JLS 5.6.2, double &gt; float &gt; long &gt; int) to
+   * a pair of already-unary-widened (see widen() above) operands whose boxed types differ,
+   * rather than rejecting the pair outright. This matters because the DSL grammar has no
+   * long/float-literal syntax (a bare "1" always evaluates as an Integer - see
+   * ExpressionEvaluator's literal fallback and ExprBuilder.ONE/ONE_DOUBLE's own comment), so
+   * e.g. a Long-typed candidate expression combined with the literal "1" in an ADD_ONE/SUB_ONE
+   * mutation legitimately needs Integer promoted up to Long here, not rejected as a genuine
+   * type mismatch. An expression can also combine two independently-sampled examples of a
+   * heterogeneously-typed Object parameter (e.g. push(Object), fed Integer/Long/Float/Double/...
+   * across different recorded calls) - promotion handles that case correctly too, since any pair
+   * of actual Number values has a well-defined common numeric type.
+   */
+  static Number[] promote(Number n1, Number n2) {
+    if (n1 instanceof Double || n2 instanceof Double)
+      return new Number[] { n1.doubleValue(), n2.doubleValue() };
+    if (n1 instanceof Float || n2 instanceof Float)
+      return new Number[] { n1.floatValue(), n2.floatValue() };
+    if (n1 instanceof Long || n2 instanceof Long)
+      return new Number[] { n1.longValue(), n2.longValue() };
+    // Both operands are already Integer at this point (widen() reduces Byte/Short to Integer,
+    // and Integer/Long/Float/Double are the only boxed types eval*() below handles), so this is
+    // unreachable in practice - kept as a defensive fallback rather than an assumption.
+    throw new NonEvaluableExpressionException("Mismatched numeric types: "
+        + n1.getClass().getSimpleName() + " vs " + n2.getClass().getSimpleName());
   }
 
 }

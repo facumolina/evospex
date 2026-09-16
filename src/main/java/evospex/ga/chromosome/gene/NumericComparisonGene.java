@@ -23,9 +23,32 @@ import java.util.List;
 public class NumericComparisonGene extends ExprGene {
 
   // Which random-expression pool ADD_EXPR/SUB_EXPR/REPLACE_RIGHT should draw from when
-  // mutating this gene (Integer.class or Double.class) - can't be recovered from the gene's
-  // expression text alone (see mutate() below), so it's tracked explicitly per-gene.
+  // mutating this gene (Integer.class, Double.class or Long.class) - can't be recovered from
+  // the gene's expression text alone (see mutate() below), so it's tracked explicitly per-gene.
   private final Class<?> operandType;
+
+  /**
+   * The literal "1" to use in ADD_ONE/SUB_ONE mutations, for this gene's operand type. Only
+   * Double needs a distinct literal (ExprBuilder.ONE_DOUBLE) - the DSL grammar has no
+   * long-literal syntax, so a Long-typed comparison uses the same bare "1" as Integer
+   * (ExprBuilder.ONE) and relies on NumericBinaryExpressionEvaluator's numeric promotion to
+   * widen it to Long alongside a Long-typed sibling operand (see that class's promote()).
+   */
+  private Expr oneForOperandType() {
+    return operandType.equals(Double.class) ? ExprBuilder.ONE_DOUBLE : ExprBuilder.ONE;
+  }
+
+  /**
+   * A random expression from this gene's own operand-type pool, for ADD_EXPR/SUB_EXPR/
+   * REPLACE_RIGHT mutations.
+   */
+  private Expr randomExprForOperandType() {
+    if (operandType.equals(Double.class))
+      return targetInfo.getRandomDoubleExpr();
+    if (operandType.equals(Long.class))
+      return targetInfo.getRandomLongExpr();
+    return targetInfo.getRandomIntExpr();
+  }
 
   public NumericComparisonGene(Configuration a_conf, ExprGeneValue value, TargetInformation info) throws InvalidConfigurationException {
     this(a_conf, value, info, Integer.class);
@@ -55,7 +78,7 @@ public class NumericComparisonGene extends ExprGene {
         return this;
       case ExprGeneMutations.ADD_ONE: {
         // Add one at the right expression
-        Expr one = operandType.equals(Double.class) ? ExprBuilder.ONE_DOUBLE : ExprBuilder.ONE;
+        Expr one = oneForOperandType();
         newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
                 + ExprOperator.PLUS + " " + one, Boolean.class);
         value.setExpression(newExpr, false);
@@ -63,7 +86,7 @@ public class NumericComparisonGene extends ExprGene {
       }
       case ExprGeneMutations.SUB_ONE: {
         // Subtract one at the right expression
-        Expr one = operandType.equals(Double.class) ? ExprBuilder.ONE_DOUBLE : ExprBuilder.ONE;
+        Expr one = oneForOperandType();
         newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
                 + ExprOperator.MINUS + " " + one, Boolean.class);
         value.setExpression(newExpr, false);
@@ -71,7 +94,7 @@ public class NumericComparisonGene extends ExprGene {
       }
       case ExprGeneMutations.ADD_EXPR: {
         // Add a random expression (of this gene's own operand type) to the right expression
-        Expr exprToAdd = operandType.equals(Double.class) ? targetInfo.getRandomDoubleExpr() : targetInfo.getRandomIntExpr();
+        Expr exprToAdd = randomExprForOperandType();
         newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
                 + ExprOperator.PLUS + " " + exprToAdd.exprCtx().getText(), Boolean.class);
         value.setExpression(newExpr, false);
@@ -79,7 +102,7 @@ public class NumericComparisonGene extends ExprGene {
       }
       case ExprGeneMutations.SUB_EXPR: {
         // Subtract a random expression (of this gene's own operand type) to the right expression
-        Expr exprToSub = operandType.equals(Double.class) ? targetInfo.getRandomDoubleExpr() : targetInfo.getRandomIntExpr();
+        Expr exprToSub = randomExprForOperandType();
         newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + right.getText() + " "
                 + ExprOperator.MINUS + " " + exprToSub.exprCtx().getText(), Boolean.class);
         value.setExpression(newExpr, false);
@@ -87,7 +110,7 @@ public class NumericComparisonGene extends ExprGene {
       }
       case ExprGeneMutations.REPLACE_RIGHT: {
         // Replace the right expression
-        Expr replacementExpr = operandType.equals(Double.class) ? targetInfo.getRandomDoubleExpr() : targetInfo.getRandomIntExpr();
+        Expr replacementExpr = randomExprForOperandType();
         newExpr = ExprBuilder.toExpr(left.getText() + " " + op + " " + replacementExpr.exprCtx().getText(), Boolean.class);
         value.setExpression(newExpr, false);
         return this;

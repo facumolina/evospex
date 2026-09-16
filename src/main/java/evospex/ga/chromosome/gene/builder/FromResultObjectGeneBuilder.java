@@ -51,15 +51,18 @@ public class FromResultObjectGeneBuilder extends GeneBuilder {
       // (allIntExpressions, read via getIntEvaluableExpressions()) - not into joinedExpressions
       // (field-chain expressions, read via getEvaluableExpressionsOfType()), which is empty for
       // a target class with no fields (e.g. a static-method-only utility class). Query the pool
-      // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer/Double
-      // handling (Double-typed results land in allDoubleExpressions the same way).
+      // 'result' actually landed in, matching FromArgumentsGeneBuilder's own Integer/Double/Long
+      // handling (Double/Long-typed results land in allDoubleExpressions/allLongExpressions the
+      // same way).
       targetInfo.addVariableForType(resultExample.getClass(), ExprName.RESULT);
       // operandType is passed through to NumericComparisonGene so its ADD_EXPR/SUB_EXPR/etc.
       // mutations later draw from the matching pool (see NumericComparisonGene.operandType).
       Class<?> operandType = (resultExample instanceof Integer) ? Integer.class
-          : (resultExample instanceof Double) ? Double.class : resultExample.getClass();
+          : (resultExample instanceof Double) ? Double.class
+          : (resultExample instanceof Long) ? Long.class : resultExample.getClass();
       List<Expr> exprsOfType = (resultExample instanceof Integer) ? targetInfo.getIntEvaluableExpressions()
           : (resultExample instanceof Double) ? targetInfo.getDoubleEvaluableExpressions()
+          : (resultExample instanceof Long) ? targetInfo.getLongEvaluableExpressions()
           : targetInfo.getEvaluableExpressionsOfType(resultExample.getClass());
       for (Expr expr : exprsOfType) {
         Expr geneExpr = ExprBuilder.eq(resultExpr, expr);

@@ -47,49 +47,51 @@ public class ComparisonExpressionEvaluator {
         return !set_o2_not_in.containsAll((java.util.Collection)o1);
       else
         return !set_o2_not_in.contains(o1);
-    case ExprOperator.LT:
+    case ExprOperator.LT: {
       requireBothNumbers(o1, o2);
-      Number n1_lt = NumericBinaryExpressionEvaluator.widen((Number) o1);
-      Number n2_lt = NumericBinaryExpressionEvaluator.widen((Number) o2);
-      return evalLT(n1_lt, n2_lt);
-    case ExprOperator.GT:
+      Number[] p = promote(NumericBinaryExpressionEvaluator.widen((Number) o1),
+          NumericBinaryExpressionEvaluator.widen((Number) o2));
+      return evalLT(p[0], p[1]);
+    }
+    case ExprOperator.GT: {
       requireBothNumbers(o1, o2);
-      Number n1_gt = NumericBinaryExpressionEvaluator.widen((Number) o1);
-      Number n2_gt = NumericBinaryExpressionEvaluator.widen((Number) o2);
-      return evalGT(n1_gt, n2_gt);
-    case ExprOperator.LTE:
+      Number[] p = promote(NumericBinaryExpressionEvaluator.widen((Number) o1),
+          NumericBinaryExpressionEvaluator.widen((Number) o2));
+      return evalGT(p[0], p[1]);
+    }
+    case ExprOperator.LTE: {
       requireBothNumbers(o1, o2);
-      Number n1_lte = NumericBinaryExpressionEvaluator.widen((Number) o1);
-      Number n2_lte = NumericBinaryExpressionEvaluator.widen((Number) o2);
-      return evalLTE(n1_lte, n2_lte);
-    case ExprOperator.GTE:
+      Number[] p = promote(NumericBinaryExpressionEvaluator.widen((Number) o1),
+          NumericBinaryExpressionEvaluator.widen((Number) o2));
+      return evalLTE(p[0], p[1]);
+    }
+    case ExprOperator.GTE: {
       requireBothNumbers(o1, o2);
-      Number n1_gte = NumericBinaryExpressionEvaluator.widen((Number) o1);
-      Number n2_gte = NumericBinaryExpressionEvaluator.widen((Number) o2);
-      return evalGTE(n1_gte, n2_gte);
+      Number[] p = promote(NumericBinaryExpressionEvaluator.widen((Number) o1),
+          NumericBinaryExpressionEvaluator.widen((Number) o2));
+      return evalGTE(p[0], p[1]);
+    }
     }
     return false;
   }
 
   /**
-   * Guards against comparing two independently-sampled examples of a heterogeneously-typed
-   * Object parameter (e.g. push(Object), fed Integer/Long/Float/Double/... across different
-   * recorded calls) whose boxed types don't match - defers to the same "this example doesn't
-   * support this candidate expression" mechanism already used for division-by-zero
-   * (NonEvaluableExpressionException, caught by the GA's fitness evaluator), rather than
-   * crashing with a ClassCastException from blindly casting n2 to n1's type below.
+   * Promotes a pair of already-unary-widened operands to a common numeric type (JLS 5.6.2)
+   * when their boxed types differ - e.g. an Integer-typed candidate compared against a
+   * Long-typed one - rather than rejecting the pair outright. Delegates to
+   * NumericBinaryExpressionEvaluator.promote, which throws NonEvaluableExpressionException
+   * (caught by the GA's fitness evaluator) only if no common numeric type exists, which
+   * shouldn't happen for any pair of actual Number values.
    */
-  private static void requireSameNumericType(Number n1, Number n2) {
-    if (n1.getClass() != n2.getClass())
-      throw new NonEvaluableExpressionException("Mismatched numeric types: "
-          + n1.getClass().getSimpleName() + " vs " + n2.getClass().getSimpleName());
+  private static Number[] promote(Number n1, Number n2) {
+    return n1.getClass() == n2.getClass() ? new Number[] { n1, n2 }
+        : NumericBinaryExpressionEvaluator.promote(n1, n2);
   }
 
   /**
    * Evaluate LT operator
    */
   private static boolean evalLT(Number n1, Number n2) {
-    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 < (Integer) n2;
     if (n1 instanceof Long)
@@ -106,7 +108,6 @@ public class ComparisonExpressionEvaluator {
    * Evaluate GT operator
    */
   private static boolean evalGT(Number n1, Number n2) {
-    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 > (Integer) n2;
     if (n1 instanceof Long)
@@ -123,7 +124,6 @@ public class ComparisonExpressionEvaluator {
    * Evaluate LTE operator
    */
   private static boolean evalLTE(Number n1, Number n2) {
-    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 <= (Integer) n2;
     if (n1 instanceof Long)
@@ -140,7 +140,6 @@ public class ComparisonExpressionEvaluator {
    * Evaluate GTE operator
    */
   private static boolean evalGTE(Number n1, Number n2) {
-    requireSameNumericType(n1, n2);
     if (n1 instanceof Integer)
       return (Integer) n1 >= (Integer) n2;
     if (n1 instanceof Long)
